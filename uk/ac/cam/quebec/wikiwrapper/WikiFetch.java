@@ -29,7 +29,7 @@ public class WikiFetch {
 	 *            an extra query for edits to be made.
 	 * @return List of fetched articles ordered in the order that WIkipedia
 	 *         gives them. Can be empty.
-	 * @throws WikiException
+	 * @throws WikiException Throws exception if connection fails.
 	 */
 
 	public static List<WikiArticle> search(String searchTerm, int max, int edits)

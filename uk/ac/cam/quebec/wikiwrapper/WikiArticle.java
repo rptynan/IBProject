@@ -31,6 +31,7 @@ public abstract class WikiArticle {
 	 * @param title
 	 *            The correct title for the article
 	 * @throws WikiException
+	 *             Throws exception if connection fails
 	 */
 	public WikiArticle(String title) throws WikiException {
 		// TODO
@@ -42,6 +43,7 @@ public abstract class WikiArticle {
 	 * it may not be that useful and perhaps better to rely on search.
 	 * 
 	 * @throws WikiException
+	 *             Throws exception if connection fails
 	 * @return The number of views of the page in the past 30 days.
 	 */
 	public abstract int getViews() throws WikiException;
@@ -54,16 +56,18 @@ public abstract class WikiArticle {
 	public abstract String getURL();
 
 	/**
-	 * Method to get the edits list. If the editCount is <= the current length
-	 * of the edit list then there is no call to Wikipeda and the cached list is
-	 * returned. However if it is > then the entire edit list will be rebuilt
-	 * (costly).
+	 * Method to get the edits list. If the editCount is less than or equal to
+	 * the current length of the edit list then there is no call to Wikipeda and
+	 * the cached list is returned. However if it is greater than then the
+	 * entire edit list will be rebuilt (costly).
 	 * 
 	 * @param editCount
 	 *            Number of edits wanted
 	 * @return List of the edits
 	 * @throws WikiException
+	 *             Throws exception if connection fails
 	 */
+
 	public abstract List<WikiEdit> getEdits(int editCount) throws WikiException;
 
 	/**

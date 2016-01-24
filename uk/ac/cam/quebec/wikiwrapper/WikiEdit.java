@@ -31,7 +31,7 @@ public abstract class WikiEdit {
 	 *            String from Wikipedia representing time
 	 * @param article
 	 *            The associated article
-	 * @throws WikiException
+	 * @throws WikiException Throws exception if connection fails
 	 */
 	public WikiEdit(String id, String comment, String wikiTime,
 			WikiArticle article) throws WikiException {
@@ -43,7 +43,7 @@ public abstract class WikiEdit {
 	 * the diff can be discussed - I can remove wiki text and some of the HTML
 	 * but not quite sure what the final format will be.
 	 * 
-	 * @throws WikiException
+	 * @throws WikiException Throws exception if connection fails
 	 * @return The content of the diff of this edit with the previous one.
 	 */
 	public abstract String getDiff() throws WikiException;
@@ -54,7 +54,7 @@ public abstract class WikiEdit {
 	 * (costly), afterwards it will just give the cached value. Will either be
 	 * in html format or if you want will have further parsing done to it.
 	 * 
-	 * @throws WikiException
+	 * @throws WikiException Throws exception if connection fails
 	 * @return The content of the article after this edit.
 	 */
 	public abstract String getContent() throws WikiException;
