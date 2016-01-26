@@ -1,8 +1,15 @@
 package uk.ac.cam.quebec.trends;
 
-import java.lang.String;
-
-public interface Trends {
+/**
+ * Class which fetches and schedules trends to be processsed.
+ * This class provides a thread-safe way for other classes to queue a trend to
+ * be run. It also is responsible for updating the queue with fresh trends from
+ * the TwitterWrapper.
+ *
+ * @author Richard
+ *
+ */
+public interface TrendsQueue {
 
     /**
      * Puts a custom trend on the processing queue.
