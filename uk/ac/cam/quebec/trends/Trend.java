@@ -2,10 +2,20 @@ package uk.ac.cam.quebec.trends;
 
 import java.lang.String;
 
+/**
+ * Class to represent a single "trend".
+ * This is not necessarily a trend from twitter, but a single concept or phrase
+ * that we want to process.
+ *
+ * @author Richard
+ *
+ */
 public abstract class Trend {
 
     private String name;
+    private String location;
     private int priority;
+    private int processCount;
 
     /**
      * Create a Trend object.
@@ -19,9 +29,20 @@ public abstract class Trend {
      *                  Twitter/Wikipedia Processing should half the priority
      *                  of the trend which causes this one to be created.
      */
-    public Trend(String name, int priority) {
+    public Trend(String name, String location, int priority) {
         this.name = name;
+        this.location = location;
         this.priority = priority;
+        processCount = 0;
     }
+
+    /**
+     * Increment the amount of times this trend has been processed.
+     *
+     * <p>Used to keep track of how many times we've process this trend, the
+     * Wikipedia Processing module should call this *once* after it is finished
+     * and about to store this class (or its subclass).
+     */
+    public abstract void incrementProcessCount();
 
 }
