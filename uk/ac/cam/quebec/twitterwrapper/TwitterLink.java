@@ -1,5 +1,6 @@
 package uk.ac.cam.quebec.twitterwrapper;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,7 +38,7 @@ public abstract class TwitterLink {
 	 * Map to lookup the woeids for the location strings. Is initialised in
 	 * login the shouldn't be changed.
 	 */
-	private static Map<String, Long> locationLookup;
+	private static Map<String, Integer> locationLookup;
 	/**
 	 * Underlying JTwitter twitter object.
 	 */
@@ -56,7 +57,7 @@ public abstract class TwitterLink {
 
 	/**
 	 * Call one to perform login and then build multiple TwitterLink objects
-	 * from the single login
+	 * from the single login. It also initialises the location map.
 	 * 
 	 * @param AccessToken
 	 *            Token for application
@@ -74,6 +75,13 @@ public abstract class TwitterLink {
 	public static void login(String AccessToken, String AccessTokenSecret,
 			String OAuthKey, String OAuthSecret, String username)
 			throws TwitterException {
+		locationLookup = new HashMap<String,Integer>(6);
+		locationLookup.put("World",1);
+		locationLookup.put("UK",23424975);
+		locationLookup.put("USA",23424977);
+		locationLookup.put("Australia",	23424748);
+		locationLookup.put("Ireland", 23424803);
+		locationLookup.put("India", 23424848);
 	}
 
 	/**
