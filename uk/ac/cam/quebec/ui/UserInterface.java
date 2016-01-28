@@ -1,8 +1,7 @@
-package uk.ac.cam.quebec.trends;
+package uk.ac.cam.quebec.ui;
 
-import com.xyz;
 
-public class Trends {
+public class UserInterface {
 
     /**
      * Validates a chess move.
@@ -18,6 +17,7 @@ public class Trends {
      */
     boolean isValidMove(int theFromFile, int theFromRank, int theToFile, int theToRank) {
         // ...body
+        return false;
     }
 
     /**
