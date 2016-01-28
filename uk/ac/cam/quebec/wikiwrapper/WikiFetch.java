@@ -1,5 +1,6 @@
 package uk.ac.cam.quebec.wikiwrapper;
 
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -34,7 +35,9 @@ public class WikiFetch {
 
 	public static List<WikiArticle> search(String searchTerm, int max, int edits)
 			throws WikiException {
-		return null;
+	    List<WikiArticle> ret = new LinkedList<WikiArticle>();
+		ret.add(new WikiArticle("Lawrence Paulson"));
+		return ret;
 	}
 
 }
