@@ -10,7 +10,7 @@ import java.lang.String;
  * @author Richard
  *
  */
-public abstract class Trend {
+public class Trend {
 
     private String name;
     private String location;
@@ -43,6 +43,8 @@ public abstract class Trend {
      * Wikipedia Processing module should call this *once* after it is finished
      * and about to store this class (or its subclass).
      */
-    public abstract void incrementProcessCount();
+    public void incrementProcessCount() {
+        processCount++;
+    }
 
 }

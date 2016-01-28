@@ -1,5 +1,6 @@
-package uk.ac.cam.quebec.trends;
+package uk.ac.cam.quebec.dbwrapper;
 
+import uk.ac.cam.quebec.trends.Trend;
 import uk.ac.cam.quebec.wikiwrapper.WikiArticle;
 
 import winterwell.jtwitter.Status;
@@ -67,7 +68,7 @@ public abstract class Database {
      * @param articles  a list of WikiArticles, to put in the database
      * @param trend     the trend to store these articles under
      */
-    public abstract void putWikiArticles(List<WikiArticles> articles, Trend trend);
+    public abstract void putWikiArticles(List<WikiArticle> articles, Trend trend);
 
     /**
      * Gets a list of wikipedia articles with reference to the given Trend.

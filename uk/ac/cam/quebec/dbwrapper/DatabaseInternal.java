@@ -1,5 +1,6 @@
-package uk.ac.cam.quebec.trends;
+package uk.ac.cam.quebec.dbwrapper;
 
+import uk.ac.cam.quebec.trends.Trend;
 import uk.ac.cam.quebec.wikiwrapper.WikiArticle;
 
 import winterwell.jtwitter.Status;
@@ -18,7 +19,7 @@ import java.util.List;
  * @author Richard
  *
  */
-private class DatabaseInternal implements Database {
+class DatabaseInternal extends Database {
     private static final DatabaseInternal INSTANCE = new DatabaseInternal();
 
     public static Database getInstance() {
@@ -31,9 +32,9 @@ private class DatabaseInternal implements Database {
 
     public List<Trend> getTrends() {
         ArrayList<Trend> result = new ArrayList<Trend>(3);
-        result[0] = new Trend("POTUS with the mostest", "USA", 10);
-        result[1] = new Trend("Larry", "UK", 10);
-        result[2] = new Trend("Flat-Earth BOB", "World", 10);
+        result.add(0, new Trend("POTUS with the mostest", "USA", 10));
+        result.add(1, new Trend("Larry", "UK", 10));
+        result.add(2, new Trend("Flat-Earth BOB", "World", 10));
         return result;
     }
 
@@ -43,24 +44,24 @@ private class DatabaseInternal implements Database {
 
     public List<Status> getTweets(Trend trend) {
         ArrayList<Status> result = new ArrayList<Status>(3);
-        result[0] = new Status(new User("DTrump"),
-                "Blah Blash BLasdfhlsafhkdlsf", null, new Date());
-        result[1] = new Status(new User("DTrump"),
-                "Blah Bloh Bleh", null, new Date());
-        result[2] = new Status(new User("DTrump"),
-                "Blaaaaaaaaaaaaaaah", null, new Date());
+        result.add(0, new Status(new User("DTrump"),
+                "Blah Blash BLasdfhlsafhkdlsf", null, new Date()));
+        result.add(1, new Status(new User("DTrump"),
+                "Blah Bloh Bleh", null, new Date()));
+        result.add(2, new Status(new User("DTrump"),
+                "Blaaaaaaaaaaaaaaah", null, new Date()));
         return result;
     }
 
-    public void putWikiArticles(List<WikiArticles> articles, Trend trend) {
+    public void putWikiArticles(List<WikiArticle> articles, Trend trend) {
         return;
     }
 
     public List<WikiArticle> getWikiArticles(Trend trend) {
         ArrayList<WikiArticle> result = new ArrayList<WikiArticle>(3);
-        result[0] = new WikiArticle("Standard ML");
-        result[1] = new WikiArticle("The Salmon of Knowledge");
-        result[2] = new WikiArticle("The Trout of No-Craic");
+        result.add(0, new WikiArticle("Standard ML"));
+        result.add(1, new WikiArticle("The Salmon of Knowledge"));
+        result.add(2, new WikiArticle("The Trout of No-Craic"));
         return result;
     }
 
