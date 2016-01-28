@@ -33,7 +33,7 @@ public abstract class Database {
      * under this trend, although (hopefully) if you don't do this, the other
      * functions should cause this to be called..
      *
-     * @return a single Trend to put in the database
+     * @param trend     single Trend to put in the database
      */
     public abstract void putTrend(Trend trend);
 

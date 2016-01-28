@@ -24,6 +24,7 @@ public class Trend {
      * should be taken to preserve the priority.
      *
      * @param name      a string which represents the trend
+     * @param location  the string identifier for the location of the trend
      * @param priority  the priority of the trend, 0 being the highest. This
      *                  should be 0 for user requests and requests made by
      *                  Twitter/Wikipedia Processing should half the priority
