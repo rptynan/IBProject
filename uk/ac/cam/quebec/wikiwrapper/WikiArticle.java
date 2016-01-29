@@ -48,18 +48,17 @@ public class WikiArticle {
      *             Throws exception if connection fails
      * @return The number of views of the page in the past 30 days.
      */
-    public int getViews() throws WikiException{
+    public int getViews() throws WikiException {
         views = 69;
         return views;
     }
-  
 
     /**
      * Forms the URL of the page.
      * 
      * @return URL as a string
      */
-    public String getURL(){
+    public String getURL() {
         return "https://en.wikipedia.org/wiki/Lawrence_Paulson";
     }
 
@@ -76,7 +75,7 @@ public class WikiArticle {
      *             Throws exception if connection fails
      */
 
-    public  List<WikiEdit> getEdits(int editCount) throws WikiException{
+    public List<WikiEdit> getEdits(int editCount) throws WikiException {
         return edits;
     }
 
@@ -86,14 +85,14 @@ public class WikiArticle {
      * 
      * @return List of the edits.
      */
-    public List<WikiEdit> getCachedEdits(){
+    public List<WikiEdit> getCachedEdits() {
         return edits;
     }
 
     /**
      * Removes all cached edits
      */
-    public void clearCachedEdits(){
+    public void clearCachedEdits() {
         edits = new LinkedList<WikiEdit>();
     };
 
