@@ -10,7 +10,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import uk.ac.cam.quebec.core.test.TestDatabase;
 import uk.ac.cam.quebec.core.test.Worker;
-import uk.ac.cam.quebec.core.test.WorkerType;
+import uk.ac.cam.quebec.core.TaskType;
 import uk.ac.cam.quebec.dbwrapper.Database;
 import uk.ac.cam.quebec.trends.Trend;
 import uk.ac.cam.quebec.trends.TrendsQueue;
@@ -126,15 +126,18 @@ public class GroupProjectCore extends Thread implements TrendsQueue{
         Worker t = null;
         for(int i=0; i<ThreadPoolSize;i++)
         {
-            t = new Worker(WorkerType.Trend);
+            t = new Worker(TaskType.Trend);
             Threadpool.add(t);
             ThreadQueue.add(t);
-            t = new Worker(WorkerType.Tweet);
+            t = new Worker(TaskType.Tweet);
             Threadpool.add(t);
             ThreadQueue.add(t);
-            t = new Worker(WorkerType.Page);
+            t = new Worker(TaskType.Page);
             Threadpool.add(t);
             ThreadQueue.add(t);            
         }
+        t = new Worker(TaskType.Core);
+        Threadpool.add(t);
+        ThreadQueue.add(t);
     }
 }
