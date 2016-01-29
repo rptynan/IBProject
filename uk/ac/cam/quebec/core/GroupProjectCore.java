@@ -1,5 +1,5 @@
 
-package uk.ac.cam.qubec.core;
+package uk.ac.cam.quebec.core;
 
 import uk.ac.cam.quebec.userapi.APIServerAbstract;
 import java.util.ArrayList;
