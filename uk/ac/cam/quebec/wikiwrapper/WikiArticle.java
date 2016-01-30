@@ -1,7 +1,15 @@
 package uk.ac.cam.quebec.wikiwrapper;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+
+import winterwell.json.JSONArray;
+import winterwell.json.JSONObject;
 
 /**
  * Class to represent a single Wikipedia article
@@ -22,7 +30,7 @@ public class WikiArticle {
         return extract;
     }
 
-    private int views;
+    private int views = -1;
     private List<WikiEdit> edits = new LinkedList<WikiEdit>();
 
     /**
@@ -36,7 +44,21 @@ public class WikiArticle {
      */
     public WikiArticle(String title) throws WikiException {
         this.title = title;
-        extract = "Lawrence Charles Paulson (born 1955) is a professor at the University of Cambridge Computer Laboratory and a fellow of Clare College, Cambridge. \n\n\n== Education ==\nPaulson graduated from the California Institute of Technology in 1977, and obtained his PhD in Computer Science from Stanford University under the supervision of John L. Hennessy.\n\n\n== Research ==\nPaulson came to the University of Cambridge in 1983 and became a Fellow of Clare College, Cambridge in 1987. He is best known for the cornerstone text on the programming language ML, ML for the Working Programmer. His research is based around the interactive theorem prover Isabelle, which he introduced in 1986. He has worked on the verification of cryptographic protocols using inductive definitions, and he has also formalized the constructible universe of Kurt G\u00f6del. Recently he has built a new theorem prover, MetiTarski, for real-valued special functions.\n\n\n== Teaching ==\nPaulson teaches two undergraduate lecture courses on the Computer Science Tripos, entitled Foundations of Computer Science (which introduces functional programming) and Logic and Proof(which covers automated theorem proving and related methods).\n\n\n== Personal life ==\nPaulson has two children by his first wife, Dr Susan Mary Paulson, who died in 2010. He is now married to Dr Elena Tchougounova.\n\n\n== Awards and honours ==\nPaulson is a Fellow of the Association for Computing Machinery (2008).\n\n\n== References ==";
+        try {
+            title = title.replace(" ", "%20");
+            JSONObject json = WikiFetch
+                    .getJSONfromAddress("https://en.wikipedia.org/w/api.php?"
+                            + "action=query&prop=extracts&"
+                            + "format=json&explaintext=&titles=" + title);
+            json = json.getJSONObject("query").getJSONObject("pages");
+            JSONArray names = json.names();
+            extract = json.getJSONObject(names.getString(0)).getString(
+                    "extract");
+
+        } catch (IOException e) {
+            throw new WikiException("Connection to Wikipedia failed.");
+        }
+
     }
 
     /**
@@ -49,8 +71,26 @@ public class WikiArticle {
      * @return The number of views of the page in the past 30 days.
      */
     public int getViews() throws WikiException {
-        views = 69;
-        return views;
+        if (views >= 0)
+            return views;
+        else {
+            try {
+
+                JSONObject json = WikiFetch
+                        .getJSONfromAddress("http://stats.grok.se/json/en/latest30/"
+                                + title.replace(" ", "%20"));
+                json = json.getJSONObject("daily_views");
+                Iterator keys = json.keys();
+                views = 0;
+                while (keys.hasNext()) {
+                    views += json.getInt((String) keys.next());
+                }
+                return views;
+
+            } catch (IOException e) {
+                throw new WikiException("Connection to stats.grok.se failed.");
+            }
+        }
     }
 
     /**
@@ -59,7 +99,8 @@ public class WikiArticle {
      * @return URL as a string
      */
     public String getURL() {
-        return "https://en.wikipedia.org/wiki/Lawrence_Paulson";
+
+        return "https://en.wikipedia.org/wiki/" + title.replace(" ", "_");
     }
 
     /**
@@ -76,7 +117,44 @@ public class WikiArticle {
      */
 
     public List<WikiEdit> getEdits(int editCount) throws WikiException {
-        return edits;
+        if (editCount <= edits.size()) {
+            List<WikiEdit> ret = new LinkedList<WikiEdit>();
+            for (WikiEdit e : edits) {
+                if (editCount == 0)
+                    break;
+                ret.add(e);
+                editCount--;
+            }
+            return ret;
+        } else {
+            edits = new LinkedList<WikiEdit>();
+            try {
+                JSONObject json = WikiFetch
+                        .getJSONfromAddress("https://en.wikipedia.org/w/api.php?"
+                                + "action=query&prop=revisions&format=json&rvprop=ids%"
+                                + "7Ctimestamp%7Ccomment&"
+                                + "rvlimit="
+                                + editCount
+                                + "&titles="
+                                + title.replace(" ", "%20"));
+                json = json.getJSONObject("query").getJSONObject("pages");
+                JSONArray array = json.names();
+                array = json.getJSONObject(array.getString(0)).getJSONArray(
+                        "revisions");
+                int len = array.length();
+                for (int i = 0; i < len; i++) {
+                    json = array.getJSONObject(i);
+                    edits.add(new WikiEdit(json.getInt("revid"), json
+                            .getString("comment"), json.getString("timestamp"),
+                            this));
+                }
+                return edits;
+
+            } catch (IOException e) {
+                throw new WikiException("Connection to Wikipedia failed.");
+            }
+        }
+
     }
 
     /**

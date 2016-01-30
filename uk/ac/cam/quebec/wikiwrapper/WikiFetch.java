@@ -7,6 +7,7 @@ import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
 
+import winterwell.json.JSONArray;
 import winterwell.json.JSONObject;
 
 /**
@@ -28,7 +29,7 @@ public class WikiFetch {
      * testing reasons. Only the concern of the wikiwrapper.
      * 
      * @param address
-     *            Part of the address after the standard Wikipedia bit.
+     *            The web address.
      * @return The JSON object of the page.
      * @throws IOException
      *             If there are IO issues.
@@ -37,7 +38,7 @@ public class WikiFetch {
             throws IOException {
 
         BufferedReader r = new BufferedReader(new InputStreamReader(new URL(
-                "https://en.wikipedia.org/w/api.php?" + address).openStream()));
+                address).openStream()));
         String str = null;
         StringBuilder sb = new StringBuilder(32768);
         try {
@@ -71,8 +72,22 @@ public class WikiFetch {
     public static List<WikiArticle> search(String searchTerm, int max, int edits)
             throws WikiException {
         List<WikiArticle> ret = new LinkedList<WikiArticle>();
-        ret.add(new WikiArticle("Lawrence Paulson"));
-        return ret;
+        try {
+            JSONObject json = getJSONfromAddress("https://en.wikipedia.org/w/api.php?action=query&list=search&format=json&srsearch="
+                    + searchTerm.replace(" ", "%20") + "&srlimit=" + max);
+            JSONArray array = json.getJSONObject("query").getJSONArray("search");
+            int len = array.length();
+            WikiArticle wiki;
+            for(int i = 0; i < len; i++){
+                wiki = new WikiArticle(array.getJSONObject(i).getString("title"));
+                if(edits > 0) wiki.getEdits(edits);
+                ret.add(wiki);
+            }
+            return ret;
+        } catch (IOException e) {
+            throw new WikiException("Connection to Wikipedia failed.");
+        }
+
     }
 
 }
