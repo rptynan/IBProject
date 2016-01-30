@@ -1,7 +1,13 @@
 package uk.ac.cam.quebec.wikiwrapper;
 
+import info.bliki.wiki.model.WikiModel;
+
+import java.io.IOException;
 import java.time.Instant;
 import java.util.Date;
+
+import winterwell.json.JSONArray;
+import winterwell.json.JSONObject;
 
 /**
  * Class representing a single edit to a Wikipedia article. It is content heavy
@@ -13,8 +19,8 @@ import java.util.Date;
 public class WikiEdit {
 
     private String comment;
-    private String diff;
-    private String content;
+    private String diff = null;
+    private String content = null;
     private int id;
     private Date timeStamp;
     private WikiArticle article;
@@ -35,18 +41,18 @@ public class WikiEdit {
      *             Throws exception if connection fails
      */
     @SuppressWarnings("deprecation")
-    public WikiEdit(int id, String comment, String wikiTime,
-            WikiArticle article) throws WikiException {
+    public WikiEdit(int id, String comment, String wikiTime, WikiArticle article)
+            throws WikiException {
         this.id = id;
         this.comment = comment;
         this.article = article;
-        timeStamp = new Date(Integer.parseInt(wikiTime.substring(0, 4),10)-1900,
-                Integer.parseInt(wikiTime.substring(5, 7),10) - 1,
-                Integer.parseInt(wikiTime.substring(8, 10),10),
-                Integer.parseInt(wikiTime.substring(11, 13),10),
-                Integer.parseInt(wikiTime.substring(14, 16),10),
-                Integer.parseInt(wikiTime.substring(17, 19),10)
-                ); 
+        timeStamp = new Date(
+                Integer.parseInt(wikiTime.substring(0, 4), 10) - 1900,
+                Integer.parseInt(wikiTime.substring(5, 7), 10) - 1,
+                Integer.parseInt(wikiTime.substring(8, 10), 10),
+                Integer.parseInt(wikiTime.substring(11, 13), 10),
+                Integer.parseInt(wikiTime.substring(14, 16), 10),
+                Integer.parseInt(wikiTime.substring(17, 19), 10));
     }
 
     /**
@@ -60,7 +66,23 @@ public class WikiEdit {
      * @return The content of the diff of this edit with the previous one.
      */
     public String getDiff() throws WikiException {
-        return null;
+        if (diff == null) {
+            try {
+                JSONObject json = WikiFetch
+                        .getJSONfromAddress("https://en.wikipedia.org/w/"
+                                + "api.php?action=query&prop=revisions&format=json&"
+                                + "rvdiffto=prev&revids=" + id);
+                json = json.getJSONObject("query").getJSONObject("pages");
+                JSONArray array = json.names();
+                array = json.getJSONObject(array.getString(0)).getJSONArray(
+                        "revisions");
+                diff = WikiModel.toHtml(array.getJSONObject(0).getJSONObject("diff").getString("*"));
+                diff = diff.replace("href=\"/", "href=\"https://en.wikipedia.org/wiki/");
+            } catch (IOException e) {
+                throw new WikiException("Connection to Wikipedia failed.");
+            }
+        }
+        return diff;
     }
 
     /**
@@ -74,7 +96,23 @@ public class WikiEdit {
      * @return The content of the article after this edit.
      */
     public String getContent() throws WikiException {
-        return null;
+        if (content == null) {
+            try {
+                JSONObject json = WikiFetch
+                        .getJSONfromAddress("https://en.wikipedia.org/w/"
+                                + "api.php?action=query&prop=revisions&format=json&"
+                                + "rvprop=content&revids=" + id);
+                json = json.getJSONObject("query").getJSONObject("pages");
+                JSONArray array = json.names();
+                array = json.getJSONObject(array.getString(0)).getJSONArray(
+                        "revisions");
+                content = WikiModel.toHtml(array.getJSONObject(0).getString("*"));
+                content = content.replace("href=\"/", "href=\"https://en.wikipedia.org/wiki/");
+            } catch (IOException e) {
+                throw new WikiException("Connection to Wikipedia failed.");
+            }
+        }
+        return content;
     }
 
     public String getComment() {

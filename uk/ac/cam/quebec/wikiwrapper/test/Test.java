@@ -10,9 +10,10 @@ public class Test {
 
     public static void main(String[] args) throws IOException, WikiException {
         long time = System.nanoTime();
-        WikiFetch.search("Cambridge", 10, 3);
-        System.out.println(((double)(System.nanoTime() - time))/1000000000.0);
+        String s = WikiFetch.search("Donald Trump", 1, 1).get(0).getEdits(1).get(0).getDiff();
         
+        System.out.println(((double)(System.nanoTime() - time))/1000000000.0);
+        System.out.println(s);
 
     }
 
