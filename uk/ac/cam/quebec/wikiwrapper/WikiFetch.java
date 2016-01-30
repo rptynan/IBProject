@@ -1,7 +1,13 @@
 package uk.ac.cam.quebec.wikiwrapper;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
+
+import winterwell.json.JSONObject;
 
 /**
  * Class providing methods to get Wikipedia articles. Is uninstantiable.
@@ -15,6 +21,34 @@ public class WikiFetch {
      * Blocks construction.
      */
     private WikiFetch() {
+    }
+
+    /**
+     * Gets the parsed JSON of a WIki API call. Public not default only for
+     * testing reasons. Only the concern of the wikiwrapper.
+     * 
+     * @param address
+     *            Part of the address after the standard Wikipedia bit.
+     * @return The JSON object of the page.
+     * @throws IOException
+     *             If there are IO issues.
+     */
+    public static JSONObject getJSONfromAddress(String address)
+            throws IOException {
+
+        BufferedReader r = new BufferedReader(new InputStreamReader(new URL(
+                "https://en.wikipedia.org/w/api.php?" + address).openStream()));
+        String str = null;
+        StringBuilder sb = new StringBuilder(32768);
+        try {
+            while ((str = r.readLine()) != null) {
+                sb.append(str);
+            }
+        } finally {
+            r.close();
+        }
+        return new JSONObject(sb.toString());
+
     }
 
     /**
