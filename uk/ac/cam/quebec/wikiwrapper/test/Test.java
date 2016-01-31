@@ -1,19 +1,50 @@
 package uk.ac.cam.quebec.wikiwrapper.test;
 
-import java.io.IOException;
+import java.util.List;
 
 import uk.ac.cam.quebec.wikiwrapper.WikiArticle;
 import uk.ac.cam.quebec.wikiwrapper.WikiException;
 import uk.ac.cam.quebec.wikiwrapper.WikiFetch;
 
+/**
+ * Test cases for the WikiWrapper.
+ * 
+ * @author Stuart
+ * 
+ */
 public class Test {
 
-    public static void main(String[] args) throws IOException, WikiException {
+    /**
+     * @param args
+     *            None
+     * @throws WikiException
+     *             If error.
+     */
+    public static void main(String[] args) throws WikiException {
         long time = System.nanoTime();
-        String s = WikiFetch.search("Donald Trump", 1, 1).get(0).getEdits(1).get(0).getDiff();
-        
-        System.out.println(((double)(System.nanoTime() - time))/1000000000.0);
-        System.out.println(s);
+        List<WikiArticle> l = WikiFetch.search("Trengune", 3, 3);
+
+        double result = ((double) (System.nanoTime() - time)) / 1000000000.0;
+        System.out.println("Expect a list of artiles relating to Trengune:");
+        System.out.println(l);
+        System.out.println("\n\n\nExpect the extract for Trengune:");
+        System.out.println(l.get(0).getExtract());
+        System.out
+                .println("\n\n\nExpect a list of edit comments for Trengune:");
+        System.out.println(l.get(0).getEdits(3));
+        System.out
+                .println("\n\n\nExpect the timestamp of the last edit for Trengune:");
+        System.out.println(l.get(0).getEdits(3).get(0).getTimeStamp());
+        System.out
+                .println("\n\n\nExpect the content of the last edit for Trengune:");
+        System.out.println(l.get(0).getEdits(3).get(0).getContent());
+        System.out
+                .println("\n\n\nExpect the diff of the last edit for Trengune:");
+        System.out.println(l.get(0).getEdits(3).get(0).getDiff());
+
+        System.out
+                .println("\n\n\nExpect a time in seconds for the above to be gathered:");
+        System.out.println(result);
 
     }
 

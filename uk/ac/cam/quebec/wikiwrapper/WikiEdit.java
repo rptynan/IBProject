@@ -76,8 +76,10 @@ public class WikiEdit {
                 JSONArray array = json.names();
                 array = json.getJSONObject(array.getString(0)).getJSONArray(
                         "revisions");
-                diff = WikiModel.toHtml(array.getJSONObject(0).getJSONObject("diff").getString("*"));
-                diff = diff.replace("href=\"/", "href=\"https://en.wikipedia.org/wiki/");
+                diff = WikiModel.toHtml(array.getJSONObject(0)
+                        .getJSONObject("diff").getString("*"));
+                diff = diff.replace("href=\"/",
+                        "href=\"https://en.wikipedia.org/wiki/");
             } catch (IOException e) {
                 throw new WikiException("Connection to Wikipedia failed.");
             }
@@ -106,8 +108,10 @@ public class WikiEdit {
                 JSONArray array = json.names();
                 array = json.getJSONObject(array.getString(0)).getJSONArray(
                         "revisions");
-                content = WikiModel.toHtml(array.getJSONObject(0).getString("*"));
-                content = content.replace("href=\"/", "href=\"https://en.wikipedia.org/wiki/");
+                content = WikiModel.toHtml(array.getJSONObject(0)
+                        .getString("*"));
+                content = content.replace("href=\"/",
+                        "href=\"https://en.wikipedia.org/wiki/");
             } catch (IOException e) {
                 throw new WikiException("Connection to Wikipedia failed.");
             }
@@ -129,6 +133,11 @@ public class WikiEdit {
 
     public WikiArticle getArticle() {
         return article;
+    }
+
+    @Override
+    public String toString() {
+        return comment;
     }
 
 }

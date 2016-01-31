@@ -174,4 +174,9 @@ public class WikiArticle {
         edits = new LinkedList<WikiEdit>();
     };
 
+    @Override
+    public String toString() {
+        return title;
+    }
+
 }

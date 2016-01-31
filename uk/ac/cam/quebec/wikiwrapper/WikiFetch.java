@@ -73,14 +73,18 @@ public class WikiFetch {
             throws WikiException {
         List<WikiArticle> ret = new LinkedList<WikiArticle>();
         try {
-            JSONObject json = getJSONfromAddress("https://en.wikipedia.org/w/api.php?action=query&list=search&format=json&srsearch="
+            JSONObject json = getJSONfromAddress("https://en.wikipedia.org/w/api.php?"
+                    + "action=query&list=search&format=json&srsearch="
                     + searchTerm.replace(" ", "%20") + "&srlimit=" + max);
-            JSONArray array = json.getJSONObject("query").getJSONArray("search");
+            JSONArray array = json.getJSONObject("query")
+                    .getJSONArray("search");
             int len = array.length();
             WikiArticle wiki;
-            for(int i = 0; i < len; i++){
-                wiki = new WikiArticle(array.getJSONObject(i).getString("title"));
-                if(edits > 0) wiki.getEdits(edits);
+            for (int i = 0; i < len; i++) {
+                wiki = new WikiArticle(array.getJSONObject(i)
+                        .getString("title"));
+                if (edits > 0)
+                    wiki.getEdits(edits);
                 ret.add(wiki);
             }
             return ret;
