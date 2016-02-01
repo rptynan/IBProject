@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="google-api-services-kgsearch-v1-rev3-1.21.0">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/lib/kgsearch/google-api-services-kgsearch-v1-rev3-1.21.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
