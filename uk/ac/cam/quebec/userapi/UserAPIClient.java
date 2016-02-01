@@ -155,6 +155,10 @@ public class UserAPIClient extends Thread{
     }
     private static String getDateString()
     {
+        if(true)
+        {
+            return "Fri, 31 Dec 1999 23:59:59 GMT";
+        }
     Calendar cal = Calendar.getInstance();
     SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zS");
     return format.format(cal);

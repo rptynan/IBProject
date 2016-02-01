@@ -18,13 +18,16 @@ import java.net.Socket;
 public class StringChatInner extends Thread {
 
     private final Socket sock;
-
+    private final StringChat parent;
     /**
      *
      * @param socket the socket to read text from
+     * @param StringChat the client's parent
      */
-    public StringChatInner(Socket socket) {
+    public StringChatInner(Socket socket, StringChat _parent) {
+        
         sock = socket;
+        parent = _parent;
     }
 
     @Override
@@ -35,9 +38,8 @@ public class StringChatInner extends Thread {
             in = sock.getInputStream();
             data = new BufferedReader(new InputStreamReader(in));
             String s;
-            while (!(sock.isClosed()) && sock.isConnected()) {
-                s = data.readLine();
-                System.out.println(s);
+            while (!(sock.isClosed()) && sock.isConnected()&&((s = data.readLine())!=null)) {
+                parent.recievedMessage(s);//System.out.println(s);
             }
         } catch (IOException ex) {
             System.err.println(ex);

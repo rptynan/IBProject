@@ -12,12 +12,18 @@ import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.net.SocketException;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A very basic chat client
  * @author James
  */
-public class StringChat {
+public class StringChat extends Thread{
 
     public static void main(String[] args) {
         String server = null;
@@ -35,28 +41,48 @@ public class StringChat {
             System.out.println("This application requires two arguments: <machine> <port>");
             return;
         }
+        StringChat stuffs = new StringChat(server,port);
+        stuffs.run();
+    }
+    private final Socket sock;
+    private final BlockingQueue<String> inputMessages; //
+    private final List<String> sentMessages;
+    private final BlockingQueue<String> outputMessages; //= new ArrayBlockingQueue<>();
+    private final List<String> recievedMessages;
+    private StringChatInner output;
+    private boolean running;
+    public StringChat(String server, int port)
+    {
+        inputMessages = new ArrayBlockingQueue<>(20);
+        outputMessages = new ArrayBlockingQueue<>(20);
+        sentMessages = new ArrayList<>();
+        recievedMessages = new ArrayList<>();
         /*sock is declared final because we should not have to replace the socket object once the program is running, declaring it final prevents us accidentaly
          replacing it instead of modifying it. Unfortunately it also prevented me from splitting it into a null declaration and assignment.
          */
-        final Socket sock = getSocket(server, port);
+        sock = getSocket(server, port);
         if (sock==null)
         {
             return;
         }
+    }
+    @Override
+    public void run()
+    { running = true;
+    BufferedWriter out = null;
+    output = null;
+    BufferedReader r = null;
         try {
             
-
-            Thread output = null;
-            
-                //Two classes in one file, so I de-anonimised and extracted it
-                output = new StringChatInner(sock);
+            //Two classes in one file, so I de-anonimised and extracted it
+                output = new StringChatInner(sock,this);
                 output.setDaemon(true); //The JVM will kill the Daemon threads when the last non-Daemon thread dies. 
+                output.setName(this.getName()+" inner");
                 output.start();
-                BufferedWriter out = new BufferedWriter(new OutputStreamWriter(sock.getOutputStream()));
-                BufferedReader r = new BufferedReader(new InputStreamReader(System.in));
-                String s;
-                while ((s=r.readLine()).length()>0) {
-                    out.write(s);
+                out = new BufferedWriter(new OutputStreamWriter(sock.getOutputStream()));
+                r = new BufferedReader(new InputStreamReader(System.in));
+                while (running) {
+                    out.write(inputMessages.take());
                     out.flush();
                 }
                 out.close();
@@ -64,9 +90,11 @@ public class StringChat {
                 sock.close();
         } catch (IOException ex) {
             System.err.println(ex);
+        } catch (InterruptedException ex) {
+            Logger.getLogger(StringChat.class.getName()).log(Level.SEVERE, null, ex);
         }
         finally
-        {
+        {         
             if(!sock.isClosed())
             { 
                 try {
@@ -79,6 +107,25 @@ public class StringChat {
                 }
             }
         }
+    }
+    public void sendMessage(String message)
+    {   sentMessages.add(message);
+        inputMessages.add(message);
+    }
+    public void recievedMessage(String message)
+    {   if(message!=null)
+    {
+        recievedMessages.add(message);
+        outputMessages.add(message);
+    }
+     else
+    {
+        System.err.println("null recieved from server");
+    }
+    }
+    public BlockingQueue<String> getOutputMessages()
+    {
+        return outputMessages;
     }
     /**
      * Makes a Socket to the host with the port provided
