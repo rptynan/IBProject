@@ -6,7 +6,6 @@
       <sourceFolder url="file://$MODULE_DIR$" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/checkstyle" />
       <excludeFolder url="file://$MODULE_DIR$/lib/JTwitter" />
-      <excludeFolder url="file://$MODULE_DIR$/lib/bliki" />
       <excludeFolder url="file://$MODULE_DIR$/uk/ac/cam/quebec/common" />
       <excludeFolder url="file://$MODULE_DIR$/uk/ac/cam/quebec/core" />
       <excludeFolder url="file://$MODULE_DIR$/uk/ac/cam/quebec/dbwrapper" />
@@ -16,7 +15,6 @@
       <excludeFolder url="file://$MODULE_DIR$/uk/ac/cam/quebec/ui" />
       <excludeFolder url="file://$MODULE_DIR$/uk/ac/cam/quebec/userapi" />
       <excludeFolder url="file://$MODULE_DIR$/uk/ac/cam/quebec/wikiproc" />
-      <excludeFolder url="file://$MODULE_DIR$/uk/ac/cam/quebec/wikiwrapper" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
@@ -42,5 +40,6 @@
     <orderEntry type="library" name="json-simple (2)" level="project" />
     <orderEntry type="library" name="json-path-0.8.0" level="project" />
     <orderEntry type="library" name="commons-lang-2.6" level="project" />
+    <orderEntry type="library" name="bliki-core-3.0.19 (3)" level="project" />
   </component>
 </module>

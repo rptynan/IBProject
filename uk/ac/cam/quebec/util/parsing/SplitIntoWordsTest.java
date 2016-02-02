@@ -7,7 +7,7 @@ import org.junit.Test;
  *
  * @author tudor
  */
-public class SplitIntoWordsTest {
+class SplitIntoWordsTest {
 
     @Test
     public static void main(String[] args) {
