@@ -15,6 +15,7 @@ import javafx.util.Pair;
  * Given sentences as an array of words (Strings) will keep a word count and an n-gram count,
  * based on (n <= 10). By default n is 2, and that will be used if incorrect n is given
  *
+ * Should be thread safe.
  *
  * @author tudor
  */
@@ -96,7 +97,7 @@ public class WordCounter {
      * Add a sentence, make sure we do not change the given array
      * @param words to be added
      */
-    public void addSentence(List<String> words) {
+    public synchronized void addSentence(List<String> words) {
         if (words == null) return;
         // Increment single word count
         updatedWordCount = true;
@@ -159,7 +160,7 @@ public class WordCounter {
      * Get all the words encountered with the most common at the top
      * @return array of pairs<string, integer> ordered in decreasing order by value
      */
-    public Pair<String, Integer>[] getOrderedWordsAndCount() {
+    public synchronized Pair<String, Integer>[] getOrderedWordsAndCount() {
         if (!updatedWordCount) {
             return wordsAndCount;
         }
@@ -177,7 +178,7 @@ public class WordCounter {
      * @return array of pairs<list<string>, integer> ordered in decreasing order by value
      *         where each list has size n, if n is within the range 2 and getNValue, otherwise null
      */
-    public Pair<List<String>, Integer>[] getOrderedNGramsAndCount(int n) {
+    public synchronized Pair<List<String>, Integer>[] getOrderedNGramsAndCount(int n) {
         if (n < 2 || n > this.n) {
             return null;
         }
