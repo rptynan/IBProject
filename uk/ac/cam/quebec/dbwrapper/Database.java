@@ -23,7 +23,7 @@ public abstract class Database {
      *          be used for calls
      */
     public static Database getInstance() {
-        return DatabaseInternal.getInstance();
+        return DatabaseInternalDummy.getInstance();
     }
 
     /**
