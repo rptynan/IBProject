@@ -17,6 +17,11 @@ public class Trend {
     private int priority;
     private int processCount;
 
+    public String getName() { return name; }
+    public String getLocation() { return location; }
+    public int getPriority() { return priority; }
+    public int getProcessCount() { return processCount; }
+
     /**
      * Create a Trend object.
      *
