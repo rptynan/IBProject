@@ -13,15 +13,10 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-import java.io.FileInputStream;
-import java.util.Properties;
-
 /** Example of Java client calling Knowledge Graph Search API */
 public class ExampleSearch {
-    public static Properties properties = new Properties();
     public static void main(String[] args) {
         try {
-            //properties.load(new FileInputStream("kgsearch.properties"));
 
             HttpTransport httpTransport = new NetHttpTransport();
             HttpRequestFactory requestFactory = httpTransport.createRequestFactory();
@@ -30,7 +25,7 @@ public class ExampleSearch {
             url.put("query", "Taylor Swift");
             url.put("limit", "10");
             url.put("indent", "true");
-            url.put("key", "AIzaSyBEAaUAzNW4eVxhg--sD5IndQP3ZoCX2go");
+            url.put("key", APIConstants.API_KEY);
             HttpRequest request = requestFactory.buildGetRequest(url);
             HttpResponse httpResponse = request.execute();
             JSONObject response = (JSONObject) parser.parse(httpResponse.parseAsString());
