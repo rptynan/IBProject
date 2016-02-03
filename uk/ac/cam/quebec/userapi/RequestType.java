@@ -13,6 +13,7 @@ import java.util.regex.Pattern;
 
 /**
  * Class that handles the parsing of the Request
+ *
  * @author James
  */
 public enum RequestType {
@@ -22,29 +23,35 @@ public enum RequestType {
     InvalidRequest("inv", "(.)*");
     private final Pattern requestPattern;
     private final String requestOption;
+
     private RequestType(String option, String pattern) {
         requestOption = option;
         requestPattern = Pattern.compile(option + "\\?" + pattern);
     }
-/**
- * The returns the pattern that should be used to parse the request
- * @return the associated pattern
- */
+
+    /**
+     * The returns the pattern that should be used to parse the request
+     *
+     * @return the associated pattern
+     */
     public Pattern getPattern() {
         return requestPattern;
     }
-/**
- * This returns the name selector of the option
- * @return The associated selector
- */
+
+    /**
+     * This returns the name selector of the option
+     *
+     * @return The associated selector
+     */
     public String getOption() {
         return requestOption;
     }
-/**
- * The static pattern that should be used to parse a generic request
- */
+    /**
+     * The static pattern that should be used to parse a generic request
+     */
     public static final Pattern parsePattern = Pattern.compile("([^\\?]+)?(.*)");
     private static final Map<String, RequestType> lookupMap = new HashMap<>();
+
     /**
      * Builds the contests of the lookup map at compile time
      */
@@ -53,8 +60,10 @@ public enum RequestType {
             lookupMap.put(t.getOption(), t);
         }
     }
+
     /**
-     * This gets the Type of the request  
+     * This gets the Type of the request
+     *
      * @param message The message to get the type of
      * @return the type of the request
      */
@@ -70,13 +79,14 @@ public enum RequestType {
         }
         return DefaultRequest;
     }
+
     /**
-     * This returns an unmodifiable copy of the lookup map, should only be used 
-     * for debugging 
+     * This returns an unmodifiable copy of the lookup map, should only be used
+     * for debugging
+     *
      * @return An unmodifiable view of the lookupMap
      */
-    public static final Map<String,RequestType> getLookupMap()
-    {
+    public static final Map<String, RequestType> getLookupMap() {
         return Collections.unmodifiableMap(lookupMap);
     }
 
