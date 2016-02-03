@@ -13,7 +13,7 @@ public class TwitException extends Exception {
     private static final long serialVersionUID = 1L;
 
     /**
-     * Constructor to force the supplying of a meesage.
+     * Constructor to force the supplying of a message.
      * 
      * @param message
      *            Details of the exception.

@@ -6,7 +6,8 @@ import `checkstyle/google_checks.xml` into your own style-checker.
 
 ## Libraries
 JTwitter is in the lib file. The link to its Javadoc is
-http://www.winterwell.com/software/jtwitter/javadoc/ .
+http://www.winterwell.com/software/jtwitter/javadoc/ . Bliki is used for parsing
+Wiki-text and can be found at https://code.google.com/archive/p/gwtwiki/source .  
 
 ## Generating Docs
 ```javadoc -d docs -classpath lib/JTwitter/jtwitter.jar -sourcepath

@@ -1,7 +1,14 @@
 package uk.ac.cam.quebec.wikiwrapper;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.net.URL;
 import java.util.LinkedList;
 import java.util.List;
+
+import winterwell.json.JSONArray;
+import winterwell.json.JSONObject;
 
 /**
  * Class providing methods to get Wikipedia articles. Is uninstantiable.
@@ -15,6 +22,34 @@ public class WikiFetch {
      * Blocks construction.
      */
     private WikiFetch() {
+    }
+
+    /**
+     * Gets the parsed JSON of a WIki API call. Public not default only for
+     * testing reasons. Only the concern of the wikiwrapper.
+     * 
+     * @param address
+     *            The web address.
+     * @return The JSON object of the page.
+     * @throws IOException
+     *             If there are IO issues.
+     */
+    public static JSONObject getJSONfromAddress(String address)
+            throws IOException {
+
+        BufferedReader r = new BufferedReader(new InputStreamReader(new URL(
+                address).openStream()));
+        String str = null;
+        StringBuilder sb = new StringBuilder(32768);
+        try {
+            while ((str = r.readLine()) != null) {
+                sb.append(str);
+            }
+        } finally {
+            r.close();
+        }
+        return new JSONObject(sb.toString());
+
     }
 
     /**
@@ -37,8 +72,26 @@ public class WikiFetch {
     public static List<WikiArticle> search(String searchTerm, int max, int edits)
             throws WikiException {
         List<WikiArticle> ret = new LinkedList<WikiArticle>();
-        ret.add(new WikiArticle("Lawrence Paulson"));
-        return ret;
+        try {
+            JSONObject json = getJSONfromAddress("https://en.wikipedia.org/w/api.php?"
+                    + "action=query&list=search&format=json&srsearch="
+                    + searchTerm.replace(" ", "%20") + "&srlimit=" + max);
+            JSONArray array = json.getJSONObject("query")
+                    .getJSONArray("search");
+            int len = array.length();
+            WikiArticle wiki;
+            for (int i = 0; i < len; i++) {
+                wiki = new WikiArticle(array.getJSONObject(i)
+                        .getString("title"));
+                if (edits > 0)
+                    wiki.getEdits(edits);
+                ret.add(wiki);
+            }
+            return ret;
+        } catch (IOException e) {
+            throw new WikiException("Connection to Wikipedia failed.");
+        }
+
     }
 
 }
