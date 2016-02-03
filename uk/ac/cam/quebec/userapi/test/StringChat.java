@@ -89,6 +89,14 @@ public class StringChat extends Thread{
             }
         }
     }
+    public synchronized void close()
+    {
+        running = false;
+        if((this.getState().equals(Thread.State.WAITING))||(this.getState().equals(Thread.State.BLOCKED)))
+        {
+            this.interrupt();
+        }
+    }
     public void sendMessage(String message)
     {   sentMessages.add(message);
         inputMessages.add(message);

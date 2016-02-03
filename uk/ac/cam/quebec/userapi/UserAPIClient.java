@@ -167,6 +167,7 @@ public class UserAPIClient extends Thread {
             this.close();
         } catch (Exception e) {
             String s = e.getMessage();//generic hook for debugging
+            throw ex;//chuck it back to the inner thread
         } finally {
             System.err.println(ex);
         }
