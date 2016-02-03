@@ -20,30 +20,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * A very basic chat client
+ * A very basic chat client, converted to use queues for its input and output
+ * needs
  * @author James
  */
 public class StringChat extends Thread{
-
-    public static void main(String[] args) {
-        String server = null;
-        int port = 0;
-        try {
-
-            if (args.length == 2) {
-                server = args[0];
-                port = Integer.parseInt(args[1]);
-            } else {
-                System.out.println("This application requires two arguments: <machine> <port>");
-                return;
-            }
-        } catch (NumberFormatException ex) {
-            System.out.println("This application requires two arguments: <machine> <port>");
-            return;
-        }
-        StringChat stuffs = new StringChat(server,port);
-        stuffs.run();
-    }
     private final Socket sock;
     private final BlockingQueue<String> inputMessages; //
     private final List<String> sentMessages;
@@ -118,10 +99,19 @@ public class StringChat extends Thread{
         recievedMessages.add(message);
         outputMessages.add(message);
     }
-     else
+     else//this should never happen, but sometimes it does :(
     {
         System.err.println("null recieved from server");
     }
+    }
+    /**
+     * This should notify the parent thread if an exception happens in the 
+     * inner thread 
+     * @param e the exception that is thrown
+     */
+    public void InnerError(Exception e)
+    {
+        System.err.println(e);
     }
     public BlockingQueue<String> getOutputMessages()
     {
@@ -150,5 +140,35 @@ public class StringChat extends Thread{
             System.err.println(ex);
         }
         return null;
+    }
+    /**
+     * Old start point for the StringChat class
+     * @param args [String host name, int port number]
+     * @throws java.lang.InterruptedException
+     */
+    public static void main(String[] args) throws InterruptedException {
+        String server = null;
+        int port = 0;
+        try {
+
+            if (args.length == 2) {
+                server = args[0];
+                port = Integer.parseInt(args[1]);
+            } else {
+                System.out.println("This application requires two arguments: <machine> <port>");
+                return;
+            }
+        } catch (NumberFormatException ex) {
+            System.out.println("This application requires two arguments: <machine> <port>");
+            return;
+        }
+        StringChat stuffs = new StringChat(server,port);
+        stuffs.sendMessage("Test");
+        stuffs.start();
+        BlockingQueue<String> m = stuffs.getOutputMessages();
+        while(stuffs.isAlive()||(!m.isEmpty()))
+        {
+            System.out.println(m.take());
+        }
     }
 }

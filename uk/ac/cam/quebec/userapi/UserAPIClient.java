@@ -36,7 +36,7 @@ public class UserAPIClient extends Thread {
         parent = _parent;
         inner = new UserAPIClientInner(this, client);
         inner.setDaemon(true);
-        inner.setName("Client number: " + clientID + " inner");
+        inner.setName("Client handler number: " + clientID + " inner");
         out = new PrintWriter(clientSocket.getOutputStream());
         MessageQueue = new ArrayBlockingQueue<>(6);
     }
@@ -125,7 +125,6 @@ public class UserAPIClient extends Thread {
         tmp += "Expires: " + s + "\r\n";
         tmp += "Last-modified: " + s + "\r\n";
         return tmp;
-
     }
 
     private void buildJson(Object o) {
@@ -181,13 +180,20 @@ public class UserAPIClient extends Thread {
         }
 
     }
-
+    private static final Calendar cal = Calendar.getInstance();
+    private static final SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z");
     private static String getDateString() {
-        if (true) {
-            return "Fri, 31 Dec 1999 23:59:59 GMT";
+        
+        String s = "Fri, 31 Dec 1999 23:59:59 GMT";
+        try
+        {
+        String ret = format.format(cal.getTime());
+        return ret;
         }
-        Calendar cal = Calendar.getInstance();
-        SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zS");
-        return format.format(cal);
+        catch(Exception ex)
+        {
+           System.out.println(ex);
+           return s;
+        }
     }
 }

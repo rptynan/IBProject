@@ -34,7 +34,6 @@ public class GroupProjectCore extends Thread implements TrendsQueue{
     private final Database DB;
     private final static int UAPIPort = 90;
     private final static int ThreadPoolSize = 10;//The thread pool that we want to allocate for each job
-    private Thread thisThread;
     private boolean running;
     public GroupProjectCore()
     {
@@ -52,8 +51,7 @@ public class GroupProjectCore extends Thread implements TrendsQueue{
     @Override
     public void run()
     {   running = true;
-        thisThread = Thread.currentThread();
-        thisThread.setName("CoreThread");
+        this.setName("CoreThread");
         startUAPI();
         populateThreadPool();
         mainLoop();
@@ -106,6 +104,9 @@ public class GroupProjectCore extends Thread implements TrendsQueue{
         }
         }
     }
+    /**
+     * Kill everything neatly
+     */
     private void close()
     {
         

@@ -19,54 +19,65 @@ import uk.ac.cam.quebec.trends.TrendsQueue;
  *
  * @author James
  */
-public class UserAPIServer extends APIServerAbstract{
+public class UserAPIServer extends APIServerAbstract {
+
     private final ServerSocket serverSocket;
     private boolean running = false;
     private final List<Socket> clientList = new ArrayList<>();
-    private Thread ServerThread;
     private final List<UserAPIClient> APIclientList = new ArrayList<>();
     private int clientNumber = 0;
     private final Database db;
     private final TrendsQueue callback;
-    public UserAPIServer(int port)
-    {
+
+    /**
+     * Create an isolated instance of the server for debugging
+     *
+     * @param port The port to listen on
+     */
+    public UserAPIServer(int port) {
         serverSocket = makeSocket(port);
-        db=null;
-        callback =null;
+        db = null;
+        callback = null;
     }
 
+    /**
+     * Create a full instance of the server
+     *
+     * @param port The port to listen on
+     * @param DB The Database wrapper to use
+     * @param _callback the callback used to add new Trends
+     */
     public UserAPIServer(int port, Database DB, TrendsQueue _callback) {
         serverSocket = makeSocket(port);
         db = DB;
         callback = _callback;
-        
+
     }
+
     @Override
-    public void run()
-    {running = true;
-    ServerThread = Thread.currentThread();
-    Socket client = null;
-    UserAPIClient APIclient = null;
-        while(running)
-        {
-        try {
-            client = null;
-            APIclient = null;
-            client = serverSocket.accept();
-            clientList.add(client);
-            APIclient = new UserAPIClient(client,clientNumber,this);
-            APIclientList.add(APIclient);
-            APIclient.setDaemon(true);
-            APIclient.setName("Client number: "+clientNumber);
-            APIclient.start();
-            clientNumber ++;
-        } catch (IOException ex) {
-            System.err.println(ex);
-        }
+    public void run() {
+        running = true;
+        Socket client = null;
+        UserAPIClient APIclient = null;
+        while (running) {
+            try {
+                client = null;
+                APIclient = null;
+                client = serverSocket.accept();
+                clientList.add(client);
+                APIclient = new UserAPIClient(client, clientNumber, this);
+                APIclientList.add(APIclient);
+                APIclient.setDaemon(true);
+                APIclient.setName("Client handler number: " + clientNumber);
+                APIclient.start();
+                clientNumber++;
+            } catch (IOException ex) {
+                System.err.println(ex);
+            }
         }
     }
-    private static ServerSocket makeSocket(int port)
-    {
+
+    private static ServerSocket makeSocket(int port) {
         try {
             ServerSocket server = new ServerSocket(port);
             return server;
@@ -74,34 +85,35 @@ public class UserAPIServer extends APIServerAbstract{
             System.err.println(ex);
             return null;
         }
-        
+
     }
-    public void addUserTrend(String str)
-    {
-        if(callback==null)
-        {
-            System.out.println("adding trend: "+str);
-        }
-        else
-        {   Trend t = new TestTrend(str,"",1);
+
+    public void addUserTrend(String str) {
+        if (callback == null) {
+            System.out.println("adding trend: " + str);
+        } else {
+            Trend t = new TestTrend(str, "", 1);
             callback.putTrend(t);
         }
     }
-    public void removeClient(UserAPIClient c)
-    {
-        
-    }
-    public void close()
-    {
-        running = false;
-        APIclientList.stream().forEach(UserAPIClient::close);
-        ServerThread.interrupt();
+
+    public void removeClient(UserAPIClient c) {
+
     }
 
+    public synchronized void close() {
+        if (running) {
+            running = false;
+            APIclientList.stream().forEach(UserAPIClient::close);
+            if (this.getState().equals(Thread.State.BLOCKED)) {
+                this.interrupt();
+            }
+        }
+    }
 
     @Override
     public APIServerAbstract create(Database DB, int port, TrendsQueue callback) {
-        UserAPIServer tmp = new UserAPIServer(port, DB,callback);
+        UserAPIServer tmp = new UserAPIServer(port, DB, callback);
         return tmp;
     }
 
