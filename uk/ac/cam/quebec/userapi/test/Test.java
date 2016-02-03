@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 import uk.ac.cam.quebec.userapi.UserAPIServer;
 
 /**
- *
+ * Class that handles the testing of the UserAPI server
  * @author James
  */
 public class Test extends Thread{
@@ -35,7 +35,7 @@ public class Test extends Thread{
         s.setName("Test client number: "+i);
         testClients.add(s);
         }
-        tests = buildTests(new ArrayList<TestItem>());
+        tests = buildTests(new ArrayList<>());
     }
     @Override
     public void run()
@@ -93,14 +93,26 @@ public class Test extends Thread{
     }
     /**
      * Starts the test suite for the user API, will hang waiting for console input
-     * @param args No args are required for this
+     * @param args [int port] If the first argument is a number it will listen on that port
+     * otherwise it will listen on the default port.
      */
     public static void main(String[] args)
-    {try
-    {
-        Test t = new Test(90);
+    {Test t;
+    int port =90;
+        try
+    {               if(args.length>0)
+            {
+                String s = args[0];
+                try{
+                port = Integer.parseInt(s);
+                }
+                catch(NumberFormatException ex)
+                {
+                    port = 90;
+                }
+            }
+        t = new Test(port);
         t.run();
-        String s = null;
         System.in.read();
         
     }
@@ -108,5 +120,9 @@ public class Test extends Thread{
     {
         System.err.println(ex);//break here to keep scope for debugging
     }
+        finally
+        {
+            //t.close(); Do any needed cleanup here
+        }
     }
 }
