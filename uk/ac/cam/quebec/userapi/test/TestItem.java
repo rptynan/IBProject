@@ -19,12 +19,29 @@ public class TestItem {
     private final String input;
     private int index = 0;
     private boolean valid = true;
-    private String name;
+    private final String name;
+    /**
+     * Creates a new test item with no expected responses
+     * @param _input The input that we are going to send to the server
+     * @param _name The name of this test
+     */
     public TestItem(String _input,String _name)
     {
         input = _input;
         name = _name;
         expectedResponses = new ArrayList<>();
+    }
+    /**
+     * Creates a new test item
+     * @param _input The input that we are going to send to the server
+     * @param _name The name of this test
+     * @param _responses The list of Patterns that we expect in response
+     */
+    public TestItem(String _input,String _name, List<Pattern> _responses)
+    {
+        input = _input;
+        name = _name;
+        expectedResponses = _responses;
     }
     public void buildResponse(String s)
     {   Pattern p = Pattern.compile(s);

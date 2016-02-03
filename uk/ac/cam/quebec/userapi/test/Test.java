@@ -49,6 +49,11 @@ public class Test extends Thread{
         String tmp = "a";
         System.out.println(tmp);
     }
+    /**
+     * Runs an instance of the test suite on a StringChat instance
+     * @param s the StringChat client to run it on
+     * @return returns true if the tests run successfully
+     */
     public boolean testSuite(StringChat s)
     {   boolean b = true;
         boolean b0;
@@ -72,6 +77,11 @@ public class Test extends Thread{
     }
         return b;
     }
+    /**
+     * Builds the list of tests that the tester will run
+     * @param l The list to add the Test items to.
+     * @return The list that the Test items are added to. Can be ignored.
+     */
     public static List<TestItem> buildTests(List<TestItem> l)
     {
         TestItem t = new TestItem("testing","Test1");
@@ -81,6 +91,10 @@ public class Test extends Thread{
         l.add(t);
         return l;
     }
+    /**
+     * Starts the test suite for the user API, will hang waiting for console input
+     * @param args No args are required for this
+     */
     public static void main(String[] args)
     {try
     {
@@ -90,9 +104,9 @@ public class Test extends Thread{
         System.in.read();
         
     }
-    catch (Exception ex)
+    catch (Exception ex)//not a problem here
     {
-        System.err.println(ex);
+        System.err.println(ex);//break here to keep scope for debugging
     }
     }
 }
