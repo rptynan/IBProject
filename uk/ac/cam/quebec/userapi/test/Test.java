@@ -116,7 +116,7 @@ public class Test extends Thread{
         System.in.read();
         
     }
-    catch (Exception ex)//not a problem here
+    catch (Exception ex)
     {
         System.err.println(ex);//break here to keep scope for debugging
     }
