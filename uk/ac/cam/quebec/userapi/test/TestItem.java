@@ -7,13 +7,15 @@ package uk.ac.cam.quebec.userapi.test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *
  * @author James
  */
 public class TestItem {
-    private final List<String> expectedResponses;
+    private final List<Pattern> expectedResponses;
     private final String input;
     private int index = 0;
     private boolean valid = true;
@@ -24,9 +26,9 @@ public class TestItem {
         name = _name;
         expectedResponses = new ArrayList<>();
     }
-    public void buildResponse(String a)
-    {
-        expectedResponses.add(a);
+    public void buildResponse(String s)
+    {   Pattern p = Pattern.compile(s);
+        expectedResponses.add(p);
     }
     public String getInput()
     {
@@ -34,8 +36,10 @@ public class TestItem {
     }
     public boolean check(String s) throws TestException
     {   try{
-        String expected = expectedResponses.get(index);
-        boolean b =(expected.equals(s));
+        Pattern expected = expectedResponses.get(index);
+        String regex = expected.pattern();
+        Matcher m = expected.matcher(s);
+        boolean b = m .matches();
         valid = b&&valid;
         index++;
         if(!b)

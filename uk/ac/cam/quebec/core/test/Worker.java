@@ -5,18 +5,20 @@
  */
 package uk.ac.cam.quebec.core.test;
 
+import uk.ac.cam.quebec.core.TaskType;
+
 /**
  *This is a dummy class that represents a worker thread and the object it is
  * working on
  * @author James
  */
 public class Worker extends Thread implements Comparable{
-    private final WorkerType type;
-    public Worker (WorkerType _type)
+    private final TaskType type;
+    public Worker (TaskType _type)
     {
         type = _type;
     }
-    public WorkerType getWorkerType()
+    public TaskType getWorkerType()
     {
         return type;
     }
