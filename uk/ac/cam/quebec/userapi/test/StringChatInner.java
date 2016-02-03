@@ -22,7 +22,7 @@ public class StringChatInner extends Thread {
     private final StringChat parent;
 
     /**
-     *
+     * Create an instance of the inner class of StringChat
      * @param socket the socket to read text from
      * @param _parent the client's parent
      */
@@ -43,8 +43,7 @@ public class StringChatInner extends Thread {
             while (!(sock.isClosed()) && sock.isConnected() && ((s = data.readLine()) != null)) {
 
                 try {
-                    parent.recievedMessage(s);//System.out.println(s);
-
+                    parent.recievedMessage(s);
                 } catch (Exception ex) {
                     parent.InnerError(ex);//notify the parent that something broke
                     throw ex;//then throw the exception again so it gets handled

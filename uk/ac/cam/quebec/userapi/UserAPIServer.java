@@ -16,7 +16,7 @@ import uk.ac.cam.quebec.trends.Trend;
 import uk.ac.cam.quebec.trends.TrendsQueue;
 
 /**
- *
+ * This class creates the Server that listens for new client API connections
  * @author James
  */
 public class UserAPIServer extends APIServerAbstract {
@@ -57,8 +57,8 @@ public class UserAPIServer extends APIServerAbstract {
     @Override
     public void run() {
         running = true;
-        Socket client = null;
-        UserAPIClient APIclient = null;
+        Socket client;
+        UserAPIClient APIclient;
         while (running) {
             try {
                 client = null;
@@ -76,10 +76,15 @@ public class UserAPIServer extends APIServerAbstract {
             }
         }
     }
-
+    /**
+     * Constructs a ServerSocket object listening on the given port
+     * @param port the port to listen on
+     * @return A ServerSocket object if creation is successful, null otherwise
+     */
     private static ServerSocket makeSocket(int port) {
         try {
             ServerSocket server = new ServerSocket(port);
+            //TODO: set further options here
             return server;
         } catch (IOException ex) {
             System.err.println(ex);
@@ -87,10 +92,10 @@ public class UserAPIServer extends APIServerAbstract {
         }
 
     }
-
+    
     public void addUserTrend(String str) {
         if (callback == null) {
-            System.out.println("adding trend: " + str);
+            System.out.println("Unable to add trend: " + str+". No trend callback added");
         } else {
             Trend t = new TestTrend(str, "", 1);
             callback.putTrend(t);

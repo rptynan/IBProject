@@ -158,8 +158,9 @@ public class UserAPIClient extends Thread {
      * exception we need to decide if the socket needs to die
      *
      * @param ex The exception that is thrown
+     * @throws java.lang.Exception if the exception needs to be thrown back
      */
-    public void innerError(Exception ex) {
+    public void innerError(Exception ex) throws Exception{
         try {
             throw ex;
         } catch (SocketException e) {//this is fatal, time to die

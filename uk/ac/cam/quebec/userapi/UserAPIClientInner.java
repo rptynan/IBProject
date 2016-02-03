@@ -5,7 +5,6 @@
  */
 package uk.ac.cam.quebec.userapi;
 
-import uk.ac.cam.quebec.core.test.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;

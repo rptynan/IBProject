@@ -5,20 +5,21 @@
  */
 package uk.ac.cam.quebec.userapi;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * 
+ * Class that handles the parsing of the Request
  * @author James
  */
 public enum RequestType {
 
-    TestRequest("Test", ""),
-    DefaultRequest("", ""),
-    InvalidRequest("Invalid", "");
+    TestRequest("Test", "(.)*"),
+    DefaultRequest("", "(.)*"),
+    InvalidRequest("inv", "(.)*");
     private final Pattern requestPattern;
     private final String requestOption;
     private RequestType(String option, String pattern) {
@@ -42,12 +43,12 @@ public enum RequestType {
 /**
  * The static pattern that should be used to parse a generic request
  */
-    private static final Pattern parsePattern = Pattern.compile("([\\?]+)?(.*)");
+    public static final Pattern parsePattern = Pattern.compile("([\\?]+)?(.*)");
     private static final Map<String, RequestType> lookupMap = new HashMap<>();
     /**
      * Builds the contests of the lookup map at compile time
      */
-    static {
+    static {//This must be positioned after the lookupMap declaration
         for (RequestType t : RequestType.values()) {
             lookupMap.put(t.getOption(), t);
         }
@@ -68,6 +69,15 @@ public enum RequestType {
             }
         }
         return DefaultRequest;
+    }
+    /**
+     * This returns an unmodifiable copy of the lookup map, should only be used 
+     * for debugging 
+     * @return An unmodifiable view of the lookupMap
+     */
+    public static final Map<String,RequestType> getLookupMap()
+    {
+        return Collections.unmodifiableMap(lookupMap);
     }
 
 }
