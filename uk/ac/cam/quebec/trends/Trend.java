@@ -1,6 +1,7 @@
 package uk.ac.cam.quebec.trends;
 
-import java.lang.String;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Class to represent a single "trend".
@@ -17,12 +18,16 @@ public class Trend {
     private String location;
     private int priority;
     private int processCount;
+    private int popularity;
+    private List<String> concepts;
 
     public String getName() { return name; }
     public String getParsedName() { return parsedName; }
     public String getLocation() { return location; }
     public int getPriority() { return priority; }
     public int getProcessCount() { return processCount; }
+    public List<String> getConcepts() { return concepts; }
+    public int getPopularity() { return popularity; }
 
     /**
      * Create a Trend object.
@@ -43,10 +48,16 @@ public class Trend {
         this.priority = priority;
         processCount = 0;
         parsedName = null;
+        popularity = 0;
+        concepts = new LinkedList<>();
     }
     
     public void setParsedName(String parsedName) {
 	this.parsedName = parsedName;
+    }
+    
+    public void setPopularity(int popularity) {
+	this.popularity = popularity;
     }
 
     /**

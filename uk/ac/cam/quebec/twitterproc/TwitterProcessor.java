@@ -1,7 +1,13 @@
 package uk.ac.cam.quebec.twitterproc;
 
+import java.util.List;
+
 import uk.ac.cam.quebec.common.VisibleForTesting;
+import uk.ac.cam.quebec.dbwrapper.Database;
 import uk.ac.cam.quebec.trends.Trend;
+import uk.ac.cam.quebec.twitterwrapper.TwitException;
+import uk.ac.cam.quebec.twitterwrapper.TwitterLink;
+import winterwell.jtwitter.Status;
 
 /**
  * Class responsible for processing trends. It should extract relevant tweets,
@@ -14,7 +20,7 @@ import uk.ac.cam.quebec.trends.Trend;
 public class TwitterProcessor {
 
     @VisibleForTesting
-    String parse(String trendName) {
+    static String parse(String trendName) {
 	String newTrendName = trendName.replaceAll("[^a-zA-Z0-9-]", " ").trim();
 	StringBuilder parsedResult = new StringBuilder();
 	for (int i = 0; i < newTrendName.length(); i++) {
@@ -43,11 +49,20 @@ public class TwitterProcessor {
 	}
 	return parsedResult.toString();
     }
-    
-    /**
-     * TwitterProcessor constructor. 
-     */
-    public TwitterProcessor() {
+
+    private static int calculatePopularity(List<Status> tweets) {
+	int popularity = 0;
+	for (Status tweet : tweets) {
+	    if (tweet.retweetCount != -1) {
+		// retweetCount is not unknown
+		popularity += 10 * tweet.retweetCount;
+	    }
+	    if (tweet.getUser() != null) {
+		// add the "popularity" (i.e. number of followers) of the user who made the tweet
+		popularity += tweet.getUser().getFollowersCount();
+	    }
+	}
+	return popularity;
     }
 
     /**
@@ -56,7 +71,21 @@ public class TwitterProcessor {
      * 
      * @param trend The trend that should be processed.
      */
-    public void process(Trend trend) {
+    public static void process(Trend trend) {
+	trend.setParsedName(parse(trend.getName()));
+	TwitterLink twitter;
+	try {
+	    twitter = new TwitterLink();
+	    List<Status> tweets = twitter.getTweets(trend.getName());
+	    Database db = Database.getInstance();
+	    db.putTweets(tweets, trend);
+	    tweets = db.getTweets(trend);
+	    trend.setPopularity(calculatePopularity(tweets));
+	} catch (TwitException e) {
+	    // TODO Auto-generated catch block
+	    System.err.println("Could not create a TwitterLink object");
+	    e.printStackTrace();
+	}
     }
 
 }
