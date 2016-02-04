@@ -1,6 +1,6 @@
 package uk.ac.cam.quebec.trends;
 
-import java.lang.String;
+import java.util.List;
 
 /**
  * Class to represent a single "trend".
@@ -17,12 +17,14 @@ public class Trend {
     private String location;
     private int priority;
     private int processCount;
+    private List<String> concepts;
 
     public String getName() { return name; }
     public String getParsedName() { return parsedName; }
     public String getLocation() { return location; }
     public int getPriority() { return priority; }
     public int getProcessCount() { return processCount; }
+    public List<String> getConcepts() { return concepts; }
 
     /**
      * Create a Trend object.
