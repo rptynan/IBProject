@@ -2,6 +2,9 @@ package uk.ac.cam.quebec.twitterproc;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import org.junit.Test;
 
 import uk.ac.cam.quebec.twitterwrapper.TwitException;
@@ -18,15 +21,25 @@ public class TwitterProcessorTest {
 	assertEquals(tp.parse("@JPMorgan"), "JP Morgan");
     }
     
-    @Test
-    public void twitterLinkIntegrationTest() {
+   
+    public static void main(String[] args) {
 	System.out.println("login start");
 	try {
-	    TwitterLink.login("3qZZH5HFPZtKEPRNRvY3K6gu8",
-	    	"7GhzY7PGsSJZ2bBm9jqdfcbaZJRKXK49Bi1jenUW95i6ZpI9Yx",
-	    	"4818230530-66u4XPAkVML77f7jlirK825m2DyNOPTkx7s4hkm",
-	    	"BzFPA6dtBzn4yX8F4u2bxmbXqRhCtAYs69XFtZOQcjDHC",
+	    TwitterLink.login(args[0],
+	    	args[1],
+	    	args[2],
+	    	args[3],
 	    	"IBProjectQuebec");
+	    TwitterLink tl = new TwitterLink();
+	    TwitterProcessor tp = new TwitterProcessor();
+	    List<String> trends = tl.getTrends("World");
+	    List<String> parsedTrends = new LinkedList<String>();
+	    System.out.println(trends);
+	    for(String t:trends){
+	        
+	         parsedTrends.add(tp.parse(t));
+	    }
+	    System.out.println(parsedTrends);
 	} catch (TwitException e) {
 	    // TODO Auto-generated catch block
 	    e.printStackTrace();
