@@ -13,11 +13,13 @@ import java.lang.String;
 public class Trend {
 
     private String name;
+    private String parsedName;
     private String location;
     private int priority;
     private int processCount;
 
     public String getName() { return name; }
+    public String getParsedName() { return parsedName; }
     public String getLocation() { return location; }
     public int getPriority() { return priority; }
     public int getProcessCount() { return processCount; }
@@ -40,6 +42,11 @@ public class Trend {
         this.location = location;
         this.priority = priority;
         processCount = 0;
+        parsedName = null;
+    }
+    
+    public void setParsedName(String parsedName) {
+	this.parsedName = parsedName;
     }
 
     /**
