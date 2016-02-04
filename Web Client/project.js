@@ -41,7 +41,7 @@ $(document).ready(function(){
 		
 		var updatePage = function(event){
 			cPage = $(event.target);
-			if (cTrend[0].nodeName == "LI"){
+			if (cPage[0].nodeName == "LI"){
 				wF.get(0).src = "https://en.wikipedia.org/wiki/Tetris";
 			}
 		}
