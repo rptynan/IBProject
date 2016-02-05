@@ -23,6 +23,7 @@ import java.util.List;
  *
  */
 class DatabaseInternalDummy extends Database {
+
     private static final DatabaseInternalDummy INSTANCE = new DatabaseInternalDummy();
 
     public static Database getInstance() {
