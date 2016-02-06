@@ -17,12 +17,13 @@ import java.util.List;
  * Database abstract class. For descriptions of what the functions do see
  * there. If you're not modifying the Database Wrapper, you shouldn't be here!
  *
- * This is the dummy class which is here until the real implementation is done.
+ * <p>This is the dummy class which is here until the real implementation is done.
  *
  * @author Richard
  *
  */
 class DatabaseInternalDummy extends Database {
+
     private static final DatabaseInternalDummy INSTANCE = new DatabaseInternalDummy();
 
     public static Database getInstance() {
@@ -68,9 +69,8 @@ class DatabaseInternalDummy extends Database {
             result.add(0, new WikiArticle("Standard ML"));
             result.add(1, new WikiArticle("The Salmon of Knowledge"));
             result.add(2, new WikiArticle("The Trout of No-Craic"));
-        }
-        catch (WikiException e) {
-            e.printStackTrace();
+        } catch (WikiException exp) {
+            exp.printStackTrace();
         }
         return result;
     }

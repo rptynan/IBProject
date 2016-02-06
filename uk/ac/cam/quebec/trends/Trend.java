@@ -1,5 +1,7 @@
 package uk.ac.cam.quebec.trends;
 
+import java.io.Serializable;
+import java.lang.String;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -11,7 +13,9 @@ import java.util.List;
  * @author Richard
  *
  */
-public class Trend {
+public class Trend implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private String name;
     private String location;
@@ -58,11 +62,11 @@ public class Trend {
     }
 
     public void setParsedName(String parsedName) {
-	this.parsedName = parsedName;
+        this.parsedName = parsedName;
     }
 
     public void setPopularity(int popularity) {
-	this.popularity = popularity;
+        this.popularity = popularity;
     }
 
     public void addConcept(String concept) {
