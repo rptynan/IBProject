@@ -45,6 +45,9 @@ public class Test {
         System.out
                 .println("\n\n\nExpect a time in seconds for the above to be gathered:");
         System.out.println(result);
+        System.out
+        .println("\n\n\nExpect the number of views of the Trengune article.");
+        System.out.println(l.get(0).getViews());
 
     }
 
