@@ -1,12 +1,9 @@
 package uk.ac.cam.quebec.trends;
 
-<<<<<<< eb69792a603ad77b6dc159b1cf41d480c6004042
-import java.util.LinkedList;
-import java.util.List;
-=======
 import java.io.Serializable;
 import java.lang.String;
->>>>>>> DatabaseInternal can now store trends
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Class to represent a single "trend".
@@ -16,7 +13,7 @@ import java.lang.String;
  * @author Richard
  *
  */
-public class Trend implements Serializable{
+public class Trend implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -58,13 +55,13 @@ public class Trend implements Serializable{
         popularity = 0;
         concepts = new LinkedList<>();
     }
-    
+
     public void setParsedName(String parsedName) {
-	this.parsedName = parsedName;
+        this.parsedName = parsedName;
     }
-    
+
     public void setPopularity(int popularity) {
-	this.popularity = popularity;
+        this.popularity = popularity;
     }
 
     /**

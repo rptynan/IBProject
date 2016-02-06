@@ -26,7 +26,7 @@ import java.util.List;
  * Database abstract class. For descriptions of what the functions do see
  * there. If you're not modifying the Database Wrapper, you shouldn't be here!
  *
- * Notes on concurrency: It appears to suggest here
+ * <p>Notes on concurrency: It appears to suggest here
  * (http://stackoverflow.com/q/1209693/1205923) that we are responsible for
  * ensuring only one thread accesses one Connection object at a time. For now,
  * I will be wrapping the one connection in a mutex.  When/If speed become an
@@ -51,9 +51,8 @@ class DatabaseInternal extends Database {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         try {
             password = br.readLine();
-        }
-        catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException exp) {
+            exp.printStackTrace();
         }
 
         try {
@@ -62,8 +61,7 @@ class DatabaseInternal extends Database {
             connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
             connection.setAutoCommit(true);
             System.out.println(">Database Connected");
-        }
-        catch (SQLException e) {
+        } catch (SQLException exp) {
             System.out.println(">Failed to connect to database");
         }
 
@@ -71,18 +69,16 @@ class DatabaseInternal extends Database {
         Statement stmt = null;
         try {
             stmt = connection.createStatement();
-            stmt.execute("CREATE TABLE IF NOT EXISTS trends (" +
-                    "name VARCHAR(60) NOT NULL," +
-                    "location VARCHAR(60) NOT NULL," +
-                    "updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP," +
-                    "object MEDIUMBLOB NOT NULL," +
-                    "trend_id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY" +
-                    ")");
-        }
-        catch (SQLException e) {
-            e.printStackTrace();
-        }
-        finally {
+            stmt.execute("CREATE TABLE IF NOT EXISTS trends ("
+                    + "name VARCHAR(60) NOT NULL,"
+                    + "location VARCHAR(60) NOT NULL,"
+                    + "updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,"
+                    + "object MEDIUMBLOB NOT NULL,"
+                    + "trend_id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY"
+                    + ")");
+        } catch (SQLException exp) {
+            exp.printStackTrace();
+        } finally {
             try { if (stmt != null) stmt.close(); } catch (Exception e) {};
         }
     }
@@ -99,14 +95,12 @@ class DatabaseInternal extends Database {
             stmt.setString(1, trend.getName());
             stmt.setString(2, trend.getLocation());
             stmt.setObject(3, trend);
-            synchronized(conMutex) {
-                    stmt.executeUpdate();
+            synchronized (conMutex) {
+                stmt.executeUpdate();
             }
-        }
-        catch (SQLException e) {
-            e.printStackTrace();
-        }
-        finally {
+        } catch (SQLException exp) {
+            exp.printStackTrace();
+        } finally {
             try { if (stmt != null) stmt.close(); } catch (Exception e) {};
         }
         return;
