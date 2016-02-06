@@ -1,5 +1,7 @@
 package uk.ac.cam.quebec.trends;
 
+import uk.ac.cam.quebec.dbwrapper.Database;
+
 import java.io.Serializable;
 import java.lang.String;
 import java.util.LinkedList;
@@ -19,6 +21,7 @@ public class Trend implements Serializable {
 
     private String name;
     private String location;
+    private int id;
     private int priority;
     private int processCount;
 
@@ -29,6 +32,7 @@ public class Trend implements Serializable {
 
     public String getName() { return name; }
     public String getLocation() { return location; }
+    public int getId() { return id; }
     public int getPriority() { return priority; }
     public int getProcessCount() { return processCount; }
 
@@ -53,6 +57,7 @@ public class Trend implements Serializable {
     public Trend(String name, String location, int priority) {
         this.name = name;
         this.location = location;
+        id = 0;
         this.priority = priority;
         processCount = 0;
         parsedName = null;
@@ -70,11 +75,32 @@ public class Trend implements Serializable {
     }
 
     public void addConcept(String concept) {
-	concepts.add(concept);
+        concepts.add(concept);
     }
 
     public void addRelatedHashTag(String hashTag) {
-	relatedHashTags.add(hashTag);
+        relatedHashTags.add(hashTag);
+    }
+
+    /**
+     * Set the ID of this trend.
+     *
+     * <p>This sets the ID of the trend which will be used to index the
+     * database trends table. getId() can be relied on by other classes once
+     * the Trend has been put in the database, but no other classes are allowed
+     * to call this function, hence the parameter is an obscure private class
+     * provided by the database to only allow this (see
+     * http://stackoverflow.com/a/18634125/1205923)
+     *
+     * @param id        the id to set it to
+     * @param access    must be provided to call the method, only the database
+     *                  can construct it
+     */
+    public void setId(int id, Database.AccessId access) {
+        if (access == null) {
+            return;
+        }
+        this.id = id;
     }
 
     /**

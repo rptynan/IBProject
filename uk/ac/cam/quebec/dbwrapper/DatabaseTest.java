@@ -25,13 +25,23 @@ public class DatabaseTest {
         Database db1 = Database.getInstance();
         Database db2 = Database.getInstance();
 
-        // putTrend & getTrends
+        // putTrend(), getTrends() and check ID has been set
         System.out.println("==> Testing Trends");
-        db1.putTrend(new Trend("TestTrend1", "USA", 42));
-        List<Trend> trendList = db2.getTrends();
+        Trend t1 = new Trend("TestTrend1", "USA", 42);
+        Trend t2 = new Trend("TestTrend2", "UK", 43);
+        List<Trend> trendList = null;
+        try {
+            db1.putTrend(t1);
+            db1.putTrend(t2);
+            trendList = db2.getTrends();
+        } catch (DatabaseException exp) {
+            exp.printStackTrace();
+        }
         for (Trend t : trendList) {
             System.out.println(t.getName() + " " + t.getLocation()
-                    + " " + t.getPriority() + " " + t.getProcessCount());
+                    + " " + t.getPriority() + " " + t.getProcessCount()
+                    + " " + t.getId());
         }
+        System.out.println("Check ID of trends inserted: " + t1.getId() + " " + t2.getId());
     }
 }

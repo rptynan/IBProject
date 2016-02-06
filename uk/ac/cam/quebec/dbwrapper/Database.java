@@ -17,13 +17,22 @@ import java.util.List;
 public abstract class Database {
 
     /**
+     * Used for accessing setId() methods on Trends, WikiArticles and Tweets.
+     */
+    public static final class AccessId {
+        private AccessId() {}
+    }
+
+    protected static final AccessId accessId = new AccessId();
+
+    /**
      * Gets an instance of the database wrapper.
      *
      * @return  an object which implements the Database interface which should
      *          be used for calls
      */
     public static Database getInstance() {
-        return DatabaseInternalDummy.getInstance();
+        return DatabaseInternal.getInstance();
     }
 
     /**
@@ -35,14 +44,14 @@ public abstract class Database {
      *
      * @param trend     single Trend to put in the database
      */
-    public abstract void putTrend(Trend trend);
+    public abstract void putTrend(Trend trend) throws DatabaseException;
 
     /**
      * Gets a list of all the trends in the Database.
      *
      * @return a list of Trend objects from the database
      */
-    public abstract List<Trend> getTrends();
+    public abstract List<Trend> getTrends() throws DatabaseException;
 
     /**
      * Stores a list of tweets with reference to the given Trend.

@@ -7,8 +7,10 @@ import winterwell.jtwitter.Status;
 import winterwell.jtwitter.User;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
 import java.lang.String;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -87,8 +89,9 @@ class DatabaseInternal extends Database {
         return INSTANCE;
     }
 
-    public void putTrend(Trend trend) {
+    public void putTrend(Trend trend) throws DatabaseException {
         PreparedStatement stmt = null;
+
         try {
             stmt = connection.prepareStatement(
                     "INSERT INTO trends(name, location, object) VALUES (?, ?, ?)");
@@ -96,18 +99,48 @@ class DatabaseInternal extends Database {
             stmt.setString(2, trend.getLocation());
             stmt.setObject(3, trend);
             synchronized (conMutex) {
+                // If ID hasn't been set before, we need to set it
+                if (trend.getId() == 0) {
+                    Statement ss = connection.createStatement();
+                    ResultSet rs = ss.executeQuery("SELECT MAX(trend_id) FROM trends");
+                    rs.first();
+                    trend.setId(rs.getInt(1) + 1, accessId);
+                    rs.close();
+                    ss.close();
+                    stmt.setObject(3, trend);
+                }
                 stmt.executeUpdate();
             }
         } catch (SQLException exp) {
-            exp.printStackTrace();
+            throw new DatabaseException("SQL failed to insert Trend into the database", exp);
         } finally {
             try { if (stmt != null) stmt.close(); } catch (Exception e) {};
         }
         return;
     }
 
-    public List<Trend> getTrends() {
-        ArrayList<Trend> result = new ArrayList<Trend>(3);
+    public List<Trend> getTrends() throws DatabaseException {
+        ArrayList<Trend> result = new ArrayList<Trend>();
+        Statement stmt= null;
+        ResultSet rs = null;
+
+        try {
+            // Creates forward & read only ResultSet by default
+            stmt = connection.createStatement();
+            synchronized (conMutex) {
+                rs = stmt.executeQuery("SELECT object FROM trends");
+            }
+            while (rs.next()) {
+                byte[] buffer = rs.getBytes(1);
+                ObjectInputStream obj = new ObjectInputStream(new ByteArrayInputStream(buffer));
+                result.add((Trend) obj.readObject());
+            }
+        } catch (SQLException | IOException | ClassNotFoundException exp) {
+            throw new DatabaseException("SQL failed to get Trends from database", exp);
+        } finally {
+            try { if (rs != null) rs.close(); } catch (Exception e) {};
+            try { if (stmt != null) stmt.close(); } catch (Exception e) {};
+        }
         return result;
     }
 
