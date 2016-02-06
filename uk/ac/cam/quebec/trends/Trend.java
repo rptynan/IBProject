@@ -14,20 +14,24 @@ import java.util.List;
 public class Trend {
 
     private String name;
-    private String parsedName;
     private String location;
     private int priority;
     private int processCount;
+
+    private String parsedName;
     private int popularity;
     private List<String> concepts;
+    private List<String> relatedHashTags;
 
     public String getName() { return name; }
-    public String getParsedName() { return parsedName; }
     public String getLocation() { return location; }
     public int getPriority() { return priority; }
     public int getProcessCount() { return processCount; }
-    public List<String> getConcepts() { return concepts; }
+
+    public String getParsedName() { return parsedName; }
     public int getPopularity() { return popularity; }
+    public List<String> getConcepts() { return concepts; }
+    public List<String> getRelatedHashTags() { return relatedHashTags; }
 
     /**
      * Create a Trend object.
@@ -50,14 +54,23 @@ public class Trend {
         parsedName = null;
         popularity = 0;
         concepts = new LinkedList<>();
+        relatedHashTags = new LinkedList<>();
     }
-    
+
     public void setParsedName(String parsedName) {
 	this.parsedName = parsedName;
     }
-    
+
     public void setPopularity(int popularity) {
 	this.popularity = popularity;
+    }
+
+    public void addConcept(String concept) {
+	concepts.add(concept);
+    }
+
+    public void addRelatedHashTag(String hashTag) {
+	relatedHashTags.add(hashTag);
     }
 
     /**
