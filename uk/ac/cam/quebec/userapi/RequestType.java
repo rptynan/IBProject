@@ -19,6 +19,7 @@ import java.util.regex.Pattern;
 public enum RequestType {
 
     TestRequest("Test", "(.)*"),
+    TestRequest2("stuff","(.)*"),
     DefaultRequest("", "(.)*"),
     InvalidRequest("inv", "(.)*");
     private final Pattern requestPattern;
@@ -49,7 +50,7 @@ public enum RequestType {
     /**
      * The static pattern that should be used to parse a generic request
      */
-    public static final Pattern parsePattern = Pattern.compile("([^\\?]+)?(.*)");
+    public static final Pattern parsePattern = Pattern.compile("([^\\?]+)\\?(.*)");
     private static final Map<String, RequestType> lookupMap = new HashMap<>();
 
     /**
@@ -68,6 +69,10 @@ public enum RequestType {
      * @return the type of the request
      */
     public static final RequestType getRequestType(String message) {
+        if(message==null)
+        {
+            return InvalidRequest;
+        }
         Matcher m = parsePattern.matcher(message);
         if (!m.matches()) {
             return InvalidRequest;
@@ -79,7 +84,6 @@ public enum RequestType {
         }
         return DefaultRequest;
     }
-
     /**
      * This returns an unmodifiable copy of the lookup map, should only be used
      * for debugging
@@ -89,5 +93,4 @@ public enum RequestType {
     public static final Map<String, RequestType> getLookupMap() {
         return Collections.unmodifiableMap(lookupMap);
     }
-
 }

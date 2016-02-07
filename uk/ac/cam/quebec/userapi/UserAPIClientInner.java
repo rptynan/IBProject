@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.Socket;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -35,7 +37,11 @@ public class UserAPIClientInner extends Thread{
             try {    
                 processMessage(reader.readLine());
             } catch (Exception ex) {
-                parent.innerError(ex);//lets handle the errors somewhere else
+                try {
+                    parent.innerError(ex);//lets handle the errors somewhere else
+                } catch (Exception ex1) {
+                Logger.getLogger(UserAPIClientInner.class.getName()).log(Level.SEVERE, null, ex1);
+                }
             }
         }
         parent.close();

@@ -15,6 +15,8 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  *
@@ -56,17 +58,19 @@ public class UserAPIClient extends Thread {
         }
         try {
             while (running) {
-                if (true) {
-                    break;
-                }
                 try {
-                    buildMessage(MessageQueue.take());
+                    if(true)
+                    {
+                        break;
+                    }
+                    String s = MessageQueue.take();
+                    buildMessage(s);
                 } catch (InterruptedException ex) {
                     System.err.println(ex);//can probably be ignored
                 }
             }
         } catch (IOException ex) {
-        System.err.println(ex); //probably fatal and we need to die
+            System.err.println(ex); //probably fatal and we need to die
         } finally {
             close();
         }
@@ -137,7 +141,7 @@ public class UserAPIClient extends Thread {
         if (running) {
             running = false;
             parent.removeClient(this);
-            if (this.getState().equals(Thread.State.BLOCKED)) {
+            if ((this.getState().equals(Thread.State.BLOCKED)) || (this.getState().equals(Thread.State.WAITING))) {
                 this.interrupt();
             }
             if (out != null) {
@@ -160,7 +164,7 @@ public class UserAPIClient extends Thread {
      * @param ex The exception that is thrown
      * @throws java.lang.Exception if the exception needs to be thrown back
      */
-    public void innerError(Exception ex) throws Exception{
+    public void innerError(Exception ex) throws Exception {
         try {
             throw ex;
         } catch (SocketException e) {//this is fatal, time to die
@@ -174,28 +178,39 @@ public class UserAPIClient extends Thread {
     }
 
     public void processMessage(String message) {
-        RequestType t = RequestType.getRequestType(message);
+        if (message != null) {
+            String s = "";
+            Pattern p = Pattern.compile("GET \\/(.*) HTTP\\/(.*)");
+            Matcher m = p.matcher(message);
+            if (m.matches()) {
+                processRequest(m.group(1));
+            }
+        }
+    }
+
+    private void processRequest(String request) {
+        String s = "";
+        RequestType t = RequestType.getRequestType(request);
         switch (t) {
             default:
-                System.out.println("Message of type: " + t + " recieved. " + message);
+                s = "Message of type: " + t + " recieved. " + request;
+                System.out.println(s);
+                MessageQueue.add(s);
                 break;
         }
-
     }
     private static final Calendar cal = Calendar.getInstance();
     private static final SimpleDateFormat format = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss z");
+
     private static String getDateString() {
-        
+
         String s = "Fri, 31 Dec 1999 23:59:59 GMT";
-        try
-        {
-        String ret = format.format(cal.getTime());
-        return ret;
-        }
-        catch(Exception ex)
-        {
-           System.out.println(ex);
-           return s;
+        try {
+            String ret = format.format(cal.getTime());
+            return ret;
+        } catch (Exception ex) {
+            System.out.println(ex);
+            return s;
         }
     }
 }
