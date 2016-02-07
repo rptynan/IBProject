@@ -3,6 +3,7 @@ package uk.ac.cam.quebec.wikiwrapper;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.Serializable;
 import java.net.URL;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -17,7 +18,9 @@ import winterwell.json.JSONObject;
  * @author Stuart
  * 
  */
-public class WikiArticle {
+public class WikiArticle implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private String title;
     private String extract;

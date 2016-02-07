@@ -79,7 +79,7 @@ class DatabaseInternal extends Database {
                     + "updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,"
                     + "object MEDIUMBLOB NOT NULL,"
                     + "trend_id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY)");
-            //tweets
+            // tweets
             stmt.execute("CREATE TABLE IF NOT EXISTS tweets ("
                     + "content VARCHAR(200) NOT NULL,"
                     + "location VARCHAR(60),"
@@ -87,6 +87,17 @@ class DatabaseInternal extends Database {
                     + "object MEDIUMBLOB NOT NULL,"
                     + "trend_id INT UNSIGNED NOT NULL,"
                     + "tweet_id BIGINT UNSIGNED NOT NULL PRIMARY KEY)");
+            // wikiarticles
+            stmt.execute("CREATE TABLE IF NOT EXISTS wikiarticles ("
+                    + "title VARCHAR(300) NOT NULL,"
+                    + "updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,"
+                    + "object MEDIUMBLOB NOT NULL,"
+                    + "wikiarticle_id INT UNSIGNED NOT NULL PRIMARY KEY)");
+            // trends_wikiarticles_junction
+            stmt.execute("CREATE TABLE IF NOT EXISTS trends_wikiarticles_junction ("
+                    + "trend_id INT UNSIGNED NOT NULL,"
+                    + "wikiarticle_id INT UNSIGNED NOT NULL,"
+                    + "PRIMARY KEY(trend_id, wikiarticle_id))");
         } catch (SQLException exp) {
             exp.printStackTrace();
         } finally {
@@ -145,11 +156,13 @@ class DatabaseInternal extends Database {
             synchronized (conMutex) {
                 rs = stmt.executeQuery("SELECT object FROM trends");
             }
+
             while (rs.next()) {
                 byte[] buffer = rs.getBytes(1);
                 ObjectInputStream obj = new ObjectInputStream(new ByteArrayInputStream(buffer));
                 result.add((Trend) obj.readObject());
             }
+
         } catch (SQLException | IOException | ClassNotFoundException exp) {
             throw new DatabaseException("SQL failed to get Trends from database", exp);
         } finally {
@@ -197,7 +210,7 @@ class DatabaseInternal extends Database {
                 connection.setAutoCommit(true);
             }
         } catch (SQLException exp) {
-            throw new DatabaseException("SQL failed to insert all tweets into the database", exp);
+            throw new DatabaseException("SQL failed to insert all Tweets into the database", exp);
         } finally {
             try { if (stmt != null) stmt.close(); } catch (Exception e) {};
         }
@@ -216,11 +229,13 @@ class DatabaseInternal extends Database {
                 rs = stmt.executeQuery("SELECT object FROM tweets WHERE "
                         + "trend_id = " + trend.getId());
             }
+
             while (rs.next()) {
                 byte[] buffer = rs.getBytes(1);
                 ObjectInputStream obj = new ObjectInputStream(new ByteArrayInputStream(buffer));
                 result.add((Status) obj.readObject());
             }
+
         } catch (SQLException | IOException | ClassNotFoundException exp) {
             throw new DatabaseException("SQL failed to get Tweets from database", exp);
         } finally {
@@ -230,12 +245,100 @@ class DatabaseInternal extends Database {
         return result;
     }
 
-    public void putWikiArticles(List<WikiArticle> articles, Trend trend) {
+    public void putWikiArticles(List<WikiArticle> articles, Trend trend) throws DatabaseException {
+        // In case this trend hasn't been put in the db before
+        if (trend.getId() == 0) {
+            putTrend(trend);
+        }
+
+        PreparedStatement stmt = null;
+
+        try {
+            synchronized (conMutex) {
+                // require for batch update
+                connection.setAutoCommit(false);
+
+                // Insert articles
+                stmt = connection.prepareStatement("INSERT INTO wikiarticles (title,"
+                        + "object, wikiarticle_id) VALUES (?, ?, ?) "
+                        + "ON DUPLICATE KEY UPDATE title = VALUES(title), "
+                        + "object = VALUES(object), wikiarticle_id = VALUES(wikiarticle_id)");
+
+                int num = 0;
+                for (WikiArticle wk : articles) {
+                    stmt.setString(1, wk.getTitle());
+                    stmt.setObject(2, wk);
+                    stmt.setInt(3, wk.getId());
+                    stmt.addBatch();
+                    num++;
+                    // Some DB drivers don't like big batches
+                    if (num % 1000 == 0) {
+                        stmt.executeBatch();
+                    }
+                }
+                stmt.executeBatch();
+                connection.commit();
+                try { if (stmt != null) stmt.close(); } catch (Exception e) {};
+
+                // Insert which trend they relate to (update clause is just to
+                // ignore, duplicate entries)
+                stmt = connection.prepareStatement("INSERT INTO "
+                        + "trends_wikiarticles_junction (trend_id, wikiarticle_id) "
+                        + "VALUES (?, ?) ON DUPLICATE KEY UPDATE trend_id = VALUES(trend_id)");
+
+                num = 0;
+                for (WikiArticle wk : articles) {
+                    stmt.setInt(1, trend.getId());
+                    stmt.setInt(2, wk.getId());
+                    stmt.addBatch();
+                    num++;
+                    // Some DB drivers don't like big batches
+                    if (num % 1000 == 0) {
+                        stmt.executeBatch();
+                    }
+                }
+                stmt.executeBatch();
+
+                connection.commit();
+                connection.setAutoCommit(true);
+            }
+        } catch (SQLException exp) {
+            throw new DatabaseException("SQL failed to insert all WikiArticles "
+                    + "into the database", exp);
+        } finally {
+            try { if (stmt != null) stmt.close(); } catch (Exception e) {};
+        }
         return;
     }
 
-    public List<WikiArticle> getWikiArticles(Trend trend) {
-        ArrayList<WikiArticle> result = new ArrayList<WikiArticle>(3);
+    public List<WikiArticle> getWikiArticles(Trend trend) throws DatabaseException {
+        ArrayList<WikiArticle> result = new ArrayList<WikiArticle>();
+        Statement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            // Creates forward & read only ResultSet by default
+            stmt = connection.createStatement();
+            synchronized (conMutex) {
+                rs = stmt.executeQuery("SELECT object "
+                        + "FROM wikiarticles INNER JOIN trends_wikiarticles_junction "
+                        + "ON wikiarticles.wikiarticle_id = "
+                        + "trends_wikiarticles_junction.wikiarticle_id "
+                        + "WHERE trend_id = " + trend.getId());
+            }
+
+            while (rs.next()) {
+                byte[] buffer = rs.getBytes(1);
+                ObjectInputStream obj = new ObjectInputStream(new ByteArrayInputStream(buffer));
+                result.add((WikiArticle) obj.readObject());
+            }
+
+        } catch (SQLException | IOException | ClassNotFoundException exp) {
+            throw new DatabaseException("SQL failed to get WikiArticles from database", exp);
+        } finally {
+            try { if (rs != null) rs.close(); } catch (Exception e) {};
+            try { if (stmt != null) stmt.close(); } catch (Exception e) {};
+        }
         return result;
     }
 

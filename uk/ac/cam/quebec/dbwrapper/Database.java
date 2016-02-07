@@ -77,7 +77,8 @@ public abstract class Database {
      * @param articles  a list of WikiArticles, to put in the database
      * @param trend     the trend to store these articles under
      */
-    public abstract void putWikiArticles(List<WikiArticle> articles, Trend trend);
+    public abstract void putWikiArticles(List<WikiArticle> articles, Trend trend)
+        throws DatabaseException;
 
     /**
      * Gets a list of wikipedia articles with reference to the given Trend.
@@ -86,6 +87,6 @@ public abstract class Database {
      *
      * @return a list of the WikiArticles
      */
-    public abstract List<WikiArticle> getWikiArticles(Trend trend);
+    public abstract List<WikiArticle> getWikiArticles(Trend trend) throws DatabaseException;
 
 }
