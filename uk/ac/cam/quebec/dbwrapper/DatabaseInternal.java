@@ -65,19 +65,28 @@ class DatabaseInternal extends Database {
             System.out.println(">Database Connected");
         } catch (SQLException exp) {
             System.out.println(">Failed to connect to database");
+            return;
         }
 
         // Create database tables if they don't exist
         Statement stmt = null;
         try {
             stmt = connection.createStatement();
+            // trends
             stmt.execute("CREATE TABLE IF NOT EXISTS trends ("
                     + "name VARCHAR(60) NOT NULL,"
-                    + "location VARCHAR(60) NOT NULL,"
+                    + "location VARCHAR(60),"
                     + "updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,"
                     + "object MEDIUMBLOB NOT NULL,"
-                    + "trend_id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY"
-                    + ")");
+                    + "trend_id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY)");
+            //tweets
+            stmt.execute("CREATE TABLE IF NOT EXISTS tweets ("
+                    + "content VARCHAR(200) NOT NULL,"
+                    + "location VARCHAR(60),"
+                    + "updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,"
+                    + "object MEDIUMBLOB NOT NULL,"
+                    + "trend_id INT UNSIGNED NOT NULL,"
+                    + "tweet_id BIGINT UNSIGNED NOT NULL PRIMARY KEY)");
         } catch (SQLException exp) {
             exp.printStackTrace();
         } finally {
@@ -93,11 +102,12 @@ class DatabaseInternal extends Database {
         PreparedStatement stmt = null;
 
         try {
-            stmt = connection.prepareStatement(
-                    "INSERT INTO trends(name, location, object) VALUES (?, ?, ?)");
+            stmt = connection.prepareStatement("INSERT INTO trends"
+                    + "(name, location, object) VALUES (?, ?, ?)");
             stmt.setString(1, trend.getName());
             stmt.setString(2, trend.getLocation());
             stmt.setObject(3, trend);
+
             synchronized (conMutex) {
                 // If ID hasn't been set before, we need to set it
                 if (trend.getId() == 0) {
@@ -121,7 +131,7 @@ class DatabaseInternal extends Database {
 
     public List<Trend> getTrends() throws DatabaseException {
         ArrayList<Trend> result = new ArrayList<Trend>();
-        Statement stmt= null;
+        Statement stmt = null;
         ResultSet rs = null;
 
         try {
@@ -144,12 +154,74 @@ class DatabaseInternal extends Database {
         return result;
     }
 
-    public void putTweets(List<Status> tweets, Trend trend) {
+    public void putTweets(List<Status> tweets, Trend trend) throws DatabaseException {
+        // In case this trend hasn't been put in the db before
+        if (trend.getId() == 0) {
+            putTrend(trend);
+        }
+
+        PreparedStatement stmt = null;
+
+        try {
+            synchronized (conMutex) {
+                // require for batch update
+                connection.setAutoCommit(false);
+                stmt = connection.prepareStatement("INSERT INTO tweets (content,"
+                        + "location, object, trend_id, tweet_id) VALUES (?, ?, ?, ?, ?) "
+                        + "ON DUPLICATE KEY UPDATE content = VALUES(content), "
+                        + "location = VALUES(location), object = VALUES(object),"
+                        + "trend_id = VALUES(trend_id), tweet_id = VALUES(tweet_id)");
+
+                int num = 0;
+                for (Status tw : tweets) {
+                    stmt.setString(1, tw.getText());
+                    stmt.setString(2, tw.getLocation());
+                    stmt.setObject(3, tw);
+                    stmt.setInt(4, trend.getId());
+                    stmt.setString(5, tw.getId().toString());
+                    stmt.addBatch();
+                    num++;
+
+                    // Some DB drivers don't like big batches
+                    if (num % 1000 == 0) {
+                        stmt.executeBatch();
+                    }
+                }
+                stmt.executeBatch();
+                connection.commit();
+                connection.setAutoCommit(true);
+            }
+        } catch (SQLException exp) {
+            throw new DatabaseException("SQL failed to insert all tweets into the database", exp);
+        } finally {
+            try { if (stmt != null) stmt.close(); } catch (Exception e) {};
+        }
         return;
     }
 
-    public List<Status> getTweets(Trend trend) {
-        ArrayList<Status> result = new ArrayList<Status>(3);
+    public List<Status> getTweets(Trend trend) throws DatabaseException {
+        ArrayList<Status> result = new ArrayList<Status>();
+        Statement stmt = null;
+        ResultSet rs = null;
+
+        try {
+            // Creates forward & read only ResultSet by default
+            stmt = connection.createStatement();
+            synchronized (conMutex) {
+                rs = stmt.executeQuery("SELECT object FROM tweets WHERE "
+                        + "trend_id = " + trend.getId());
+            }
+            while (rs.next()) {
+                byte[] buffer = rs.getBytes(1);
+                ObjectInputStream obj = new ObjectInputStream(new ByteArrayInputStream(buffer));
+                result.add((Status) obj.readObject());
+            }
+        } catch (SQLException | IOException | ClassNotFoundException exp) {
+            throw new DatabaseException("SQL failed to get Tweets from database", exp);
+        } finally {
+            try { if (rs != null) rs.close(); } catch (Exception e) {};
+            try { if (stmt != null) stmt.close(); } catch (Exception e) {};
+        }
         return result;
     }
 

@@ -60,7 +60,7 @@ public abstract class Database {
      *                  tweets to put in the database
      * @param trend     the trend to store these tweets under
      */
-    public abstract void putTweets(List<Status> tweets, Trend trend);
+    public abstract void putTweets(List<Status> tweets, Trend trend) throws DatabaseException;
 
     /**
      * Gets a list of tweets with reference to the given Trend.
@@ -69,7 +69,7 @@ public abstract class Database {
      *
      * @return a list of jtwitter Status Objects representing the tweets
      */
-    public abstract List<Status> getTweets(Trend trend);
+    public abstract List<Status> getTweets(Trend trend) throws DatabaseException;
 
     /**
      * Stores a list of wikipedia articles with reference to the given Trend.
