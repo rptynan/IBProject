@@ -103,10 +103,14 @@ class DatabaseInternal extends Database {
 
         try {
             stmt = connection.prepareStatement("INSERT INTO trends"
-                    + "(name, location, object) VALUES (?, ?, ?)");
+                    + "(name, location, object, trend_id) VALUES (?, ?, ?, ?) "
+                    + "ON DUPLICATE KEY UPDATE name = VALUES(name), "
+                    + "location = VALUES(location), object = VALUES(object), "
+                    + "trend_id = VALUES(trend_id)");
             stmt.setString(1, trend.getName());
             stmt.setString(2, trend.getLocation());
             stmt.setObject(3, trend);
+            stmt.setInt(4, trend.getId());
 
             synchronized (conMutex) {
                 // If ID hasn't been set before, we need to set it
@@ -118,6 +122,7 @@ class DatabaseInternal extends Database {
                     rs.close();
                     ss.close();
                     stmt.setObject(3, trend);
+                    stmt.setInt(4, trend.getId());
                 }
                 stmt.executeUpdate();
             }

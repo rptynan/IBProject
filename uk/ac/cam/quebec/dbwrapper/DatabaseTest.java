@@ -33,7 +33,8 @@ public class DatabaseTest {
         Database db1 = Database.getInstance();
         Database db2 = Database.getInstance();
 
-        // putTrend(), getTrends() and check ID has been set
+        // putTrend(), getTrends(), check ID has been set, and that replacing
+        // trend works (check processCount of t1)
         System.out.println("==> Testing Trends");
         Trend t1 = new Trend("TestTrend1", "USA", 42);
         Trend t2 = new Trend("TestTrend2", "UK", 43);
@@ -41,6 +42,8 @@ public class DatabaseTest {
         try {
             db1.putTrend(t1);
             db1.putTrend(t2);
+            t1.incrementProcessCount();
+            db1.putTrend(t1);
             trendList = db2.getTrends();
         } catch (DatabaseException exp) {
             exp.printStackTrace();
@@ -51,6 +54,7 @@ public class DatabaseTest {
                     + " " + t.getId());
         }
         System.out.println("Check ID of trends inserted: " + t1.getId() + " " + t2.getId());
+        System.out.println("Check processCount of " + t1.getId());
 
         // putTweets(), getTweets()
         System.out.println("==> Testing Tweets");
