@@ -21,6 +21,7 @@ public class WikiArticle {
 
     private String title;
     private String extract;
+    private int id;
 
     public String getTitle() {
         return title;
@@ -28,6 +29,9 @@ public class WikiArticle {
 
     public String getExtract() {
         return extract;
+    }
+    public int getId() {
+        return id;
     }
 
     private int views = -1;
@@ -54,6 +58,8 @@ public class WikiArticle {
             JSONArray names = json.names();
             extract = json.getJSONObject(names.getString(0)).getString(
                     "extract");
+            id = json.getJSONObject(names.getString(0)).getInt(
+                    "pageid");
 
         } catch (IOException e) {
             throw new WikiException("Connection to Wikipedia failed.");

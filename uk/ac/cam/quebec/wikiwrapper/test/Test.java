@@ -29,6 +29,8 @@ public class Test {
         System.out.println(l);
         System.out.println("\n\n\nExpect the extract for Trengune:");
         System.out.println(l.get(0).getExtract());
+        System.out.println("\n\n\nExpect the id for Trengune:");
+        System.out.println(l.get(0).getId());
         System.out
                 .println("\n\n\nExpect a list of edit comments for Trengune:");
         System.out.println(l.get(0).getEdits(3));
