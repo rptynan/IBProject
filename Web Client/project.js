@@ -29,7 +29,7 @@ $(document).ready(function(){
 			cTrend = $(event.target);
 			if (cTrend[0].nodeName == "LI"){
 				pL.empty();
-				tH.html(cTrend.html()+ " related Wikipedia pages");
+				tH.html(cTrend.html()+ "<br>related Wikipedia pages");
 				//Now make a get request to get the list of page name
 				pageList = ["Computer Lab", "Doombar", "Marmite"];
 				var i;
@@ -43,6 +43,7 @@ $(document).ready(function(){
 			cPage = $(event.target);
 			if (cPage[0].nodeName == "LI"){
 				wF.get(0).src = "https://en.wikipedia.org/wiki/Tetris";
+				
 			}
 		}
 		

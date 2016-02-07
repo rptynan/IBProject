@@ -18,7 +18,14 @@
   <option id = "oIreland"value="Ireland">Ireland</option>
   <option id = "oUSA"value="USA">USA</option>
 </select> 
+
 <h3 id = "placeHeading"></h3>
+<h4>Sort by:</h4>
+<form >
+  <input type="radio" name="sort" checked="checked"  > Recency<br>
+  <input type="radio" name="sort" > Popularity<br>
+  <input type="radio" name="sort" > Controversy
+</form>
 <ul id="trendList">
     
 </ul>
@@ -39,9 +46,16 @@
 <iframe id = "wikiFrame" src="https://en.wikipedia.org/wiki/Computer_Laboratory,_University_of_Cambridge" width="800" height="550"></iframe>
 </div>
 <style type="text/css">
-  #sidebar { float: left; color: orange; background: blue; font-family: Arial; cursor: pointer; }
+  #sidebar { float: left; color: orange;  padding: 10px 10px 10px 10px; background: blue; font-family: Arial; cursor: pointer; border-radius: 25px; }
   
-  #rightbar { float: right; color: orange; background: blue; font-family: Arial; cursor: pointer; }
+  #rightbar { float: right; color: orange; padding: 10px 10px 10px 10px; background: blue; font-family: Arial; cursor: pointer;  border-radius: 25px;}
+  #trendList { list-style: none;  list-style-position: outside;}
+  #trendHeading {align: center;}
+  #placeHeading {align: center;}
+  ul,li { list-style-type: none;
+        list-style-position:inside;
+        margin:10px;
+        padding:0; }
 </style>
 </body>
 </html>
