@@ -8,11 +8,11 @@ public class TwitterProcessorTest {
 
     @Test
     public void parseTest() {
-	TwitterProcessor tp = new TwitterProcessor();
-	assertEquals(tp.parse("#DigitalMarketingForLife"), "Digital Marketing For Life");
-	assertEquals(tp.parse("Federer"), "Federer");
-	assertEquals(tp.parse("#BaeIn3Words"), "Bae In 3 Words");
-	assertEquals(tp.parse("@JPMorgan"), "JP Morgan");
+	assertEquals(TwitterProcessor.parse("#DigitalMarketingForLife"),
+		"Digital Marketing For Life");
+	assertEquals(TwitterProcessor.parse("Federer"), "Federer");
+	assertEquals(TwitterProcessor.parse("#BaeIn3Words"), "Bae In 3 Words");
+	assertEquals(TwitterProcessor.parse("@JPMorgan"), "JP Morgan");
     }
 
 }

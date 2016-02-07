@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>TwikFeed</title>
+<script type = "text/javascript" src = "jQuery.js" ></script>
+<script type = "text/javascript" src = "project.js" ></script>
+</head>
+<body>
+<style type="text/css"> 
+  body { color: blue; background: pink; font-family: Arial;}
+</style>
+<h1 align="center" >TwikFeed</h1>
+<div id = "sidebar">
+ <select id = "dropdown" align="center">
+  <option id = "oWorld" value="World">World</option>
+  <option id = "oUK"value="UK">UK</option>
+  <option id = "oIreland"value="Ireland">Ireland</option>
+  <option id = "oUSA"value="USA">USA</option>
+</select> 
+<h3 id = "placeHeading"></h3>
+<ul id="trendList">
+    
+</ul>
+</div>
+<div id = "rightbar">
+<h3 id = "trendHeading">No Trend Selected</h3>
+<h4>Sort by:</h4>
+<form >
+  <input type="radio" name="sort" checked="checked"  > Recency<br>
+  <input type="radio" name="sort" > Popularity<br>
+  <input type="radio" name="sort" > Controversy
+</form>
+<ul id="pageList">
+</ul>
+</div>
+<p id = "result" align="center"></p>
+<div class="wrapper" align="center">
+<iframe id = "wikiFrame" src="https://en.wikipedia.org/wiki/Computer_Laboratory,_University_of_Cambridge" width="800" height="550"></iframe>
+</div>
+<style type="text/css">
+  #sidebar { float: left; color: orange; background: blue; font-family: Arial; cursor: pointer; }
+  
+  #rightbar { float: right; color: orange; background: blue; font-family: Arial; cursor: pointer; }
+</style>
+</body>
+</html>

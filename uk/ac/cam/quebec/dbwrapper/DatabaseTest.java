@@ -14,6 +14,10 @@ import java.util.List;
  *
  */
 public class DatabaseTest {
+
+    /**
+     * Just a test.
+     */
     public static void main(String[] args) {
         // getInstance
         // Get two databases to check they're the same (or acting the same)
@@ -26,8 +30,8 @@ public class DatabaseTest {
         db1.putTrend(new Trend("TestTrend1", "USA", 42));
         List<Trend> trendList = db2.getTrends();
         for (Trend t : trendList) {
-            System.out.println(t.getName() + " " + t.getLocation() +
-                    " " + t.getPriority() + " " + t.getProcessCount());
+            System.out.println(t.getName() + " " + t.getLocation()
+                    + " " + t.getPriority() + " " + t.getProcessCount());
         }
     }
 }

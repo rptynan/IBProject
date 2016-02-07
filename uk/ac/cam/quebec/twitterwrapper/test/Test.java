@@ -24,26 +24,33 @@ public class Test {
      * @throws TwitException
      */
     public static void main(String[] args) {
-        TwitterLink link;
-        List<String> trends;
-        Status tweet;
-        User user;
+	TwitterLink link;
+/*
         System.out.println("Should give 'No static login performed.':");
         try {
             link = new TwitterLink();
         } catch (TwitException e) {
             System.out.println(e.toString());
         }
+*/
         try {
+            List<String> trends;
+            Status tweet;
+            User user;
+            List<Status> tweets;
+            
             TwitterLink.login(args[0], args[1], args[2], args[3], args[4]);
             link = new TwitterLink();
             System.out.println("Should give some Irish-looking trends:");
             trends = link.getTrends("Ireland");
             System.out.println(trends);
-            tweet = link.getTweets(trends.get(0)).get(0);
+            tweets = link.getTweets(trends.get(0));
+            System.out.println("Number of tweets: " + tweets.size());
+            tweet = tweets.get(0);
             System.out
                     .println("Should give a tweet related to the first trend:");
             System.out.println(tweet);
+            System.out.println(tweet.getDisplayText());
             user = tweet.getUser();
             link.fillUser(user);
             System.out

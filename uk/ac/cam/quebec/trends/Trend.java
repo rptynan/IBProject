@@ -1,6 +1,9 @@
 package uk.ac.cam.quebec.trends;
 
+import java.io.Serializable;
 import java.lang.String;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Class to represent a single "trend".
@@ -10,17 +13,29 @@ import java.lang.String;
  * @author Richard
  *
  */
-public class Trend {
+public class Trend implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private String name;
     private String location;
     private int priority;
     private int processCount;
 
+    private String parsedName;
+    private int popularity;
+    private List<String> concepts;
+    private List<String> relatedHashTags;
+
     public String getName() { return name; }
     public String getLocation() { return location; }
     public int getPriority() { return priority; }
     public int getProcessCount() { return processCount; }
+
+    public String getParsedName() { return parsedName; }
+    public int getPopularity() { return popularity; }
+    public List<String> getConcepts() { return concepts; }
+    public List<String> getRelatedHashTags() { return relatedHashTags; }
 
     /**
      * Create a Trend object.
@@ -40,6 +55,26 @@ public class Trend {
         this.location = location;
         this.priority = priority;
         processCount = 0;
+        parsedName = null;
+        popularity = 0;
+        concepts = new LinkedList<>();
+        relatedHashTags = new LinkedList<>();
+    }
+
+    public void setParsedName(String parsedName) {
+        this.parsedName = parsedName;
+    }
+
+    public void setPopularity(int popularity) {
+        this.popularity = popularity;
+    }
+
+    public void addConcept(String concept) {
+	concepts.add(concept);
+    }
+
+    public void addRelatedHashTag(String hashTag) {
+	relatedHashTags.add(hashTag);
     }
 
     /**
