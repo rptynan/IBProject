@@ -22,7 +22,8 @@ public class CoreConsole {
  private BufferedReader r = new BufferedReader(new InputStreamReader(System.in));
  private final GroupProjectCore core;
     public static void main(String args[]) throws IOException, TwitException
- {          Database DB = Database.getInstance();
+ {         Database.setCredentials("IBUser", "IBUserTest", "jdbc:mysql://localhost:3306/ibprojectdb");
+            Database DB = Database.getInstance();
             GroupProjectCore core = new GroupProjectCore(args,DB);
             core.setDaemon(true);
             core.setName("CoreThread");            

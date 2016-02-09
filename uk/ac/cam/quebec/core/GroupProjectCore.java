@@ -92,7 +92,7 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
             w = ThreadQueue.take();
         Trend T = TrendQueue.take();
         w.process(T);
-        w.start();
+        //w.start();
         //TwitterProcessor.process(T);
         //wikiProcessor.process(T);
         }
