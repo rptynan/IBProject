@@ -12,4 +12,5 @@ package uk.ac.cam.quebec.core;
 public interface ControlInterface {
     public void beginClose();
     public String getServerInfo();
+    public boolean isRunning();
 }

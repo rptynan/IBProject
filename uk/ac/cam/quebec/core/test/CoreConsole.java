@@ -18,40 +18,62 @@ import uk.ac.cam.quebec.twitterwrapper.TwitException;
  *
  * @author James
  */
-public class CoreConsole {
- private BufferedReader r = new BufferedReader(new InputStreamReader(System.in));
- private final GroupProjectCore core;
-    public static void main(String args[]) throws IOException, TwitException
- {         Database.setCredentials("IBUser", "IBUserTest", "jdbc:mysql://localhost:3306/ibprojectdb");
+public class CoreConsole extends Thread{
+
+    private final BufferedReader r = new BufferedReader(new InputStreamReader(System.in));
+    private final GroupProjectCore core;
+    private final String[] twitterCreds;
+    private boolean running = true;
+    public static void main(String[] args) {
+        try {
+          //  
+            Database.setCredentials("IBUser", "IBUserTest", "jdbc:mysql://localhost:3306/ibprojectdb");
             Database DB = Database.getInstance();
-            GroupProjectCore core = new GroupProjectCore(args,DB);
+            GroupProjectCore core = new GroupProjectCore(args, DB);
             core.setDaemon(true);
-            core.setName("CoreThread");            
- }
- public void processCommand(String command)
- {
-     if(command.equalsIgnoreCase("exit"))
-     {
-         core.beginClose();
-     }
-     else if(command.equalsIgnoreCase("status"))
-     {
-         System.out.println(core.getServerInfo());
-     }
-         }
- public CoreConsole(GroupProjectCore _core)
- {
-     core = _core;
- }
- public void run() 
- {  core.start();
-     try {
-         String s;
-         while ((s = r.readLine()).length() > 0) {
-             processCommand(s);
-         }
-     } catch (IOException ex) {
-         Logger.getLogger(CoreConsole.class.getName()).log(Level.SEVERE, null, ex);
-     }
- }
+            core.setName("CoreThread");
+            CoreConsole c = new CoreConsole(core,args);
+            c.run();
+        } catch (Exception ex) {
+System.err.println(ex);
+        }
+    }
+
+    public void processCommand(String command) {
+        if (command.equalsIgnoreCase("start"))
+        { if(!core.isRunning())
+        {
+            core.start();
+        }}
+        else if (command.equalsIgnoreCase("exit")) {
+            if(core.isRunning())
+            {
+            core.beginClose();
+            running = false;
+            }
+        } else if (command.equalsIgnoreCase("status")) {
+            System.out.println(core.getServerInfo());
+        }
+        else if (command.equalsIgnoreCase("test twitter"))
+        {
+            uk.ac.cam.quebec.twitterwrapper.test.Test.main(twitterCreds);
+        }
+    }
+
+    public CoreConsole(GroupProjectCore _core, String[] _args) {
+        core = _core;
+        twitterCreds = _args;
+    }
+
+    @Override
+    public void run() {
+        try {
+            String s;
+            while ((running)&&((s = r.readLine()).length() > 0)) {
+                processCommand(s);
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(CoreConsole.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 }

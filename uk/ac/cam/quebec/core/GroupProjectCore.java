@@ -41,7 +41,7 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
     private final static int UAPIPort = 90;
     private final static int ThreadPoolSize = 10;//The thread pool that we want to allocate for each job
     private boolean running;
-    private String location;
+    private String location = "World";
     public GroupProjectCore(String[] TwitterLoginArgs, Database _DB) throws IOException, TwitException
     {
         TweetQueue = new PriorityBlockingQueue<>();
@@ -72,8 +72,8 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
         UAPII.setName("UserAPIServer");
         UAPII.start();
     }
-    private void getTrends(String location) throws TwitException
-    {   List<String> tr = twitterWrapper.getTrends("");
+    private void getTrends() throws TwitException
+    {   List<String> tr = twitterWrapper.getTrends(location);
         Trend trend = null;
         for(String s : tr)
         {
@@ -85,7 +85,7 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
     private void mainLoop()
     {   
         try {
-        getTrends(location);
+        getTrends();
         Worker w;
         while(running)
         {
@@ -192,5 +192,10 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
     public void beginClose() {
       running = false;
       this.interrupt();
+    }
+
+    @Override
+    public boolean isRunning() {
+        return running;
     }
 }
