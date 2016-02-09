@@ -45,6 +45,11 @@ public class MyHTTPHandler  implements HttpHandler{
         }
         switch(type)
     {
+        case TrendsRequest:
+          
+            s = "Barry Chuckle";
+            break;
+            
         default:
             s+= " The Request type was: "+type.toString();
     }
