@@ -5,6 +5,7 @@ import java.util.List;
 import javafx.util.Pair;
 import uk.ac.cam.quebec.common.VisibleForTesting;
 import uk.ac.cam.quebec.dbwrapper.Database;
+import uk.ac.cam.quebec.dbwrapper.DatabaseException;
 import uk.ac.cam.quebec.trends.Trend;
 import uk.ac.cam.quebec.twitterwrapper.TwitException;
 import uk.ac.cam.quebec.twitterwrapper.TwitterLink;
@@ -13,11 +14,11 @@ import uk.ac.cam.quebec.wikiproc.WikiProcessor;
 import winterwell.jtwitter.Status;
 
 /**
- * <p>Class responsible for processing trends. It should extract relevant tweets, and send them to
+ * <p> Class responsible for processing trends. It should extract relevant tweets, and send them to
  * the database. After that analyse them and use the data to create a list of concepts that are
  * passed to the WikiProcessor.
  *
- * <p>Don't care about concurrency issues.
+ * <p> Don't care about concurrency issues.
  *
  * @author Momchil
  */
@@ -36,8 +37,12 @@ public class TwitterProcessor {
 	    List<Status> tweets = twitter.getTweets(trend.getName());
 
 	    Database db = Database.getInstance();
-	    db.putTweets(tweets, trend);
-	    tweets = db.getTweets(trend); // as it is possible to have old tweets in the database
+	    try {
+		db.putTweets(tweets, trend);
+		tweets = db.getTweets(trend); // It is possible to have old tweets in the database.
+	    } catch (DatabaseException e) {
+		// Throwing exception doesn't necessarily prevent us from continuing execution.
+	    }
 
 	    trend.setPopularity(calculatePopularity(tweets));
 	    extractConcepts(trend, tweets);
@@ -101,14 +106,16 @@ public class TwitterProcessor {
      */
     private static int calculatePopularity(List<Status> tweets) {
 	int popularity = 0;
-	for (Status tweet : tweets) {
-	    if (tweet.retweetCount != -1) {
-		// retweetCount is not unknown
-		popularity += 10 * tweet.retweetCount;
-	    }
-	    if (tweet.getUser() != null) {
-		// add the "popularity" (i.e. number of followers) of the user who made the tweet
-		popularity += tweet.getUser().getFollowersCount();
+	if (tweets != null) {
+	    for (Status tweet : tweets) {
+		if (tweet.retweetCount != -1) {
+		    // retweetCount is not unknown.
+		    popularity += 10 * tweet.retweetCount;
+		}
+		if (tweet.getUser() != null) {
+		    // Add the "popularity" (number of followers) of the user who made the tweet.
+		    popularity += tweet.getUser().getFollowersCount();
+        	}
 	    }
 	}
 	return popularity;
@@ -123,6 +130,10 @@ public class TwitterProcessor {
      * @param tweets The tweets related to this trend.
      */
     private static void extractConcepts(Trend trend, List<Status> tweets) {
+	if (tweets == null) {
+	    return;
+	}
+
 	WordCounter wordCounter = new WordCounter();
 	WordCounter hashTagCounter = new WordCounter();
 	for (Status tweet : tweets) {
