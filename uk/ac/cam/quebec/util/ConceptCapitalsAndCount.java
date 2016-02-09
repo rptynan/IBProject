@@ -1,13 +1,12 @@
 package uk.ac.cam.quebec.util;
 
-import uk.ac.cam.quebec.util.parsing.SplitIntoWords;
-
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
 import javafx.util.Pair;
+import uk.ac.cam.quebec.util.parsing.UtilParsing;
 
 /**
  * Class that implements the ConceptFinder interface by identifying words that start with capital
@@ -31,12 +30,12 @@ public class ConceptCapitalsAndCount implements ConceptFinder {
 
     @Override
     public synchronized void addText(String text) {
-        String[] words = SplitIntoWords.getWords(text);
+        String[] words = UtilParsing.splitIntoWords(text);
         LinkedList<String> capitalWords = new LinkedList<>();
 
         for (String word : words) {
-            if (word != null && (Character.isUpperCase(word.charAt(0)) ||
-                    !Character.isLetter(word.charAt(0)))) {
+            if (word != null && !word.isEmpty() && (Character.isUpperCase(word.charAt(0))
+        	|| !Character.isLetter(word.charAt(0)))) {
                 capitalWords.add(word);
             }
         }

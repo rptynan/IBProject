@@ -34,7 +34,7 @@ class SplitIntoWordsTest {
         };
 
         for (int i = 0; i < testData.length; i++) {
-            Assert.assertArrayEquals(okay[i], SplitIntoWords.getWords(testData[i]));
+            Assert.assertArrayEquals(okay[i], UtilParsing.splitIntoWords(testData[i]));
             System.out.println("Test " + i + " OKAY!");
         }
     }

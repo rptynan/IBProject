@@ -1,13 +1,13 @@
 package uk.ac.cam.quebec.util;
 
-import uk.ac.cam.quebec.util.parsing.SplitIntoWords;
+import java.util.List;
+
+import javafx.util.Pair;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.List;
-
-import javafx.util.Pair;
+import uk.ac.cam.quebec.util.parsing.UtilParsing;
 
 /**
  * Testing unit for WordCounter class
@@ -26,10 +26,10 @@ class WordCounterTest {
     public static void test1() {
         WordCounter wordCounter = new WordCounter(10);
 
-        wordCounter.addSentence(SplitIntoWords.getWords(text1));
-        wordCounter.addSentence(SplitIntoWords.getWords(text2));
-        wordCounter.addSentence(SplitIntoWords.getWords(text3));
-        wordCounter.addSentence(SplitIntoWords.getWords(text4));
+        wordCounter.addSentence(UtilParsing.splitIntoWords(text1));
+        wordCounter.addSentence(UtilParsing.splitIntoWords(text2));
+        wordCounter.addSentence(UtilParsing.splitIntoWords(text3));
+        wordCounter.addSentence(UtilParsing.splitIntoWords(text4));
         Assert.assertArrayEquals(wordCounter.getOrderedWordsAndCount(), new Pair[] {
                 new Pair("ibgroup", 4),
                 new Pair("to", 3),
