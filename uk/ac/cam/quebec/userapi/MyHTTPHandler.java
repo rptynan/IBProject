@@ -5,7 +5,6 @@
  */
 package uk.ac.cam.quebec.userapi;
 
-import com.sun.jndi.toolkit.url.Uri;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import java.io.IOException;

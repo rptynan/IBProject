@@ -119,8 +119,8 @@ public class GroupProjectCore extends Thread implements TrendsQueue{
     }
 
     @Override
-    public void putTrend(Trend trend) {
-        boolean b = TrendQueue.add(trend);
+    public boolean putTrend(Trend trend) {
+        return TrendQueue.add(trend);
     }
 
     private void populateThreadPool() {

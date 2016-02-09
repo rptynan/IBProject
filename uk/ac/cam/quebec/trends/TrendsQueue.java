@@ -20,7 +20,8 @@ public interface TrendsQueue {
      * processing.
      *
      * @param trend the trend to be processed, with proper priority and name
+     * @return true if the trend was successfully added
      */
-    public void putTrend(Trend trend);
+    public boolean putTrend(Trend trend);
 
 }

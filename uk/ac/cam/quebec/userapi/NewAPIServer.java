@@ -42,9 +42,13 @@ public class NewAPIServer  extends APIServerAbstract {
         return null;
     }
     public boolean addTrend(String trend)
-    {Trend T = new Trend(trend,"",1);
-        callback.putTrend(T);
-        return true;
+    {if (callback == null) {
+            System.err.println("Unable to add trend: " + trend+". No trend callback added");
+            return false;
+        } else {
+        Trend T = new Trend(trend,"",1);
+        return callback.putTrend(T);
+    }
     }
     @Override
     public APIServerAbstract create(Database DB, int port, TrendsQueue callback) throws IOException  {
