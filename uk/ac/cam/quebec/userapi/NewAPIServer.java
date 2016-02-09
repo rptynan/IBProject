@@ -8,8 +8,6 @@ package uk.ac.cam.quebec.userapi;
 import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import uk.ac.cam.quebec.dbwrapper.Database;
 import uk.ac.cam.quebec.trends.Trend;
 import uk.ac.cam.quebec.trends.TrendsQueue;
@@ -28,7 +26,7 @@ public class NewAPIServer  extends APIServerAbstract {
         this(null,_port,null);
     }
     public NewAPIServer(Database _DB, int _port, TrendsQueue _callback) throws IOException {
-        addr = new InetSocketAddress(_port);
+            addr = new InetSocketAddress(_port);
             DB = _DB;
             callback = _callback;
             server = HttpServer.create(addr, 0);
