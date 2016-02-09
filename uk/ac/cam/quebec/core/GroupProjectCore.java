@@ -5,6 +5,7 @@ import java.io.IOException;
 import uk.ac.cam.quebec.userapi.APIServerAbstract;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.logging.Level;
@@ -46,7 +47,7 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
     {
         TweetQueue = new PriorityBlockingQueue<>();
         PageQueue = new PriorityBlockingQueue<>();
-        TrendQueue = new PriorityBlockingQueue<>();
+        TrendQueue = new PriorityBlockingQueue<>();//Todo: replace with priority queue
         Threadpool = new ArrayList<>();
         DB = _DB;
         ThreadQueue = new PriorityBlockingQueue<>();
@@ -102,6 +103,9 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
             Logger.getLogger(GroupProjectCore.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    /**
+     * This is for when we want to make it really multithreaded
+     */
     private void mainLoopOld()
     {Worker w;
         while(running)
@@ -166,26 +170,36 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
         Worker t = null;
         for(int i=0; i<ThreadPoolSize;i++)
         {
-            t = new Worker(TaskType.Trend);
+            t = new Worker(TaskType.Trend,this);
             Threadpool.add(t);
             ThreadQueue.add(t);
-            t = new Worker(TaskType.Tweet);
+            t = new Worker(TaskType.Tweet,this);
             Threadpool.add(t);
             ThreadQueue.add(t);
-            t = new Worker(TaskType.Page);
+            t = new Worker(TaskType.Page,this);
             Threadpool.add(t);
             ThreadQueue.add(t);            
         }
-        t = new Worker(TaskType.Core);
+        t = new Worker(TaskType.Core,this);
         Threadpool.add(t);
         ThreadQueue.add(t);
     }
-
+    public void reallocateWorker(Worker w)
+    {
+        ThreadQueue.add(w);
+    }
     @Override
     public String getServerInfo() {
+        if(running)
+        {
         String s = "";
         s += "There are: " + TrendQueue.size()+ " trends in the queue";
         return s;
+        }
+        else
+        {
+            return "Core is not running";
+        }
     }
 
     @Override
