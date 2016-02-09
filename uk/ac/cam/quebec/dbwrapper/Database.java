@@ -16,6 +16,10 @@ import java.util.List;
  */
 public abstract class Database {
 
+    protected static String username = null;
+    protected static String dbserver = null;
+    protected static String password = null;
+
     /**
      * Used for accessing setId() methods on Trends, WikiArticles and Tweets.
      */
@@ -33,6 +37,23 @@ public abstract class Database {
      */
     public static Database getInstance() {
         return DatabaseInternal.getInstance();
+    }
+
+    /**
+     * Sets the username, password and database location of all instance(s) to
+     * be created.
+     *
+     * <p><b>Only to be called once by the startup code!</b>
+     *
+     * @param usernm    a string containing the username
+     * @param passwd    a string containing the password
+     * @param loctn     a string containing the database location, e.g.
+     *                  jdbc:mysql://localhost:3306/ibprojectdb
+     */
+    public static void setCredentials(String usernm, String passwd, String loctn) {
+        username = usernm;
+        password = passwd;
+        dbserver = loctn;
     }
 
     /**

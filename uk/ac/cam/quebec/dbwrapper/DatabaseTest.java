@@ -31,6 +31,7 @@ public class DatabaseTest {
         // getInstance
         // Get two databases to check they're the same (or acting the same)
         System.out.println("==> Initialising Database(s)");
+        Database.setCredentials("ibproject", null, "jdbc:mysql://localhost:3306/ibprojectdb");
         Database db1 = Database.getInstance();
         Database db2 = Database.getInstance();
 
