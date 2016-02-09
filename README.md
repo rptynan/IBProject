@@ -38,17 +38,17 @@ in the docs/ directory.
 ## Using the Knowledge Graph API:
 
 1. Include the following KG jars:
-   lib/kgsearch/libs/google-api-client-1.21.0.jar
-   lib/kgsearch/libs/google-http-client-1.21.0.jar
-   lib/kgsearch/libs/google-http-client-gson-1.21.0.jar
-   lib/kgsearch/libs/google-oauth-client-1.21.0.jar
-   lib/kgsearch/libs/gson-2.1.jar
-   lib/kgsearch/libs/jsr305-1.3.9.jar
-   lib/kgsearch/google-api-services-kgsearch-v1-rev3-1.21.0.jar
+   <p>lib/kgsearch/libs/google-api-client-1.21.0.jar
+   <p>lib/kgsearch/libs/google-http-client-1.21.0.jar
+   <p>lib/kgsearch/libs/google-http-client-gson-1.21.0.jar
+   <p>lib/kgsearch/libs/google-oauth-client-1.21.0.jar
+   <p>lib/kgsearch/libs/gson-2.1.jar
+   <p>lib/kgsearch/libs/jsr305-1.3.9.jar
+   <p>lib/kgsearch/google-api-services-kgsearch-v1-rev3-1.21.0.jar
 
 2. Include the following JSon jars:
-   lib/json/json-simple.jar
-   lib/json/json-path-0.8.0.jar
-   lib/json/commons-lang-2.6.jar
+   <p>lib/json/json-simple.jar
+   <p>lib/json/json-path-0.8.0.jar
+   <p>lib/json/commons-lang-2.6.jar
 
 3. That should be it ;) 
