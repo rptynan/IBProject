@@ -72,7 +72,7 @@ public class StringChat extends Thread{
         } catch (IOException ex) {
             System.err.println(ex);
         } catch (InterruptedException ex) {
-            Logger.getLogger(StringChat.class.getName()).log(Level.SEVERE, null, ex);
+           System.err.println(this.getName()+" thead interrupted");
         }
         finally
         {         
@@ -92,8 +92,12 @@ public class StringChat extends Thread{
     public synchronized void close()
     {
         running = false;
-        if((this.getState().equals(Thread.State.WAITING))||(this.getState().equals(Thread.State.BLOCKED)))
-        {
+        State s = this.getState();
+        Thread t = Thread.currentThread();
+        boolean c = t.equals(s);
+        System.out.println("Closing "+this.getName());
+        if((s.equals(Thread.State.WAITING)))
+        {   System.out.println("Interrupting "+this.getName());
             this.interrupt();
         }
     }

@@ -5,11 +5,14 @@
  */
 package uk.ac.cam.quebec.userapi.test;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import uk.ac.cam.quebec.userapi.APIServerAbstract;
+import uk.ac.cam.quebec.userapi.NewAPIServer;
 import uk.ac.cam.quebec.userapi.UserAPIServer;
 
 /**
@@ -17,18 +20,22 @@ import uk.ac.cam.quebec.userapi.UserAPIServer;
  * @author James
  */
 public class Test extends Thread{
-    private final UserAPIServer UAPI;
+    private final APIServerAbstract UAPI;
     private final int UAPIport;
     private final List<StringChat> testClients = new ArrayList<>();
     private final List<TestItem> tests;
-    private static final int clientNumbers = 10;
-    public Test(int port)
+    private static final int clientNumbers = 0;
+    public Test(int port) throws IOException
     {   UAPIport = port;
+        
+    if(true)
+    {
+        UAPI = new NewAPIServer(UAPIport);
+    }
+        else
+    {
         UAPI = new UserAPIServer(UAPIport);
-        UAPI.setDaemon(true);
-        this.setDaemon(true);
-        this.setName("UserAPIServer");
-        StringChat s;
+    }StringChat s;
         for(int i=0; i<clientNumbers;i++)
         {s = new StringChat("127.0.0.1",UAPIport);
         s.setDaemon(true);
@@ -36,6 +43,11 @@ public class Test extends Thread{
         testClients.add(s);
         }
         tests = buildTests(new ArrayList<>());
+    
+        UAPI.setDaemon(true);
+        this.setDaemon(true);
+        UAPI.setName("UserAPIServer");
+    
     }
     @Override
     public void run()
@@ -44,7 +56,11 @@ public class Test extends Thread{
         for(StringChat s : testClients)
         {
             s.start();
-            testSuite(s);
+            if(testSuite(s))
+            {
+                System.out.println("Test passed");
+            }
+            s.close();
         }
         String tmp = "a";
         System.out.println(tmp);

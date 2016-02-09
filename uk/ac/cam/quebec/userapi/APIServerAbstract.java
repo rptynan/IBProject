@@ -5,6 +5,7 @@
  */
 package uk.ac.cam.quebec.userapi;
 
+import java.io.IOException;
 import uk.ac.cam.quebec.dbwrapper.Database;
 import uk.ac.cam.quebec.trends.TrendsQueue;
 
@@ -13,9 +14,12 @@ import uk.ac.cam.quebec.trends.TrendsQueue;
  * @author James
  */
 public abstract class APIServerAbstract extends Thread{
-    public abstract APIServerAbstract create(Database DB,int port, TrendsQueue callback);
+    public abstract APIServerAbstract create(Database DB,int port, TrendsQueue callback) throws IOException;
     @Override
     public abstract void run();
 
-    public abstract void begin();
+    public void begin()
+    {
+        this.start();
+    }
 }

@@ -5,7 +5,9 @@
  */
 package uk.ac.cam.quebec.userapi;
 
+import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.SocketException;
@@ -29,7 +31,7 @@ public class UserAPIClient extends Thread {
     private boolean running = false;
     private final UserAPIServer parent;
     private final UserAPIClientInner inner;
-    private final PrintWriter out;
+    private final BufferedWriter out;
     private final BlockingQueue<String> MessageQueue;
 
     public UserAPIClient(Socket client, int _clientID, UserAPIServer _parent) throws IOException {
@@ -39,8 +41,8 @@ public class UserAPIClient extends Thread {
         inner = new UserAPIClientInner(this, client);
         inner.setDaemon(true);
         inner.setName("Client handler number: " + clientID + " inner");
-        out = new PrintWriter(clientSocket.getOutputStream());
-        MessageQueue = new ArrayBlockingQueue<>(6);
+        out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
+        MessageQueue = new ArrayBlockingQueue<>(60);
     }
 
     public boolean Running() {
@@ -59,12 +61,9 @@ public class UserAPIClient extends Thread {
         try {
             while (running) {
                 try {
-                    if(true)
-                    {
-                        break;
-                    }
                     String s = MessageQueue.take();
                     buildMessage(s);
+                    //running = false;
                 } catch (InterruptedException ex) {
                     System.err.println(ex);//can probably be ignored
                 }
@@ -96,7 +95,7 @@ public class UserAPIClient extends Thread {
         //tmp +="Last-modified: Fri, 09 Aug 1996 14:21:40 GMT"+"\r\n";
         //tmp += "Last-modified: "+s+"\r\n";
         tmp += content + "\r\n";
-        out.println(tmp);
+        out.write(tmp);
         out.flush();
         clientSocket.getOutputStream().flush();
 
@@ -145,7 +144,11 @@ public class UserAPIClient extends Thread {
                 this.interrupt();
             }
             if (out != null) {
-                out.close();
+                try {
+                    out.close();
+                } catch (IOException ex) {
+                    Logger.getLogger(UserAPIClient.class.getName()).log(Level.SEVERE, null, ex);
+                }
             }
             if (clientSocket.isConnected()) {
                 try {
@@ -179,6 +182,7 @@ public class UserAPIClient extends Thread {
 
     public void processMessage(String message) {
         if (message != null) {
+            MessageQueue.add(message);
             String s = "";
             Pattern p = Pattern.compile("GET \\/(.*) HTTP\\/(.*)");
             Matcher m = p.matcher(message);
@@ -195,7 +199,7 @@ public class UserAPIClient extends Thread {
             default:
                 s = "Message of type: " + t + " recieved. " + request;
                 System.out.println(s);
-                MessageQueue.add(s);
+                //MessageQueue.add(s);
                 break;
         }
     }

@@ -121,9 +121,4 @@ public class UserAPIServer extends APIServerAbstract {
         UserAPIServer tmp = new UserAPIServer(port, DB, callback);
         return tmp;
     }
-
-    @Override
-    public void begin() {
-        this.start();
-    }
 }

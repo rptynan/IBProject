@@ -27,7 +27,7 @@ public enum RequestType {
 
     private RequestType(String option, String pattern) {
         requestOption = option;
-        requestPattern = Pattern.compile(option + "\\?" + pattern);
+        requestPattern = Pattern.compile("\\/("+option + ")\\?" + pattern);
     }
 
     /**
@@ -50,7 +50,7 @@ public enum RequestType {
     /**
      * The static pattern that should be used to parse a generic request
      */
-    public static final Pattern parsePattern = Pattern.compile("([^\\?]+)\\?(.*)");
+    public static final Pattern parsePattern = Pattern.compile("\\/([^\\?]+)\\??(.*)");
     private static final Map<String, RequestType> lookupMap = new HashMap<>();
 
     /**
