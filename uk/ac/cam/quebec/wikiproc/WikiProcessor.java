@@ -1,6 +1,7 @@
 package uk.ac.cam.quebec.wikiproc;
 
 import uk.ac.cam.quebec.dbwrapper.Database;
+import uk.ac.cam.quebec.dbwrapper.DatabaseException;
 import uk.ac.cam.quebec.kgsearchwrapper.KGConcept;
 import uk.ac.cam.quebec.kgsearchwrapper.KGConceptGenerator;
 import uk.ac.cam.quebec.trends.Trend;
@@ -120,7 +121,12 @@ public class WikiProcessor {
      * Store the fetched WikiArticle in the database.
      */
     private void storeArticles() {
-        Database.getInstance().putWikiArticles(articleList, trend);
+        try {
+            Database.getInstance().putWikiArticles(articleList, trend);
+        } catch (DatabaseException ex) {
+            System.err.println("Could not store the Wiki articles due to the following error:");
+            ex.printStackTrace(System.err);
+        }
     }
 
 }
