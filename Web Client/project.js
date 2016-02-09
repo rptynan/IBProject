@@ -6,11 +6,18 @@ $(document).ready(function(){
 		var tH = $("#trendHeading");
 		var pL = $("#pageList");
 		var wF = $("#wikiFrame");
+		var eD = $("#editsDiv");
+		var tD = $("#tweetsDiv");
 		var dDdom = dD.get(0);
 		var trendList = [];
 		var pageList = [];
 		var cTrend;
-		var cPage
+		var cPage;
+		var cState = "Wikipedia";
+		eD.hide();
+		tD.hide();
+		
+		
 		
 		
 		var updateTrends = function(){
@@ -29,7 +36,7 @@ $(document).ready(function(){
 			cTrend = $(event.target);
 			if (cTrend[0].nodeName == "LI"){
 				pL.empty();
-				tH.html(cTrend.html()+ " related Wikipedia pages");
+				tH.html(cTrend.html()+ "<br>related Wikipedia pages");
 				//Now make a get request to get the list of page name
 				pageList = ["Computer Lab", "Doombar", "Marmite"];
 				var i;
@@ -43,14 +50,41 @@ $(document).ready(function(){
 			cPage = $(event.target);
 			if (cPage[0].nodeName == "LI"){
 				wF.get(0).src = "https://en.wikipedia.org/wiki/Tetris";
+				
 			}
 		}
+		
 		
 			
 		updateTrends();
 		dD.change(updateTrends);
 		(tL.get(0)).onclick = updatePages;	
 		(pL.get(0)).onclick = updatePage;
+		
+		$("#bTweets").click(function(){
+			if(cState != "Tweets"){
+				wF.hide();
+				eD.hide();
+				tD.show();
+				cState = "Tweets";
+			}
+		});
+		$("#bEdits").click(function(){
+			if(cState != "Edits"){
+				wF.hide();
+				eD.show();
+				tD.hide();
+				cState = "Edits";
+			}
+		});
+		$("#bWiki").click(function(){
+			if(cState != "Wikipedia"){
+				wF.show();
+				eD.hide();
+				tD.hide();
+				cState = "Wikipedia";
+			}
+		});
 	});
 		
 		
