@@ -15,7 +15,7 @@ import java.util.List;
  * @author Richard
  *
  */
-public class Trend implements Serializable {
+public class Trend implements Serializable, Comparable<Trend> {
 
     private static final long serialVersionUID = 1L;
 
@@ -112,6 +112,15 @@ public class Trend implements Serializable {
      */
     public void incrementProcessCount() {
         processCount++;
+    }
+    /**
+     * An implementation of the Comparator interface
+     * @param o The trend to be compared to
+     * @return The difference in their priorities
+     */
+     @Override
+    public int compareTo(Trend o) {
+        return this.getPriority()-o.getPriority();
     }
 
 }
