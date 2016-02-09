@@ -181,12 +181,12 @@ public class TwitterProcessor {
 	if (orderedHashTags != null) {
 	    // Add top 5 most common hash tags among the tweets.
 	    for (int i = 0; i < 5 && i < orderedHashTags.length; i++) {
-		trend.addRelatedHashTag(orderedHashTags[i].getKey());
+		trend.addRelatedHashTag(parse(orderedHashTags[i].getKey()));
 	    }
 	    // Add at most 5 other hash tags given that they occur in at least 30% of the tweets.
 	    for (int i = 5; i < 10 && i < orderedHashTags.length; i++) {
 		if (10 * orderedHashTags[i].getValue() >= 3 * tweets.size()) {
-		    trend.addRelatedHashTag(orderedHashTags[i].getKey());
+		    trend.addRelatedHashTag(parse(orderedHashTags[i].getKey()));
 		} else {
 		    break;
 		}
