@@ -11,6 +11,7 @@ import com.sun.net.httpserver.HttpHandler;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
+import java.util.regex.Matcher;
 
 /**
  *
@@ -29,18 +30,28 @@ public class MyHTTPHandler  implements HttpHandler{
         String path = request.getPath();
         String query = request.getQuery();
         RequestType type = RequestType.getRequestType(path);
-        handleRequest(he,type);
+        handleRequest(he,type,query);
         
     }
-    private void handleRequest(HttpExchange he,RequestType type) throws IOException
-    {   switch(type)
+    private void handleRequest(HttpExchange he,RequestType type, String query) throws IOException
+    {   String s = "";
+        Matcher m = type.getPattern().matcher(query);
+        if(m.find())
+        {
+         s+= "Found "+ m.groupCount()+" groups.";
+        }
+        else
+        {
+            s+= "Query matcher failed.";
+        }
+        switch(type)
     {
         default:
-        sendMessage(type.toString(),he);
+            s+= " The Request type was: "+type.toString();
     }
-        
+        sendMessage(s,he);
     }
-    private static void sendTweet(Tweet t, HttpExchange he)
+    private static void sendTweet(Object t, HttpExchange he)
     {
         
     }

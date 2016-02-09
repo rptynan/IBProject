@@ -23,22 +23,31 @@ public enum RequestType {
     DefaultRequest("", "(.)*"),
     InvalidRequest("inv", "(.)*");
     private final Pattern requestPattern;
+    private final Pattern fullPattern;
     private final String requestOption;
 
     private RequestType(String option, String pattern) {
         requestOption = option;
-        requestPattern = Pattern.compile("\\/("+option + ")\\?" + pattern);
+        requestPattern = Pattern.compile(pattern);
+        fullPattern = Pattern.compile("\\/("+option + ")\\?" + pattern);
     }
 
     /**
-     * The returns the pattern that should be used to parse the request
+     * The returns the pattern that should be used to parse the options
      *
      * @return the associated pattern
      */
     public Pattern getPattern() {
         return requestPattern;
     }
-
+    /**
+     * The returns the pattern that should be used to parse the entire URI
+     *
+     * @return the associated pattern
+     */
+    public Pattern getFullPattern() {
+        return fullPattern;
+    }
     /**
      * This returns the name selector of the option
      *

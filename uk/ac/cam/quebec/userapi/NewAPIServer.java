@@ -11,6 +11,7 @@ import java.net.InetSocketAddress;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import uk.ac.cam.quebec.dbwrapper.Database;
+import uk.ac.cam.quebec.trends.Trend;
 import uk.ac.cam.quebec.trends.TrendsQueue;
 
 /**
@@ -34,8 +35,16 @@ public class NewAPIServer  extends APIServerAbstract {
             NewAPIServerExecutor execute = new NewAPIServerExecutor(this);
             MyHTTPHandler handler = new MyHTTPHandler(this);
             server.createContext("/", handler);
-            server.setExecutor(null);
-        
+            server.setExecutor(null);   
+    }
+    public Object getItemFromDB(int ID)
+    {
+        return null;
+    }
+    public boolean addTrend(String trend)
+    {Trend T = new Trend(trend,"",1);
+        callback.putTrend(T);
+        return true;
     }
     @Override
     public APIServerAbstract create(Database DB, int port, TrendsQueue callback) throws IOException  {
