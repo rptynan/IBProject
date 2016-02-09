@@ -70,7 +70,6 @@ public enum RequestType {
             lookupMap.put(t.getOption(), t);
         }
     }
-
     /**
      * This gets the Type of the request
      *

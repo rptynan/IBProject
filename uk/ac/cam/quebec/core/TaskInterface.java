@@ -13,7 +13,7 @@ public interface TaskInterface {
     /*
     This method should execute the tasks that you want to complete
     */
-    public Task process();
+    public void process();
     /*
     This method should return the task's prioritysd
     */

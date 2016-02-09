@@ -1,6 +1,7 @@
 
 package uk.ac.cam.quebec.core;
 
+import java.io.IOException;
 import uk.ac.cam.quebec.userapi.APIServerAbstract;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,43 +11,51 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import uk.ac.cam.quebec.core.test.TestDatabase;
 import uk.ac.cam.quebec.core.test.Worker;
-import uk.ac.cam.quebec.core.TaskType;
 import uk.ac.cam.quebec.dbwrapper.Database;
 import uk.ac.cam.quebec.trends.Trend;
 import uk.ac.cam.quebec.trends.TrendsQueue;
+import uk.ac.cam.quebec.twitterproc.TwitterProcessor;
+import uk.ac.cam.quebec.twitterwrapper.TwitException;
+import uk.ac.cam.quebec.twitterwrapper.TwitterLink;
+import uk.ac.cam.quebec.userapi.NewAPIServer;
 import uk.ac.cam.quebec.userapi.UserAPIServer;
+import uk.ac.cam.quebec.wikiproc.WikiProcessor;
 import uk.ac.cam.quebec.wikiwrapper.WikiArticle;
 
 /**
  * A brief implementation of a first pass at some core logic 
  * @author James
  */
-public class GroupProjectCore extends Thread implements TrendsQueue{
+public class GroupProjectCore extends Thread implements TrendsQueue, ControlInterface{
     private final List<Thread> Threadpool;
     private final BlockingQueue<Worker> ThreadQueue;
     private final BlockingQueue<Object> TweetQueue;
     private final BlockingQueue<WikiArticle> PageQueue;
     private final BlockingQueue<Trend> TrendQueue;
-    private final UserAPIServer UAPI;//User API, here for testing only
+    private final NewAPIServer UAPI;//User API, here for testing only
     private final APIServerAbstract UAPII;//User API Interface
-    private final Object TwitterWrapper;
-    private final Object WikiWrapper;
+    private final TwitterLink twitterWrapper;
+    private final TwitterProcessor twitterProcessor;
+    private final WikiProcessor wikiProcessor;
     private final Database DB;
     private final static int UAPIPort = 90;
     private final static int ThreadPoolSize = 10;//The thread pool that we want to allocate for each job
     private boolean running;
-    public GroupProjectCore()
+    private String location;
+    public GroupProjectCore(String[] TwitterLoginArgs, Database _DB) throws IOException, TwitException
     {
         TweetQueue = new PriorityBlockingQueue<>();
         PageQueue = new PriorityBlockingQueue<>();
         TrendQueue = new PriorityBlockingQueue<>();
         Threadpool = new ArrayList<>();
-        DB = new TestDatabase(); 
+        DB = _DB;
         ThreadQueue = new PriorityBlockingQueue<>();
-        UAPI = new UserAPIServer(UAPIPort,DB,this);
+        UAPI = new NewAPIServer(DB,UAPIPort,this);
         UAPII = UAPI;
-        TwitterWrapper=null;
-        WikiWrapper=null;
+        TwitterLink.login(TwitterLoginArgs[0],TwitterLoginArgs[1],TwitterLoginArgs[2],TwitterLoginArgs[3],TwitterLoginArgs[4]);
+        twitterWrapper = new TwitterLink();
+        twitterProcessor = new TwitterProcessor();
+        wikiProcessor=new WikiProcessor();
     }
     @Override
     public void run()
@@ -63,7 +72,37 @@ public class GroupProjectCore extends Thread implements TrendsQueue{
         UAPII.setName("UserAPIServer");
         UAPII.start();
     }
+    private void getTrends(String location) throws TwitException
+    {   List<String> tr = twitterWrapper.getTrends("");
+        Trend trend = null;
+        for(String s : tr)
+        {
+            trend = new Trend(s,location,4);
+            TrendQueue.add(trend);
+        }
+        
+    }
     private void mainLoop()
+    {   
+        try {
+        getTrends(location);
+        Worker w;
+        while(running)
+        {
+            w = ThreadQueue.take();
+        Trend T = TrendQueue.take();
+        w.process(T);
+        w.start();
+        //TwitterProcessor.process(T);
+        //wikiProcessor.process(T);
+        }
+        } catch (InterruptedException ex) {
+            Logger.getLogger(GroupProjectCore.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (TwitException ex) {
+            Logger.getLogger(GroupProjectCore.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    private void mainLoopOld()
     {Worker w;
         while(running)
         {   
@@ -111,9 +150,9 @@ public class GroupProjectCore extends Thread implements TrendsQueue{
     {
         
     }
-    public static void main(String[] args)
-    {
-        GroupProjectCore core = new GroupProjectCore();
+    public static void main(String[] args) throws IOException, TwitException
+    {Database DB = Database.getInstance();
+        GroupProjectCore core = new GroupProjectCore(args,DB);
         core.setDaemon(true);
         core.run();//Don't want to invoke a new thread from this entry point.
     }
@@ -140,5 +179,18 @@ public class GroupProjectCore extends Thread implements TrendsQueue{
         t = new Worker(TaskType.Core);
         Threadpool.add(t);
         ThreadQueue.add(t);
+    }
+
+    @Override
+    public String getServerInfo() {
+        String s = "";
+        s += "There are: " + TrendQueue.size()+ " trends in the queue";
+        return s;
+    }
+
+    @Override
+    public void beginClose() {
+      running = false;
+      this.interrupt();
     }
 }
