@@ -41,20 +41,38 @@ class DatabaseInternal extends Database {
 
     private static final DatabaseInternal INSTANCE = new DatabaseInternal();
 
-    private static final String username = "ibproject";
-    private static final String dbserver = "jdbc:mysql://localhost:3306/ibprojectdb";
-    private static String password;
     private static Object conMutex = new Object();
     Connection connection;
 
     private DatabaseInternal() {
-        // Get password, open connection
-        System.out.println(">Enter Password for Database:");
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        try {
-            password = br.readLine();
-        } catch (IOException exp) {
-            exp.printStackTrace();
+        // Get credentials (if needed), open connection
+        if (username == null) {
+            System.out.println("> Enter Username for Database:");
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+            try {
+                username = br.readLine();
+            } catch (IOException exp) {
+                exp.printStackTrace();
+            }
+        }
+        if (password == null) {
+            System.out.println("> Enter Password for Database:");
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+            try {
+                password = br.readLine();
+            } catch (IOException exp) {
+                exp.printStackTrace();
+            }
+        }
+        if (dbserver == null) {
+            System.out.println("> Enter Location for Database (in form "
+                    + "jdbc:mysql://localhost:3306/ibprojectdb):");
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+            try {
+                dbserver = br.readLine();
+            } catch (IOException exp) {
+                exp.printStackTrace();
+            }
         }
 
         try {
@@ -62,9 +80,9 @@ class DatabaseInternal extends Database {
             // Might be able to lower this later
             connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
             connection.setAutoCommit(true);
-            System.out.println(">Database Connected");
+            System.out.println("> Database Connected");
         } catch (SQLException exp) {
-            System.out.println(">Failed to connect to database");
+            System.out.println("> Failed to connect to database");
             return;
         }
 
