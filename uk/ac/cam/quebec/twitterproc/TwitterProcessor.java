@@ -10,6 +10,7 @@ import uk.ac.cam.quebec.trends.Trend;
 import uk.ac.cam.quebec.twitterwrapper.TwitException;
 import uk.ac.cam.quebec.twitterwrapper.TwitterLink;
 import uk.ac.cam.quebec.util.WordCounter;
+import uk.ac.cam.quebec.util.parsing.UtilParsing;
 import uk.ac.cam.quebec.wikiproc.WikiProcessor;
 import winterwell.jtwitter.Status;
 
@@ -30,7 +31,7 @@ public class TwitterProcessor {
      * @param trend The trend that should be processed.
      */
     public static void process(Trend trend) {
-	trend.setParsedName(parse(trend.getName()));
+	trend.setParsedName(UtilParsing.parseTrendName(trend.getName()));
 	TwitterLink twitter;
 	try {
 	    twitter = new TwitterLink();
@@ -54,46 +55,6 @@ public class TwitterProcessor {
 	    System.err.println("Could not create a TwitterLink object");
 	    e.printStackTrace();
 	}
-    }
-
-    /**
-     * <p> Parse the name of the trend.
-     *
-     * <p> This includes removal of special symbols such as '@' and '#' and trying to put spaces
-     * in the right positions.
-     *
-     * @param trendName The original trend name that we have to parse.
-     * @return Parsed trend.
-     */
-    @VisibleForTesting
-    static String parse(String trendName) {
-	String newTrendName = trendName.replaceAll("[^a-zA-Z0-9-]", " ").trim();
-	StringBuilder parsedResult = new StringBuilder();
-	for (int i = 0; i < newTrendName.length(); i++) {
-	    char currentCharacter = newTrendName.charAt(i);
-	    parsedResult.append(currentCharacter);
-	    if (i + 1 < newTrendName.length()) {
-		if (Character.isLowerCase(currentCharacter)) {
-		    if (Character.isUpperCase(newTrendName.charAt(i + 1))
-			|| Character.isDigit(newTrendName.charAt(i + 1))) {
-			parsedResult.append(" ");
-		    }
-		} else if (Character.isDigit(currentCharacter)) {
-		    if (Character.isUpperCase(newTrendName.charAt(i + 1))
-			|| Character.isLowerCase(newTrendName.charAt(i + 1))) {
-			parsedResult.append(" ");
-		    }
-		} else if (Character.isUpperCase(currentCharacter)) {
-		    if (Character.isDigit(newTrendName.charAt(i + 1))
-			|| (i + 2 < newTrendName.length()
-			    && Character.isUpperCase(newTrendName.charAt(i + 1))
-			    && Character.isLowerCase(newTrendName.charAt(i + 2)))) {
-			parsedResult.append(" ");
-		    }
-		}
-	    }
-	}
-	return parsedResult.toString();
     }
 
     /**
@@ -129,7 +90,8 @@ public class TwitterProcessor {
      * @param trend The trend we are processing.
      * @param tweets The tweets related to this trend.
      */
-    private static void extractConcepts(Trend trend, List<Status> tweets) {
+    @VisibleForTesting
+    static void extractConcepts(Trend trend, List<Status> tweets) {
 	if (tweets == null) {
 	    return;
 	}
@@ -142,12 +104,12 @@ public class TwitterProcessor {
 		    		  .trim()
 		    		  .split("\\s+");
 	    for (String word : words) {
-		if (word.startsWith("@")) {
-		    // Discard usernames.
+		if (word.startsWith("@") || word.startsWith("http")) {
+		    // Discard usernames and links.
 		    continue;
 		} else if (word.startsWith("#")) {
 		    // Certain hash tag.
-		    if (!trend.getParsedName().equals(parse(word))) {
+		    if (!trend.getParsedName().equals(UtilParsing.parseTrendName(word))) {
 			// If the hash tag is different from the current trend, add it as a
 			// relevant trend.
 			hashTagCounter.addWord(word);
@@ -162,6 +124,15 @@ public class TwitterProcessor {
 	}
 
 	Pair<String, Integer>[] orderedWords = wordCounter.getOrderedWordsAndCount();
+
+//	ConceptCapitalsAndCount bla = new ConceptCapitalsAndCount();
+//	for (Status tweet : tweets) {
+//	    if (!tweet.getDisplayText().isEmpty()) {
+//		bla.addText(tweet.getDisplayText());
+//	    }
+//	}
+//	orderedWords = bla.getConcepts();
+
 	if (orderedWords != null) {
 	    // Add top 5 most common words among the tweets.
 	    for (int i = 0; i < 5 && i < orderedWords.length; i++) {
@@ -181,12 +152,12 @@ public class TwitterProcessor {
 	if (orderedHashTags != null) {
 	    // Add top 5 most common hash tags among the tweets.
 	    for (int i = 0; i < 5 && i < orderedHashTags.length; i++) {
-		trend.addRelatedHashTag(parse(orderedHashTags[i].getKey()));
+		trend.addRelatedHashTag(orderedHashTags[i].getKey());
 	    }
 	    // Add at most 5 other hash tags given that they occur in at least 30% of the tweets.
 	    for (int i = 5; i < 10 && i < orderedHashTags.length; i++) {
 		if (10 * orderedHashTags[i].getValue() >= 3 * tweets.size()) {
-		    trend.addRelatedHashTag(parse(orderedHashTags[i].getKey()));
+		    trend.addRelatedHashTag(orderedHashTags[i].getKey());
 		} else {
 		    break;
 		}
