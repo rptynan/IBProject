@@ -49,7 +49,7 @@ public class Worker extends Thread implements Comparable{
         {
         try {
             TwitterProcessor.process(o.take());
-        } catch (InterruptedException ex) {
+        } catch (Exception ex) {
             Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
         }
         parent.reallocateWorker(this);

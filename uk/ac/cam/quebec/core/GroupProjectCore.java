@@ -93,7 +93,10 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
             w = ThreadQueue.take();
         Trend T = TrendQueue.take();
         w.process(T);
-        //w.start();
+        if(!w.isAlive())
+        {w.start();
+        }
+//w.start();
         //TwitterProcessor.process(T);
         //wikiProcessor.process(T);
         }
@@ -171,16 +174,24 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
         for(int i=0; i<ThreadPoolSize;i++)
         {
             t = new Worker(TaskType.Trend,this);
+            t.setDaemon(true);
+            t.setName(t.getWorkerType().toString()+" worker thread id: "+i);
             Threadpool.add(t);
             ThreadQueue.add(t);
             t = new Worker(TaskType.Tweet,this);
+            t.setDaemon(true);
+            t.setName(t.getWorkerType().toString()+" worker thread id: "+i);
             Threadpool.add(t);
             ThreadQueue.add(t);
             t = new Worker(TaskType.Page,this);
+            t.setDaemon(true);
+            t.setName(t.getWorkerType().toString()+" worker thread id: "+i);
             Threadpool.add(t);
             ThreadQueue.add(t);            
         }
         t = new Worker(TaskType.Core,this);
+        t.setDaemon(true);
+        t.setName(t.getWorkerType().toString()+" worker thread");
         Threadpool.add(t);
         ThreadQueue.add(t);
     }
