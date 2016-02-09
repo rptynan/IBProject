@@ -18,45 +18,46 @@ import uk.ac.cam.quebec.twitterwrapper.TwitException;
  *
  * @author James
  */
-public class CoreConsole extends Thread{
+public class CoreConsole extends Thread {
 
     private final BufferedReader r = new BufferedReader(new InputStreamReader(System.in));
     private final GroupProjectCore core;
     private final String[] twitterCreds;
     private boolean running = true;
+
     public static void main(String[] args) {
         try {
-          //  
+            //  
             Database.setCredentials("IBUser", "IBUserTest", "jdbc:mysql://localhost:3306/ibprojectdb");
             Database DB = Database.getInstance();
             GroupProjectCore core = new GroupProjectCore(args, DB);
             core.setDaemon(true);
             core.setName("CoreThread");
-            CoreConsole c = new CoreConsole(core,args);
+            CoreConsole c = new CoreConsole(core, args);
             c.run();
         } catch (Exception ex) {
-System.err.println(ex);
+            System.err.println(ex);
         }
     }
 
     public void processCommand(String command) {
-        if (command.equalsIgnoreCase("start"))
-        { if(!core.isRunning())
-        {
-            core.start();
-        }}
-        else if (command.equalsIgnoreCase("exit")) {
-            if(core.isRunning())
-            {
-            core.beginClose();
-            running = false;
+        if (command.equalsIgnoreCase("start")) {
+            if (!core.isRunning()) {
+                System.out.println("Starting Core");
+                core.start();
             }
+        } else if (command.equalsIgnoreCase("exit")) {
+            if (core.isRunning()) {
+                System.out.println("Closing Core");
+                core.beginClose();
+            }
+            running = false;
         } else if (command.equalsIgnoreCase("status")) {
             System.out.println(core.getServerInfo());
-        }
-        else if (command.equalsIgnoreCase("test twitter"))
-        {
+        } else if (command.equalsIgnoreCase("test twitter")) {
+            System.out.println("Twitter test start");
             uk.ac.cam.quebec.twitterwrapper.test.Test.main(twitterCreds);
+            System.out.println("Twitter test end");
         }
     }
 
@@ -69,7 +70,8 @@ System.err.println(ex);
     public void run() {
         try {
             String s;
-            while ((running)&&((s = r.readLine()).length() > 0)) {
+            System.out.println("Console initialised:");
+            while ((running) && ((s = r.readLine()).length() > 0)) {
                 processCommand(s);
             }
         } catch (IOException ex) {
