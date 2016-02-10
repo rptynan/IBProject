@@ -7,10 +7,14 @@ package uk.ac.cam.quebec.userapi;
 
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
+import java.util.List;
 import java.util.regex.Matcher;
+
+import uk.ac.cam.quebec.trends.Trend;
 
 /**
  *
@@ -47,7 +51,7 @@ public class MyHTTPHandler  implements HttpHandler{
     {
         case TrendsRequest:
           
-            s = "Barry Chuckle";
+            s = parent.getTrendsAsString("World", "Popularity", 5);
             break;
             
         default:

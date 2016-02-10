@@ -6,9 +6,13 @@
 package uk.ac.cam.quebec.userapi;
 
 import com.sun.net.httpserver.HttpServer;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.List;
+
 import uk.ac.cam.quebec.dbwrapper.Database;
+import uk.ac.cam.quebec.dbwrapper.DatabaseException;
 import uk.ac.cam.quebec.trends.Trend;
 import uk.ac.cam.quebec.trends.TrendsQueue;
 
@@ -38,6 +42,28 @@ public class NewAPIServer  extends APIServerAbstract {
     public Object getItemFromDB(int ID)
     {
         return null;
+    }
+    
+    public String getTrendsAsString(String location, String sorting, int max){
+        try {
+            List<Trend> trendList = DB.getTrends();
+            // flag
+            boolean itemAdded = false;
+            String result = "[";
+            for(Trend t: trendList){
+                if (max <= 0) break;
+                if (itemAdded) result += ",";
+                max --;
+                result += t.getName();
+                itemAdded = true;
+            }
+            result += "]";
+            return result;
+          
+        } catch (DatabaseException e) {
+            return "[]";
+        }
+        
     }
     public boolean addTrend(String trend)
     {if (callback == null) {
