@@ -54,7 +54,7 @@ public class NewAPIServer  extends APIServerAbstract {
                 if (max <= 0) break;
                 if (itemAdded) result += ",";
                 max --;
-                result += t.getName();
+                result += "{\"name\":\"" + t.getName() + "\", \"id\":" +t.getId() + "}";
                 itemAdded = true;
             }
             result += "]";
