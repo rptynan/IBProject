@@ -121,7 +121,9 @@ public class TwitterLink {
      */
     public List<String> getTrends(String location) throws TwitException {
         try {
-            return twitter.getTrends(locationLookup.get(location));
+            List<String> x = twitter.getTrends(locationLookup.get(location));
+            // For testing System.out.println(x);
+            return x;
         } catch (TwitterException e) {
             throw new TwitException("Connection to Twitter failed.");
         }

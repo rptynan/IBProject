@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import winterwell.json.JSONArray;
+import winterwell.json.JSONException;
 import winterwell.json.JSONObject;
 
 /**
@@ -72,20 +73,30 @@ public class WikiFetch {
     public static List<WikiArticle> search(String searchTerm, int max, int edits)
             throws WikiException {
         List<WikiArticle> ret = new LinkedList<WikiArticle>();
+        JSONArray array;
         try {
             JSONObject json = getJSONfromAddress("https://en.wikipedia.org/w/api.php?"
                     + "action=query&list=search&format=json&srsearch="
                     + searchTerm.replace(" ", "%20") + "&srlimit=" + max);
-            JSONArray array = json.getJSONObject("query")
+            try{
+            array = json.getJSONObject("query")
                     .getJSONArray("search");
+            }catch(JSONException e){
+                return ret;
+            }
+           
             int len = array.length();
             WikiArticle wiki;
             for (int i = 0; i < len; i++) {
+                try{
                 wiki = new WikiArticle(array.getJSONObject(i)
                         .getString("title"));
                 if (edits > 0)
                     wiki.getEdits(edits);
                 ret.add(wiki);
+                }catch(JSONException e){
+                    continue;
+                }
             }
             return ret;
         } catch (IOException e) {
