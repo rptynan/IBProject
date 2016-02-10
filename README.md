@@ -59,3 +59,7 @@ in the docs/ directory.
    <p>lib/json/commons-lang-2.6.jar
 
 3. That should be it ;) 
+
+##Running
+
+Run GroupProjectCore with 5 agruements - the 4 Twitter login keys and the username IBProjectQuebec.

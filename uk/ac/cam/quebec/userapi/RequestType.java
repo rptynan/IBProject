@@ -21,7 +21,8 @@ public enum RequestType {
     TestRequest("Test", "(.)*"),
     TestRequest2("stuff","(.)*"),
     DefaultRequest("", "(.)*"),
-    InvalidRequest("inv", "(.)*");
+    InvalidRequest("inv", "(.)*"),
+    TrendsRequest("Trends","(.)*");
     private final Pattern requestPattern;
     private final Pattern fullPattern;
     private final String requestOption;
