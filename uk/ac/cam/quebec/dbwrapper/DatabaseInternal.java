@@ -82,6 +82,7 @@ class DatabaseInternal extends Database {
             connection.setAutoCommit(true);
             System.out.println("> Database Connected");
         } catch (SQLException exp) {
+            exp.printStackTrace();
             System.out.println("> Failed to connect to database");
             return;
         }
@@ -90,6 +91,9 @@ class DatabaseInternal extends Database {
         Statement stmt = null;
         try {
             stmt = connection.createStatement();
+            // Drop the tables on startup, clears any data in db!
+            stmt.execute("DROP tables trends, wikiarticles, tweets, trends_wikiarticles_junction");
+
             // trends
             stmt.execute("CREATE TABLE IF NOT EXISTS trends ("
                     + "name VARCHAR(60) NOT NULL,"
@@ -330,6 +334,10 @@ class DatabaseInternal extends Database {
     }
 
     public List<WikiArticle> getWikiArticles(Trend trend) throws DatabaseException {
+        return getWikiArticles(trend.getId());
+    }
+
+    public List<WikiArticle> getWikiArticles(int trend_id) throws DatabaseException {
         ArrayList<WikiArticle> result = new ArrayList<WikiArticle>();
         Statement stmt = null;
         ResultSet rs = null;
@@ -342,7 +350,7 @@ class DatabaseInternal extends Database {
                         + "FROM wikiarticles INNER JOIN trends_wikiarticles_junction "
                         + "ON wikiarticles.wikiarticle_id = "
                         + "trends_wikiarticles_junction.wikiarticle_id "
-                        + "WHERE trend_id = " + trend.getId());
+                        + "WHERE trend_id = " + trend_id);
             }
 
             while (rs.next()) {

@@ -102,12 +102,23 @@ public abstract class Database {
         throws DatabaseException;
 
     /**
-     * Gets a list of wikipedia articles with reference to the given Trend.
+     * Gets a list of wikipedia articles with reference to the given Trend,
+     * given the Trend object.
      *
      * @param trend     the trend the articles are stored under
      *
      * @return a list of the WikiArticles
      */
     public abstract List<WikiArticle> getWikiArticles(Trend trend) throws DatabaseException;
+
+    /**
+     * Gets a list of wikipedia articles with reference to the given Trend,
+     * given the trend_id.
+     *
+     * @param trend_id  the trend_id that the articles are stored under
+     *
+     * @return a list of the WikiArticles
+     */
+    public abstract List<WikiArticle> getWikiArticles(int trend_id) throws DatabaseException;
 
 }
