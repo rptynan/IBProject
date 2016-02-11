@@ -124,15 +124,6 @@ public class TwitterProcessor {
 	}
 
 	Pair<String, Integer>[] orderedWords = wordCounter.getOrderedWordsAndCount();
-
-//	ConceptCapitalsAndCount bla = new ConceptCapitalsAndCount();
-//	for (Status tweet : tweets) {
-//	    if (!tweet.getDisplayText().isEmpty()) {
-//		bla.addText(tweet.getDisplayText());
-//	    }
-//	}
-//	orderedWords = bla.getConcepts();
-
 	if (orderedWords != null) {
 	    // Add top 5 most common words among the tweets.
 	    for (int i = 0; i < 5 && i < orderedWords.length; i++) {
