@@ -7,6 +7,7 @@ package uk.ac.cam.quebec.core.test;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.logging.Level;
@@ -22,6 +23,7 @@ import org.xml.sax.SAXException;
 import uk.ac.cam.quebec.core.ControlInterface;
 import uk.ac.cam.quebec.core.GroupProjectCore;
 import uk.ac.cam.quebec.dbwrapper.Database;
+import uk.ac.cam.quebec.dbwrapper.DatabaseTest;
 import uk.ac.cam.quebec.trends.Trend;
 import uk.ac.cam.quebec.trends.TrendsQueue;
 import uk.ac.cam.quebec.wikiwrapper.WikiException;
@@ -57,36 +59,34 @@ public class CoreConsole extends Thread {
             System.out.println("Twitter test start");
             uk.ac.cam.quebec.twitterwrapper.test.Test.main(twitterCreds);
             System.out.println("Twitter test end");
-        }else if (command.equalsIgnoreCase("test wikiproc")) {
+        } else if (command.equalsIgnoreCase("test wikiproc")) {
             System.out.println("Wiki processing test start");
             uk.ac.cam.quebec.wikiproc.WikiProcessorTest.main(new String[0]);
             System.out.println("Wiki processing test end");
-        }else if (command.equalsIgnoreCase("test wikiwrap")) {
+        } else if (command.equalsIgnoreCase("test wikiwrap")) {
             System.out.println("Wiki wrapper test start");
             uk.ac.cam.quebec.wikiwrapper.test.Test.main(new String[0]);
             System.out.println("Wiki wrapper test end");
-        }else if (command.startsWith("add trend "))
-        {   String s = command.substring(10);
-            System.out.println("Adding trend "+s);
-            Trend T = new Trend(s,"World",0);
-            if(coreTrends.putTrend(T))
-            {
-                System.out.println("Trend "+s+" added successfully");
+        } else if (command.startsWith("add trend ")) {
+            String s = command.substring(10);
+            System.out.println("Adding trend " + s);
+            Trend T = new Trend(s, "World", 0);
+            if (coreTrends.putTrend(T)) {
+                System.out.println("Trend " + s + " added successfully");
+            } else {
+                System.out.println("Failed to add trend " + s);
             }
-            else
-            {
-                System.out.println("Failed to add trend "+s);
-            }
-            
-            
-        }
-        else if (command.equalsIgnoreCase("Repopulate trends"))
-        {
+        } else if (command.equalsIgnoreCase("Repopulate trends")) {
             System.out.println("Repopulating trends");
             coreInter.repopulateTrends();
-        }
-        else
+            System.out.println("Trends repopulated");
+        }   else if (command.equalsIgnoreCase("test database"))
         {
+            System.out.println("Starting database test");
+            DatabaseTest.main(new String[0]);
+            System.out.println("Database test finish");
+        }
+            else {
             System.out.println("Invalid command");
         }
     }
@@ -104,54 +104,81 @@ public class CoreConsole extends Thread {
             String s;
             System.out.println("Console initialised:");
             while ((running) && ((s = r.readLine()).length() > 0)) {
-                try
-                {
-                processCommand(s);
-                }
-                catch (Exception ex)
-                {
+                try {
+                    processCommand(s);
+                } catch (Exception ex) {
                     System.err.println(ex);
                 }
             }
         } catch (IOException ex) {
             Logger.getLogger(CoreConsole.class.getName()).log(Level.SEVERE, null, ex);
         }
-    }   
-    public static Document getConfig (String path)
-    {   try {
-        File inputFile = new File(path);
-        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-        Document doc = dBuilder.parse(inputFile);
-        doc.getDocumentElement().normalize();
-        return doc;
-        } catch (ParserConfigurationException| SAXException | IOException ex) {
+    }
+
+    /**
+     * Function to get the config.xml file
+     *
+     * @param path The path to the cofig.xml file
+     * @return The configuration file as an xml document
+     */
+    public static Document getConfig(String path) {
+        try {
+            File inputFile = new File(path);
+            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+            Document doc = dBuilder.parse(inputFile);
+            doc.getDocumentElement().normalize();
+            return doc;
+        } catch (FileNotFoundException ex) {
+            System.out.println("Failed to find the config file");
+            return null;
+        } catch (ParserConfigurationException | SAXException | IOException ex) {
             Logger.getLogger(CoreConsole.class.getName()).log(Level.SEVERE, null, ex);
             return null;
         }
     }
-    public static String[] getTwitterArgs(Document doc)
+    public static String getLocation(Document doc)
     {
+        String s = "";
+        NodeList parents = doc.getElementsByTagName("Misc");
+            Element parent = (Element) parents.item(0);
+            NodeList Item = parent.getElementsByTagName("Location");
+            return Item.item(0).getTextContent();
+    }
+    /**
+     * Gets the twitter arguments formatted as a string array
+     *
+     * @param doc The config.xml document
+     * @return A length 5 String array containing the twitter credentials
+     */
+    public static String[] getTwitterArgs(Document doc) {
         String[] twittercreds = new String[5];
-            if(doc != null)
-            {   NodeList parents = doc.getElementsByTagName("Twitter");
-                Element parent = (Element)parents.item(0);
-                NodeList Item = parent.getElementsByTagName("OAuth_Key");
-                twittercreds[0] = Item.item(0).getTextContent();
-                Item = parent.getElementsByTagName("OAuth_Secret");
-                twittercreds[1] = Item.item(0).getTextContent();
-                Item = parent.getElementsByTagName("Access_Token");
-                twittercreds[2] = Item.item(0).getTextContent();
-                Item = parent.getElementsByTagName("Access_Secret");
-                twittercreds[3] = Item.item(0).getTextContent();
-                Item = parent.getElementsByTagName("Account_Name");
-                twittercreds[4] = Item.item(0).getTextContent();
-            }
-            return twittercreds;
-    }   public static Database getDatabase(Document doc)
-    {   
+        if (doc != null) {
+            NodeList parents = doc.getElementsByTagName("Twitter");
+            Element parent = (Element) parents.item(0);
+            NodeList Item = parent.getElementsByTagName("OAuth_Key");
+            twittercreds[0] = Item.item(0).getTextContent();
+            Item = parent.getElementsByTagName("OAuth_Secret");
+            twittercreds[1] = Item.item(0).getTextContent();
+            Item = parent.getElementsByTagName("Access_Token");
+            twittercreds[2] = Item.item(0).getTextContent();
+            Item = parent.getElementsByTagName("Access_Secret");
+            twittercreds[3] = Item.item(0).getTextContent();
+            Item = parent.getElementsByTagName("Account_Name");
+            twittercreds[4] = Item.item(0).getTextContent();
+        }
+        return twittercreds;
+    }
+
+    /**
+     * Gets the Database instance
+     *
+     * @param doc The config.xml document
+     * @return the database instance
+     */
+    public static Database getDatabase(Document doc) {
         NodeList parents = doc.getElementsByTagName("Database");
-        Element parent = (Element)parents.item(0);
+        Element parent = (Element) parents.item(0);
         NodeList Item = parent.getElementsByTagName("UserName");
         String User = Item.item(0).getTextContent();
         Item = parent.getElementsByTagName("Password");
@@ -161,18 +188,33 @@ public class CoreConsole extends Thread {
         Item = parent.getElementsByTagName("ClearOnStart");
         String clear = Item.item(0).getTextContent();
         boolean wipe = clear.equalsIgnoreCase("true");
-        Database.setCredentials(User, Password, "jdbc:mysql://"+Path,wipe);
-            Database DB = Database.getInstance();
-            return DB;
+        Database.setCredentials(User, Password, "jdbc:mysql://" + Path, wipe);
+        Database DB = Database.getInstance();
+        return DB;
     }
-        public static void main(String[] args) {
+
+    /**
+     * Main entry point to the project for debugging
+     *
+     * @param args args[0] should be the path to a properly formatted
+     * configuration file args will be the twitter credentials otherwise
+     */
+    public static void main(String[] args) {
         try {
             Document doc = getConfig(args[0]);
-            String[] test = getTwitterArgs(doc);
-            
-            //Database.setCredentials("IBUser", "IBUserTest", "jdbc:mysql://localhost:3306/ibprojectdb",false);
-            Database DB = getDatabase(doc);//Database.getInstance();
-            GroupProjectCore core = new GroupProjectCore(test, DB);
+            String[] TwitterCreds;
+            Database DB;
+            String location;
+            if (doc == null) {
+                TwitterCreds = args; //If we fail to get the configuration file
+                DB = Database.getInstance();//fall back to these prompts
+                location = "world";
+            } else {
+                TwitterCreds = getTwitterArgs(doc);
+                DB = getDatabase(doc);
+                location = getLocation(doc);
+            }
+            GroupProjectCore core = new GroupProjectCore(TwitterCreds, DB,location);
             core.setDaemon(true);
             core.setName("CoreThread");
             CoreConsole c = new CoreConsole(core, args);

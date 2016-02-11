@@ -39,8 +39,8 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
     private final static int UAPIPort = 90;
     private final static int ThreadPoolSize = 10;//The thread pool that we want to allocate for each job
     private boolean running;
-    private String location = "World";
-    public GroupProjectCore(String[] TwitterLoginArgs, Database _DB) throws IOException, TwitException
+    private String location;
+    public GroupProjectCore(String[] TwitterLoginArgs, Database _DB,String _location) throws IOException, TwitException
     {
         TweetQueue = new PriorityBlockingQueue<>();
         PageQueue = new PriorityBlockingQueue<>();
@@ -55,6 +55,7 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
         twitterWrapper = new TwitterLink();
         twitterProcessor = new TwitterProcessor();
         wikiProcessor=new WikiProcessor();
+        location = _location;
     }
     @Override
     public void run()
@@ -62,6 +63,7 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
         this.setName("CoreThread");
         startUAPI();
         populateThreadPool();
+        repopulateTrends();
         mainLoop();
         close();
     }
@@ -85,12 +87,14 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
             trend = new Trend(s,location,4);
             TrendQueue.add(trend);
         }
-        
     }
+    /**
+     * This is the main loop of the program, it should loop around in here until
+     * 
+     */
     private void mainLoop()
     {   
         try {
-        getTrends();
         Worker w;
         while(running)
         {
@@ -106,9 +110,7 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
         //wikiProcessor.process(T);
         }
         } catch (InterruptedException ex) {
-            Logger.getLogger(GroupProjectCore.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (TwitException ex) {
-            Logger.getLogger(GroupProjectCore.class.getName()).log(Level.SEVERE, null, ex);
+         System.out.println("Core loop interupted, core should be closing");
         }
     }
     /**
@@ -164,7 +166,7 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
     }
     public static void main(String[] args) throws IOException, TwitException
     {Database DB = Database.getInstance();
-        GroupProjectCore core = new GroupProjectCore(args,DB);
+        GroupProjectCore core = new GroupProjectCore(args,DB,"World");
         core.setDaemon(true);
         core.run();//Don't want to invoke a new thread from this entry point.
     }

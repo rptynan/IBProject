@@ -20,7 +20,7 @@
 -->
 
 <!--- Put your DTDDoc comment here. -->
-<!ELEMENT Configuration (Database|Twitter)*>
+<!ELEMENT Configuration (Database|Twitter|Misc)*>
 
 <!--- Put your DTDDoc comment here. -->
 <!ELEMENT Database (UserName|Password|Path|ClearOnStart)*>
@@ -54,3 +54,9 @@
 
 <!--- Put your DTDDoc comment here. -->
 <!ELEMENT Account_Name (#PCDATA)>
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT Misc (Location)*>
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT Location (#PCDATA)>
