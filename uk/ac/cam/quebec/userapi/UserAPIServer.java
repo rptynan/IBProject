@@ -97,7 +97,7 @@ public class UserAPIServer extends APIServerAbstract {
         if (callback == null) {
             System.out.println("Unable to add trend: " + str+". No trend callback added");
         } else {
-            Trend t = new TestTrend(str, "", 1);
+            Trend t = new Trend(str, "World", 1);
             callback.putTrend(t);
         }
     }
