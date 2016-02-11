@@ -17,7 +17,6 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 import uk.ac.cam.quebec.core.ControlInterface;
@@ -26,7 +25,11 @@ import uk.ac.cam.quebec.dbwrapper.Database;
 import uk.ac.cam.quebec.dbwrapper.DatabaseTest;
 import uk.ac.cam.quebec.trends.Trend;
 import uk.ac.cam.quebec.trends.TrendsQueue;
+import uk.ac.cam.quebec.util.parsing.StopWords;
 import uk.ac.cam.quebec.wikiwrapper.WikiException;
+import uk.ac.cam.quebec.util.WordCounter;
+import uk.ac.cam.quebec.util.WordCounterTest;
+
 
 /**
  *
@@ -42,6 +45,7 @@ public class CoreConsole extends Thread {
     private boolean running = true;
 
     public void processCommand(String command) throws WikiException {
+        CoreConsoleCommand com = CoreConsoleCommand.getCommandtType(command);
         if (command.equalsIgnoreCase("start")) {
             if (!coreInter.isRunning()) {
                 System.out.println("Starting Core");
@@ -76,17 +80,31 @@ public class CoreConsole extends Thread {
             } else {
                 System.out.println("Failed to add trend " + s);
             }
-        } else if (command.equalsIgnoreCase("Repopulate trends")) {
+        } else if (command.equalsIgnoreCase("repopulate trends")) {
             System.out.println("Repopulating trends");
             coreInter.repopulateTrends();
             System.out.println("Trends repopulated");
-        }   else if (command.equalsIgnoreCase("test database"))
-        {
+        } else if (command.equalsIgnoreCase("test database")) {
             System.out.println("Starting database test");
             DatabaseTest.test();
             System.out.println("Database test finish");
+        } else if (command.startsWith("check stop word ")) {
+            String s = command.substring(17);
+            boolean b = StopWords.isStopWord(s);
+            if(b)
+            {
+                System.out.println(s+" is a stop word");
+            }
+            else
+            {
+                System.out.println(s+" is not a stop word");
+            }
+        } else if (command.equalsIgnoreCase("test word counter"))
+        {   System.out.println("Starting word count test");
+        WordCounterTest.test1();
+        System.out.println("Word count test finish");
         }
-            else {
+        else {
             System.out.println("Invalid command");
         }
     }
@@ -102,6 +120,7 @@ public class CoreConsole extends Thread {
     public void run() {
         try {
             String s;
+            System.out.println("Type start to start the core");
             System.out.println("Console initialised:");
             while ((running) && ((s = r.readLine()).length() > 0)) {
                 try {
@@ -137,14 +156,21 @@ public class CoreConsole extends Thread {
             return null;
         }
     }
-    public static String getLocation(Document doc)
-    {
+
+    /**
+     * Function to get the location for trends from the config file
+     *
+     * @param doc the XML config file
+     * @return the location to use
+     */
+    public static String getLocation(Document doc) {
         String s = "";
         NodeList parents = doc.getElementsByTagName("Misc");
-            Element parent = (Element) parents.item(0);
-            NodeList Item = parent.getElementsByTagName("Location");
-            return Item.item(0).getTextContent();
+        Element parent = (Element) parents.item(0);
+        NodeList Item = parent.getElementsByTagName("Location");
+        return Item.item(0).getTextContent();
     }
+
     /**
      * Gets the twitter arguments formatted as a string array
      *
@@ -155,6 +181,8 @@ public class CoreConsole extends Thread {
         String[] twittercreds = new String[5];
         if (doc != null) {
             NodeList parents = doc.getElementsByTagName("Twitter");
+            //parents will have more than 1 element if we have multiple twitter
+            //accounts 
             Element parent = (Element) parents.item(0);
             NodeList Item = parent.getElementsByTagName("OAuth_Key");
             twittercreds[0] = Item.item(0).getTextContent();
@@ -214,7 +242,7 @@ public class CoreConsole extends Thread {
                 DB = getDatabase(doc);
                 location = getLocation(doc);
             }
-            GroupProjectCore core = new GroupProjectCore(TwitterCreds, DB,location);
+            GroupProjectCore core = new GroupProjectCore(TwitterCreds, DB, location);
             core.setDaemon(true);
             core.setName("CoreThread");
             CoreConsole c = new CoreConsole(core, args);

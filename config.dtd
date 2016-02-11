@@ -20,7 +20,7 @@
 -->
 
 <!--- Put your DTDDoc comment here. -->
-<!ELEMENT Configuration (Database|Twitter|Misc)*>
+<!ELEMENT Configuration (Database|Twitter|SentimentAnalyser|KnowledgeGraph|Misc)*>
 
 <!--- Put your DTDDoc comment here. -->
 <!ELEMENT Database (UserName|Password|Path|ClearOnStart)*>
@@ -56,7 +56,19 @@
 <!ELEMENT Account_Name (#PCDATA)>
 
 <!--- Put your DTDDoc comment here. -->
-<!ELEMENT Misc (Location)*>
+<!ELEMENT SentimentAnalyser (API_KEY)*>
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT API_KEY (#PCDATA)>
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT KnowledgeGraph (API_KEY)*>
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT Misc (Location|UserAPI_Port)*>
 
 <!--- Put your DTDDoc comment here. -->
 <!ELEMENT Location (#PCDATA)>
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT UserAPI_Port (#PCDATA)>
