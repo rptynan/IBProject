@@ -1,0 +1,56 @@
+<?xml version='1.0' encoding='UTF-8'?>
+
+<!--
+    TODO define vocabulary identification
+    PUBLIC ID: -//vendor//vocabulary//EN
+    SYSTEM ID: http://server/path/config.dtd
+
+-->
+
+<!--
+    An example how to use this DTD from your XML document:
+
+    <?xml version="1.0"?>
+
+    <!DOCTYPE Configuration SYSTEM "config.dtd">
+
+    <Configuration>
+    ...
+    </Configuration>
+-->
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT Configuration (Database|Twitter)*>
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT Database (UserName|Password|Path|ClearOnStart)*>
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT UserName (#PCDATA)>
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT Password (#PCDATA)>
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT Path (#PCDATA)>
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT ClearOnStart (#PCDATA)>
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT Twitter (OAuth_Key|OAuth_Secret|Access_Token|Access_Secret|Account_Name)*>
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT OAuth_Key (#PCDATA)>
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT OAuth_Secret (#PCDATA)>
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT Access_Token (#PCDATA)>
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT Access_Secret (#PCDATA)>
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT Account_Name (#PCDATA)>
