@@ -106,7 +106,7 @@ public class CoreConsole extends Thread {
         public static void main(String[] args) {
         try {
             //  
-            Database.setCredentials("IBUser", "IBUserTest", "jdbc:mysql://localhost:3306/ibprojectdb");
+            Database.setCredentials("IBUser", "IBUserTest", "jdbc:mysql://localhost:3306/ibprojectdb",false);
             Database DB = Database.getInstance();
             GroupProjectCore core = new GroupProjectCore(args, DB);
             core.setDaemon(true);
