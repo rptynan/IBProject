@@ -61,7 +61,13 @@ public class UtilParsing {
 	}
 	return parsedResult.toString();
     }
-    
+
+    /**
+     * Remove links from a text.
+     *
+     * @param text
+     * @return The text without any links.
+     */
     public static String removeLinks(String text) {
 	StringBuilder sb = new StringBuilder();
 	int index = 0;
@@ -77,6 +83,6 @@ public class UtilParsing {
 		index++;
 	    }
 	}
-	return sb.toString();
+	return sb.toString().trim().replaceAll(" +", " ");
     }
 }

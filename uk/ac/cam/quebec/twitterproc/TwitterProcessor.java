@@ -99,12 +99,12 @@ public class TwitterProcessor {
 	WordCounter wordCounter = new WordCounter();
 	WordCounter hashTagCounter = new WordCounter();
 	for (Status tweet : tweets) {
-	    String[] words = tweet.getDisplayText()
-		    		  .replaceAll("[^a-zA-Z0-9@#-]", " ")
-		    		  .trim()
-		    		  .split("\\s+");
+	    String text = UtilParsing.removeLinks(tweet.getDisplayText());
+	    String[] words = text.replaceAll("[^a-zA-Z0-9@#-]", " ")
+		    		 .trim()
+		    		 .split("\\s+");
 	    for (String word : words) {
-		if (word.startsWith("@") || word.startsWith("http")) {
+		if (word.startsWith("@")) {
 		    // Discard usernames and links.
 		    continue;
 		} else if (word.startsWith("#")) {
@@ -125,33 +125,17 @@ public class TwitterProcessor {
 
 	Pair<String, Integer>[] orderedWords = wordCounter.getOrderedWordsAndCount();
 	if (orderedWords != null) {
-	    // Add top 5 most common words among the tweets.
-	    for (int i = 0; i < 5 && i < orderedWords.length; i++) {
-		trend.addConcept(orderedWords[i].getKey());
-	    }
-	    // Add at most 5 other words given that they occur in at least 30% of the tweets.
-	    for (int i = 5; i < 10 && i < orderedWords.length; i++) {
-		if (10 * orderedWords[i].getValue() >= 3 * tweets.size()) {
-		    trend.addConcept(orderedWords[i].getKey());
-		} else {
-		    break;
-		}
+	    // Add at most 100 most common words among the tweets sorted by their frequencies.
+	    for (int i = 0; i < 100 && i < orderedWords.length; i++) {
+		trend.addConcept(orderedWords[i]);
 	    }
 	}
 
 	Pair<String, Integer>[] orderedHashTags = hashTagCounter.getOrderedWordsAndCount();
 	if (orderedHashTags != null) {
-	    // Add top 5 most common hash tags among the tweets.
-	    for (int i = 0; i < 5 && i < orderedHashTags.length; i++) {
-		trend.addRelatedHashTag(orderedHashTags[i].getKey());
-	    }
-	    // Add at most 5 other hash tags given that they occur in at least 30% of the tweets.
-	    for (int i = 5; i < 10 && i < orderedHashTags.length; i++) {
-		if (10 * orderedHashTags[i].getValue() >= 3 * tweets.size()) {
-		    trend.addRelatedHashTag(orderedHashTags[i].getKey());
-		} else {
-		    break;
-		}
+	    // Add at most 100 most common hash tags among the tweets sorted by their frequencies.
+	    for (int i = 0; i < 100 && i < orderedHashTags.length; i++) {
+		trend.addRelatedHashTag(orderedHashTags[i]);
 	    }
 	}
     }

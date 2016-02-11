@@ -2,6 +2,7 @@ package uk.ac.cam.quebec.twitterproc;
 
 import java.util.List;
 
+import javafx.util.Pair;
 import uk.ac.cam.quebec.trends.Trend;
 import uk.ac.cam.quebec.twitterwrapper.TwitException;
 import uk.ac.cam.quebec.twitterwrapper.TwitterLink;
@@ -14,7 +15,7 @@ public class ExtractConceptsTest {
 	TwitterLink link;
 
 	try {
-	    Trend trend = new Trend("SpaceX", "USA", 1);
+	    Trend trend = new Trend("Donald Trump", "USA", 1);
 	    trend.setParsedName(UtilParsing.parseTrendName(trend.getName()));
 
 	    List<Status> tweets;
@@ -23,21 +24,21 @@ public class ExtractConceptsTest {
 	    tweets = link.getTweets(trend.getName());
 
 	    System.out.println("Number of tweets: " + tweets.size());
-//	    System.out.println("Print tweets");
-//	    for (Status tweet : tweets) {
-//		System.out.println(tweet.getDisplayText());
-//	    }
+	    System.out.println("Print tweets");
+	    for (Status tweet : tweets) {
+		System.out.println(tweet.getDisplayText());
+	    }
 
 	    TwitterProcessor.extractConcepts(trend, tweets);
-	    List<String> concepts = trend.getConcepts();
-	    List<String> hashTags = trend.getRelatedHashTags();
+	    List<Pair<String, Integer>> concepts = trend.getConcepts();
+	    List<Pair<String, Integer>> hashTags = trend.getRelatedHashTags();
 	    System.out.println("--- Concepts ---");
-	    for (String concept : concepts) {
-		System.out.println(concept);
+	    for (Pair<String, Integer> concept : concepts) {
+		System.out.println(concept.getKey() + " " + concept.getValue());
 	    }
 	    System.out.println("--- Hash Tags ---");
-	    for (String hashTag : hashTags) {
-		System.out.println(hashTag);
+	    for (Pair<String, Integer> hashTag : hashTags) {
+		System.out.println(hashTag.getKey() + " " + hashTag.getValue());
 	    }
 	} catch (TwitException e) {
 	    System.err.println(e.toString());
