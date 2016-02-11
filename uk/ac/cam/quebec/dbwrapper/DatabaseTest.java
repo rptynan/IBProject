@@ -23,15 +23,24 @@ public class DatabaseTest {
     /**
      * Just a test.
      *
-     * <p>SuprressWarnings is for Status constructor which is to only be used
-     * for testing.
      */
-    @SuppressWarnings( "deprecation" )
     public static void main(String[] args) {
-        // getInstance
+    Database.setCredentials("ibproject", null, "jdbc:mysql://localhost:3306/ibprojectdb", true);
+    //By seperating the set credentials call from the tests we can invoke the 
+    //tests from elsewhere
+    test();
+    }
+    /**
+     * This is the function where the tests are run
+     * 
+     * SuprressWarnings is for Status constructor which is to only be used for
+     * testing.
+     */
+    @SuppressWarnings("deprecation")
+    public static void test() {// getInstance
         // Get two databases to check they're the same (or acting the same)
         System.out.println("==> Initialising Database(s)");
-        Database.setCredentials("ibproject", null, "jdbc:mysql://localhost:3306/ibprojectdb", true);
+        
         Database db1 = Database.getInstance();
         Database db2 = Database.getInstance();
 
@@ -63,11 +72,11 @@ public class DatabaseTest {
         ArrayList<Status> tweets = new ArrayList<Status>(3);
         List<Status> tweetList = null;
         tweets.add(0, new Status(new User("User1"), "Test Tweet 1 @Me #Beans",
-                    new BigInteger("123"), new Date()));
+                new BigInteger("123"), new Date()));
         tweets.add(1, new Status(new User("User2"), "Test Tweet 2 @Me #Beans",
-                    new BigInteger("18446744073709551615"), new Date()));
+                new BigInteger("18446744073709551615"), new Date()));
         tweets.add(2, new Status(new User("User3"), "Test Tweet 3 @Me #Beans",
-                    new BigInteger("123"), new Date()));
+                new BigInteger("123"), new Date()));
         try {
             db1.putTweets(tweets, t1);
             tweetList = db2.getTweets(t1);

@@ -83,7 +83,7 @@ public class CoreConsole extends Thread {
         }   else if (command.equalsIgnoreCase("test database"))
         {
             System.out.println("Starting database test");
-            DatabaseTest.main(new String[0]);
+            DatabaseTest.test();
             System.out.println("Database test finish");
         }
             else {
