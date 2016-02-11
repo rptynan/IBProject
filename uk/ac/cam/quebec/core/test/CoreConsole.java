@@ -102,6 +102,7 @@ public class CoreConsole extends Thread {
     public void run() {
         try {
             String s;
+            System.out.println("Type start to start the core");
             System.out.println("Console initialised:");
             while ((running) && ((s = r.readLine()).length() > 0)) {
                 try {
@@ -137,6 +138,12 @@ public class CoreConsole extends Thread {
             return null;
         }
     }
+    
+    /**
+     * Function to get the location for trends from the config file
+     * @param doc the XML config file
+     * @return the location to use
+     */
     public static String getLocation(Document doc)
     {
         String s = "";
