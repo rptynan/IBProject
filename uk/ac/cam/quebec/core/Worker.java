@@ -9,8 +9,8 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import uk.ac.cam.quebec.core.test.TrendTask;
 import uk.ac.cam.quebec.trends.Trend;
-import uk.ac.cam.quebec.twitterproc.TwitterProcessor;
 
 /**
  *This is a dummy class that represents a worker thread and the object it is
@@ -18,7 +18,7 @@ import uk.ac.cam.quebec.twitterproc.TwitterProcessor;
  * @author James
  */
 public class Worker extends Thread implements Comparable{
-    private final BlockingQueue<Trend> o;
+    private final BlockingQueue<Task> o;//Todo: replace with semaphores
     private final TaskType type;
     private boolean running;
     private final GroupProjectCore parent;
@@ -34,11 +34,12 @@ public class Worker extends Thread implements Comparable{
     }
     public void process (Trend _o)
     {
-        o.add(_o);
+       TrendTask t = new TrendTask(_o);
+       process(t);
     }
-    public void process(Task _o)
+    public void process(Task _task)
     {
-        
+        o.add(_task);
     }
     public void process(Object _o)
     {
@@ -50,8 +51,10 @@ public class Worker extends Thread implements Comparable{
         while (running)
         {
         try {
-            TwitterProcessor.process(o.take());
+            Task t = o.take();
+            t.getTaskInterface().process();
         } catch (Exception ex) {
+            System.err.println("Error processing task");
             Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
         }
         parent.reallocateWorker(this);

@@ -10,11 +10,9 @@ package uk.ac.cam.quebec.core;
  * @author James
  */
 public class Task {
-    private final Object taskInterface;
-    private final TaskType type;
-    //private final TaskInterface taskInterface;
-    //public Task (TaskInterface _taskInterface,TaskType _type)
-    public Task (Object _taskInterface,TaskType _type)
+   private final TaskType type;
+    private final TaskInterface taskInterface;
+    public Task (TaskInterface _taskInterface,TaskType _type)
     {
         type = _type;
         taskInterface = _taskInterface;
@@ -23,7 +21,7 @@ public class Task {
     {
         return type;
     }
-    public Object getTaskInterface()
+    public TaskInterface getTaskInterface()
     {
         return taskInterface;
     }
