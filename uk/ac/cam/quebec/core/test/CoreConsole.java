@@ -58,8 +58,18 @@ public class CoreConsole extends Thread {
             System.out.println("Wiki wrapper test end");
         }else if (command.startsWith("add trend "))
         {   String s = command.substring(10);
+            System.out.println("Adding trend "+s);
             Trend T = new Trend(s,"World",0);
-            coreTrends.putTrend(T);
+            if(coreTrends.putTrend(T))
+            {
+                System.out.println("Trend "+s+" added successfully");
+            }
+            else
+            {
+                System.out.println("Failed to add trend "+s);
+            }
+            
+            
         }
         else
         {

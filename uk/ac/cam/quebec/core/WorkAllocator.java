@@ -26,7 +26,7 @@ public class WorkAllocator {
         TweetQueue = _TweetQueue;
         PageQueue = _PageQueue;
         TrendQueue = _TrendQueue;
-        CoreQueue = new PriorityBlockingQueue<>(TweetQueue.size());
+        CoreQueue = new PriorityBlockingQueue<>();
     }
     
     public Task getTask(TaskType preferredType) {
