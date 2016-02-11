@@ -160,7 +160,7 @@ public class CoreConsole extends Thread {
         String Path = Item.item(0).getTextContent();
         Item = parent.getElementsByTagName("ClearOnStart");
         String clear = Item.item(0).getTextContent();
-        boolean wipe = false;
+        boolean wipe = clear.equalsIgnoreCase("true");
         Database.setCredentials(User, Password, "jdbc:mysql://"+Path,wipe);
             Database DB = Database.getInstance();
             return DB;
@@ -169,10 +169,10 @@ public class CoreConsole extends Thread {
         try {
             Document doc = getConfig("Remote\\config.xml");
             String[] test = getTwitterArgs(doc);
-            getDatabase(doc);
-            Database.setCredentials("IBUser", "IBUserTest", "jdbc:mysql://localhost:3306/ibprojectdb",false);
-            Database DB = Database.getInstance();
-            GroupProjectCore core = new GroupProjectCore(args, DB);
+            
+            //Database.setCredentials("IBUser", "IBUserTest", "jdbc:mysql://localhost:3306/ibprojectdb",false);
+            Database DB = getDatabase(doc);//Database.getInstance();
+            GroupProjectCore core = new GroupProjectCore(test, DB);
             core.setDaemon(true);
             core.setName("CoreThread");
             CoreConsole c = new CoreConsole(core, args);
