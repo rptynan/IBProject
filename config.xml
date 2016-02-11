@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+
+
+<Configuration>
+    <Database>
+        <UserName>DBUser</UserName>
+        <Password>DBPass</Password>
+        <Path>localhost:3306/ibprojectdb</Path>
+        <ClearOnStart>false</ClearOnStart>
+    </Database>
+    <Twitter>
+        <OAuth_Key>KEY</OAuth_Key>
+        <OAuth_Secret>SECRET</OAuth_Secret>
+        <Access_Token>TOKEN</Access_Token>
+        <Access_Secret>TOKEN_SECRET</Access_Secret>
+        <Account_Name>NAME</Account_Name>
+    </Twitter>
+</Configuration>

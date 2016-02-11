@@ -6,10 +6,19 @@
 package uk.ac.cam.quebec.core.test;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 import uk.ac.cam.quebec.core.ControlInterface;
 import uk.ac.cam.quebec.core.GroupProjectCore;
 import uk.ac.cam.quebec.dbwrapper.Database;
@@ -71,6 +80,11 @@ public class CoreConsole extends Thread {
             
             
         }
+        else if (command.equalsIgnoreCase("Repopulate trends"))
+        {
+            System.out.println("Repopulating trends");
+            coreInter.repopulateTrends();
+        }
         else
         {
             System.out.println("Invalid command");
@@ -102,10 +116,60 @@ public class CoreConsole extends Thread {
         } catch (IOException ex) {
             Logger.getLogger(CoreConsole.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }   
+    public static Document getConfig (String path)
+    {   try {
+        File inputFile = new File(path);
+        DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+        Document doc = dBuilder.parse(inputFile);
+        doc.getDocumentElement().normalize();
+        return doc;
+        } catch (ParserConfigurationException| SAXException | IOException ex) {
+            Logger.getLogger(CoreConsole.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
+        }
+    }
+    public static String[] getTwitterArgs(Document doc)
+    {
+        String[] twittercreds = new String[5];
+            if(doc != null)
+            {   NodeList parents = doc.getElementsByTagName("Twitter");
+                Element parent = (Element)parents.item(0);
+                NodeList Item = parent.getElementsByTagName("OAuth_Key");
+                twittercreds[0] = Item.item(0).getTextContent();
+                Item = parent.getElementsByTagName("OAuth_Secret");
+                twittercreds[1] = Item.item(0).getTextContent();
+                Item = parent.getElementsByTagName("Access_Token");
+                twittercreds[2] = Item.item(0).getTextContent();
+                Item = parent.getElementsByTagName("Access_Secret");
+                twittercreds[3] = Item.item(0).getTextContent();
+                Item = parent.getElementsByTagName("Account_Name");
+                twittercreds[4] = Item.item(0).getTextContent();
+            }
+            return twittercreds;
+    }   public static Database getDatabase(Document doc)
+    {   
+        NodeList parents = doc.getElementsByTagName("Database");
+        Element parent = (Element)parents.item(0);
+        NodeList Item = parent.getElementsByTagName("UserName");
+        String User = Item.item(0).getTextContent();
+        Item = parent.getElementsByTagName("Password");
+        String Password = Item.item(0).getTextContent();
+        Item = parent.getElementsByTagName("Path");
+        String Path = Item.item(0).getTextContent();
+        Item = parent.getElementsByTagName("ClearOnStart");
+        String clear = Item.item(0).getTextContent();
+        boolean wipe = false;
+        Database.setCredentials(User, Password, "jdbc:mysql://"+Path,wipe);
+            Database DB = Database.getInstance();
+            return DB;
     }
         public static void main(String[] args) {
         try {
-            //  
+            Document doc = getConfig("Remote\\config.xml");
+            String[] test = getTwitterArgs(doc);
+            getDatabase(doc);
             Database.setCredentials("IBUser", "IBUserTest", "jdbc:mysql://localhost:3306/ibprojectdb",false);
             Database DB = Database.getInstance();
             GroupProjectCore core = new GroupProjectCore(args, DB);
