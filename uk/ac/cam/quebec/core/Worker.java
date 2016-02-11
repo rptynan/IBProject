@@ -9,6 +9,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import uk.ac.cam.quebec.core.test.TestTask;
 import uk.ac.cam.quebec.core.test.TrendTask;
 import uk.ac.cam.quebec.trends.Trend;
 
@@ -18,13 +19,13 @@ import uk.ac.cam.quebec.trends.Trend;
  * @author James
  */
 public class Worker extends Thread implements Comparable{
-    private final BlockingQueue<Task> o;//Todo: replace with semaphores
+    private BlockingQueue<Task> o;//Todo: replace with semaphores
     private final TaskType type;
     private boolean running;
     private final GroupProjectCore parent;
     public Worker (TaskType _type,GroupProjectCore _parent)
     {
-        o = new ArrayBlockingQueue<>(5);
+        o = new ArrayBlockingQueue<>(1);
         type = _type;
         parent = _parent;
     }
@@ -32,18 +33,33 @@ public class Worker extends Thread implements Comparable{
     {
         return type;
     }
-    public void process (Trend _o)
+    public boolean process (Trend _o)
     {
        TrendTask t = new TrendTask(_o);
-       process(t);
+       Task task = new Task(t,TaskType.Trend);
+       return process(task);
     }
-    public void process(Task _task)
-    {
+    /**
+    Sets a task to be processed
+     * @param _task the task to be processed
+     * @return If the task was successfully set for processing
+    */
+    public boolean process(Task _task)
+    {   try{
         o.add(_task);
+        return true;
     }
-    public void process(Object _o)
-    {
-        
+    catch (IllegalStateException ex)
+    {   //this means the Queue is full
+        return false;
+    }
+            
+    }
+    public boolean processObject(Object _o)
+    {TestTask tst = new TestTask(_o);
+    Task task = new Task(tst,TaskType.Core);
+       return process(task);
+       
     }
     @Override
     public void run()

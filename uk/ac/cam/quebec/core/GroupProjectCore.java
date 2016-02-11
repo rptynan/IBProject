@@ -98,7 +98,7 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
         while(running)
         {
             w = ThreadQueue.take();
-        //Task task = workAllocator.getTask(TaskType.Trend);
+        //Task task = workAllocator.getTask(w.getWorkerType());
         //w.process(task);
         Trend T = TrendQueue.take();
         w.process(T);
@@ -147,7 +147,7 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
             }
             if(o!=null)
             {
-                w.process(o);
+                w.processObject(o);
             }
                     } catch (InterruptedException ex) {
             Logger.getLogger(GroupProjectCore.class.getName()).log(Level.SEVERE, null, ex);
@@ -216,7 +216,7 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
            s += "Core is not running"+System.lineSeparator();
         }
         s += workAllocator.getStatus()+System.lineSeparator();
-        s += UAPII.getStatus()+System.lineSeparator();
+        s += UAPII.getStatus();
         return s;
         
     }
