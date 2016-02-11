@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
+import uk.ac.cam.quebec.core.test.TestTask;
+import uk.ac.cam.quebec.core.test.TrendTask;
 import uk.ac.cam.quebec.trends.Trend;
 import uk.ac.cam.quebec.wikiwrapper.WikiArticle;
 
@@ -23,8 +25,8 @@ public class WorkAllocator {
     private final PriorityBlockingQueue<WikiArticle> PageQueue;
     private final PriorityBlockingQueue<Trend> TrendQueue;
     private final PriorityBlockingQueue<Object> CoreQueue;
-    private final Queue<Worker>ThreadQueue;
-    private final List<Thread>ThreadPool;
+    private final Queue<Worker> ThreadQueue;
+    private final List<Thread> ThreadPool;
 
     WorkAllocator(PriorityBlockingQueue<Object> _TweetQueue, PriorityBlockingQueue<WikiArticle> _PageQueue, PriorityBlockingQueue<Trend> _TrendQueue, PriorityBlockingQueue<Worker> _ThreadQueue, List<Thread> _ThreadPool) {
         TweetQueue = _TweetQueue;
@@ -35,12 +37,11 @@ public class WorkAllocator {
         CoreQueue = new PriorityBlockingQueue<>();
     }
 
-    
-    public String getStatus()
-    {
-        String s = "There are: " + TrendQueue.size()+ " trends, "+TweetQueue.size()+" tweets and "+PageQueue.size()+" pages in the queue. There are currently "+ThreadQueue.size()+"/"+ThreadPool.size()+" idle threads.";
+    public String getStatus() {
+        String s = "There are: " + TrendQueue.size() + " trends, " + TweetQueue.size() + " tweets and " + PageQueue.size() + " pages in the queue. There are currently " + ThreadQueue.size() + "/" + ThreadPool.size() + " idle threads.";
         return s;
     }
+
     public Task getTask(TaskType preferredType) {
         Task ret = null;
         Object o = null;
@@ -58,29 +59,29 @@ public class WorkAllocator {
                 o = CoreQueue.poll();
                 break;
         }
-        if(o!=null)
-        {
-            ret = new Task(o,preferredType);
+        if (o != null) {
+            TestTask tst = new TestTask(o);
+            ret = new Task(tst, preferredType);
             return ret;
         }
-        if (!CoreQueue.isEmpty())
-        {
-            ret = new Task(CoreQueue.poll(),TaskType.Core);
+        if (!CoreQueue.isEmpty()) {
+            TestTask tst = new TestTask(CoreQueue.poll());
+            ret = new Task(tst, TaskType.Core);
             return ret;
         }
-        if (!TrendQueue.isEmpty())
-        {
-            ret = new Task(TrendQueue.poll(),TaskType.Trend);
+        if (!TrendQueue.isEmpty()) {
+            TrendTask tst = new TrendTask(TrendQueue.poll());
+            ret = new Task(tst, TaskType.Trend);
             return ret;
         }
-        if (!TweetQueue.isEmpty())
-        {
-            ret = new Task(TweetQueue.poll(),TaskType.Tweet);
+        if (!TweetQueue.isEmpty()) {
+            TestTask tst = new TestTask(TrendQueue.poll());
+            ret = new Task(tst, TaskType.Tweet);
             return ret;
         }
-        if (!PageQueue.isEmpty())
-        {
-            ret = new Task(PageQueue.poll(),TaskType.Page);
+        if (!PageQueue.isEmpty()) {
+            TestTask tst = new TestTask(TrendQueue.poll());
+            ret = new Task(tst, TaskType.Page);
             return ret;
         }
         return ret;
