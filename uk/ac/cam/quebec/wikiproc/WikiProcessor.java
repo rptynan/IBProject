@@ -60,7 +60,7 @@ public class WikiProcessor {
 
         buildConcepts();
         fetchArticles();
-        //storeArticles();
+        storeArticles();
     }
 
     /**
