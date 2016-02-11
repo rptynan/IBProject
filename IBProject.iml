@@ -5,6 +5,7 @@
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/Servlet Experiment" />
+      <excludeFolder url="file://$MODULE_DIR$/Tomcat Web App" />
       <excludeFolder url="file://$MODULE_DIR$/checkstyle" />
       <excludeFolder url="file://$MODULE_DIR$/lib/JTwitter" />
       <excludeFolder url="file://$MODULE_DIR$/uk/ac/cam/quebec/common" />
@@ -39,5 +40,6 @@
     <orderEntry type="library" name="json-path-0.8.0" level="project" />
     <orderEntry type="library" name="commons-lang-2.6" level="project" />
     <orderEntry type="library" name="bliki-core-3.0.19 (3)" level="project" />
+    <orderEntry type="library" name="mysql-connector-java-5.1.38-bin" level="project" />
   </component>
 </module>
