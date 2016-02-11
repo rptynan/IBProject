@@ -19,6 +19,7 @@ public abstract class Database {
     protected static String username = null;
     protected static String dbserver = null;
     protected static String password = null;
+    protected static boolean dropTables = false;
 
     /**
      * Used for accessing setId() methods on Trends, WikiArticles and Tweets.
@@ -49,11 +50,15 @@ public abstract class Database {
      * @param passwd    a string containing the password
      * @param loctn     a string containing the database location, e.g.
      *                  jdbc:mysql://localhost:3306/ibprojectdb
+     * @param dropTbls  a bool, if true the database will be cleared on
+     *                  startup (dropped tables), else it won't be cleared
      */
-    public static void setCredentials(String usernm, String passwd, String loctn) {
+    public static void setCredentials(String usernm, String passwd, String loctn,
+            boolean dropTbls) {
         username = usernm;
         password = passwd;
         dbserver = loctn;
+        dropTables = dropTbls;
     }
 
     /**
@@ -84,13 +89,24 @@ public abstract class Database {
     public abstract void putTweets(List<Status> tweets, Trend trend) throws DatabaseException;
 
     /**
-     * Gets a list of tweets with reference to the given Trend.
+     * Gets a list of tweets associated with the Trend specified by the Trend
+     * object.
      *
      * @param trend     the trend the tweets are stored under
      *
      * @return a list of jtwitter Status Objects representing the tweets
      */
     public abstract List<Status> getTweets(Trend trend) throws DatabaseException;
+
+    /**
+     * Gets a list of tweets associated with the Trend specified by the
+     * trend_id.
+     *
+     * @param trend_id  the trend_id the tweets are stored under
+     *
+     * @return a list of jtwitter Status Objects representing the tweets
+     */
+    public abstract List<Status> getTweets(int trend_id) throws DatabaseException;
 
     /**
      * Stores a list of wikipedia articles with reference to the given Trend.
@@ -102,8 +118,8 @@ public abstract class Database {
         throws DatabaseException;
 
     /**
-     * Gets a list of wikipedia articles with reference to the given Trend,
-     * given the Trend object.
+     * Gets a list of wikipedia articles associated with the Trend specified by
+     * the Trend object.
      *
      * @param trend     the trend the articles are stored under
      *
@@ -112,8 +128,8 @@ public abstract class Database {
     public abstract List<WikiArticle> getWikiArticles(Trend trend) throws DatabaseException;
 
     /**
-     * Gets a list of wikipedia articles with reference to the given Trend,
-     * given the trend_id.
+     * Gets a list of wikipedia articles associated with the Trend specified by
+     * the trend_id.
      *
      * @param trend_id  the trend_id that the articles are stored under
      *

@@ -92,7 +92,10 @@ class DatabaseInternal extends Database {
         try {
             stmt = connection.createStatement();
             // Drop the tables on startup, clears any data in db!
-            stmt.execute("DROP tables trends, wikiarticles, tweets, trends_wikiarticles_junction");
+            if (dropTables) {
+                stmt.execute("DROP tables trends, wikiarticles, tweets, "
+                        + "trends_wikiarticles_junction");
+            }
 
             // trends
             stmt.execute("CREATE TABLE IF NOT EXISTS trends ("
@@ -240,6 +243,10 @@ class DatabaseInternal extends Database {
     }
 
     public List<Status> getTweets(Trend trend) throws DatabaseException {
+        return getTweets(trend.getId());
+    }
+
+    public List<Status> getTweets(int trend_id) throws DatabaseException {
         ArrayList<Status> result = new ArrayList<Status>();
         Statement stmt = null;
         ResultSet rs = null;
@@ -249,7 +256,7 @@ class DatabaseInternal extends Database {
             stmt = connection.createStatement();
             synchronized (conMutex) {
                 rs = stmt.executeQuery("SELECT object FROM tweets WHERE "
-                        + "trend_id = " + trend.getId());
+                        + "trend_id = " + trend_id);
             }
 
             while (rs.next()) {
