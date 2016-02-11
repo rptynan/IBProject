@@ -32,11 +32,19 @@ public class TwikfeedServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	    response.setContentType("text/html");
 	    // Here is the decoding of the request
-	    String serverAddress = null;
-	    if(request.getParameter("Type").equals("Trends")){
+	    
+	    String serverAddress = "";
+	    String type = request.getParameter("Type");
+	    if(type.equals("Trends")){
 	        serverAddress = "Trends?stuff";
 	    }
-	    if(serverAddress != null){
+	    
+	    if(type.equals("Articles")){
+	        serverAddress = "Articles?id=" + request.getParameter("id");
+	        response.getWriter().println(
+	                request.getParameter("id"));
+	    }
+	    if(!serverAddress.equals("")){
             BufferedReader r = null;
             try {
                 r = new BufferedReader(new InputStreamReader(new URL(
@@ -59,7 +67,7 @@ public class TwikfeedServlet extends HttpServlet {
            
             response.getWriter().println(
                     sb.toString());
-	    }else response.getWriter().println(
+	    }else  response.getWriter().println(
                 "[]");
 	    
 	}
