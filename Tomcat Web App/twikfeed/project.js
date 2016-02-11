@@ -21,7 +21,7 @@ $(document).ready(function(){
 		
 		
 		var updateTrends = function(){
-			$.get("TwikfeedServlet", function(data, textStatus) {
+			$.get("TwikfeedServlet?Type=Trends").done(function(data, textStatus) {
 			
 			alert(data);
 		

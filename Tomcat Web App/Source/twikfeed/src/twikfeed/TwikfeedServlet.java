@@ -31,30 +31,37 @@ public class TwikfeedServlet extends HttpServlet {
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 	    response.setContentType("text/html");
-	    // Here will go the decoding of the request when I add more options
-	    String serverAddress = "Trends?stuff";
-        BufferedReader r = null;
-        try {
-            r = new BufferedReader(new InputStreamReader(new URL(
-                    "http://localhost:90/" + serverAddress).openStream()));
-        } catch (IOException e) {
-           
-            e.printStackTrace();
-        }
-        String str = null;
-        StringBuilder sb = new StringBuilder(32768);
-        try {
-            while ((str = r.readLine()) != null) {
-                
-                sb.append(str);
+	    // Here is the decoding of the request
+	    String serverAddress = null;
+	    if(request.getParameter("Type").equals("Trends")){
+	        serverAddress = "Trends?stuff";
+	    }
+	    if(serverAddress != null){
+            BufferedReader r = null;
+            try {
+                r = new BufferedReader(new InputStreamReader(new URL(
+                        "http://localhost:90/" + serverAddress).openStream()));
+            } catch (IOException e) {
+               
+                e.printStackTrace();
             }
-        } finally {
-            r.close();
-        }
-        System.out.println(sb.toString());
-       
-        response.getWriter().println(
-                sb.toString());
+            String str = null;
+            StringBuilder sb = new StringBuilder(32768);
+            try {
+                while ((str = r.readLine()) != null) {
+                    
+                    sb.append(str);
+                }
+            } finally {
+                r.close();
+            }
+            System.out.println(sb.toString());
+           
+            response.getWriter().println(
+                    sb.toString());
+	    }else response.getWriter().println(
+                "[]");
+	    
 	}
 
 }
