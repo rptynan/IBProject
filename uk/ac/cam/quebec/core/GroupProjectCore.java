@@ -5,12 +5,9 @@ import java.io.IOException;
 import uk.ac.cam.quebec.userapi.APIServerAbstract;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import uk.ac.cam.quebec.core.test.TestDatabase;
 import uk.ac.cam.quebec.core.test.Worker;
 import uk.ac.cam.quebec.dbwrapper.Database;
 import uk.ac.cam.quebec.trends.Trend;
@@ -19,7 +16,6 @@ import uk.ac.cam.quebec.twitterproc.TwitterProcessor;
 import uk.ac.cam.quebec.twitterwrapper.TwitException;
 import uk.ac.cam.quebec.twitterwrapper.TwitterLink;
 import uk.ac.cam.quebec.userapi.NewAPIServer;
-import uk.ac.cam.quebec.userapi.UserAPIServer;
 import uk.ac.cam.quebec.wikiproc.WikiProcessor;
 import uk.ac.cam.quebec.wikiwrapper.WikiArticle;
 
@@ -29,10 +25,11 @@ import uk.ac.cam.quebec.wikiwrapper.WikiArticle;
  */
 public class GroupProjectCore extends Thread implements TrendsQueue, ControlInterface{
     private final List<Thread> Threadpool;
-    private final BlockingQueue<Worker> ThreadQueue;
-    private final BlockingQueue<Object> TweetQueue;
-    private final BlockingQueue<WikiArticle> PageQueue;
-    private final BlockingQueue<Trend> TrendQueue;
+    private final PriorityBlockingQueue<Worker> ThreadQueue;
+    private final PriorityBlockingQueue<Object> TweetQueue;
+    private final PriorityBlockingQueue<WikiArticle> PageQueue;
+    private final PriorityBlockingQueue<Trend> TrendQueue;
+    private final WorkAllocator workAllocator;
     private final NewAPIServer UAPI;//User API, here for testing only
     private final APIServerAbstract UAPII;//User API Interface
     private final TwitterLink twitterWrapper;
@@ -47,7 +44,8 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
     {
         TweetQueue = new PriorityBlockingQueue<>();
         PageQueue = new PriorityBlockingQueue<>();
-        TrendQueue = new PriorityBlockingQueue<>();//Todo: replace with priority queue
+        TrendQueue = new PriorityBlockingQueue<>();//Todo: replace with priority multiqueue
+        workAllocator = new WorkAllocator(TweetQueue,PageQueue,TrendQueue);
         Threadpool = new ArrayList<>();
         DB = _DB;
         ThreadQueue = new PriorityBlockingQueue<>();
@@ -94,7 +92,8 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
         Trend T = TrendQueue.take();
         w.process(T);
         if(!w.isAlive())
-        {w.start();
+        {
+            w.start();
         }
 //w.start();
         //TwitterProcessor.process(T);
@@ -204,7 +203,7 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
         if(running)
         {
         String s = "";
-        s += "There are: " + TrendQueue.size()+ " trends in the queue";
+        s += "There are: " + TrendQueue.size()+ " trends, "+TweetQueue.size()+" tweets and "+PageQueue.size()+" pages in the queue. There are currently "+ThreadQueue.size()+" threads idle.";
         return s;
         }
         else

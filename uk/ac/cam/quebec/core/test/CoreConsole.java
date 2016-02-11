@@ -14,7 +14,6 @@ import uk.ac.cam.quebec.core.ControlInterface;
 import uk.ac.cam.quebec.core.GroupProjectCore;
 import uk.ac.cam.quebec.dbwrapper.Database;
 import uk.ac.cam.quebec.trends.TrendsQueue;
-import uk.ac.cam.quebec.twitterwrapper.TwitException;
 import uk.ac.cam.quebec.wikiwrapper.WikiException;
 
 /**
@@ -58,6 +57,9 @@ public class CoreConsole extends Thread {
             System.out.println("Wiki wrapper test start");
             uk.ac.cam.quebec.wikiwrapper.test.Test.main(new String[0]);
             System.out.println("Wiki wrapper test end");
+        }else
+        {
+            System.out.println("Invalid command");
         }
     }
 
