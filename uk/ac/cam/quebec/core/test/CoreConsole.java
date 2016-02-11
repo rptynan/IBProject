@@ -167,7 +167,7 @@ public class CoreConsole extends Thread {
     }
         public static void main(String[] args) {
         try {
-            Document doc = getConfig("Remote\\config.xml");
+            Document doc = getConfig(args[0]);
             String[] test = getTwitterArgs(doc);
             
             //Database.setCredentials("IBUser", "IBUserTest", "jdbc:mysql://localhost:3306/ibprojectdb",false);
