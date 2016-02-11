@@ -13,6 +13,8 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
+import javafx.util.Pair;
+
 /**
  * Class responsible for Wikipedia processing. For the minimum viable product,
  * it should have the basic functionality that given a Trend and a list of
@@ -26,8 +28,8 @@ public class WikiProcessor {
 
     private Trend trend;
     private List<WikiArticle> articleList;
-    private List<String> wikiConcepts;
-    private List<String> trendConcepts;
+    private List<Pair<String, Double>> wikiConcepts;
+    private List<Pair<String, Integer>> trendConcepts;
     private List<KGConcept> kgConcepts;
     private KGConceptGenerator kgConceptGenerator;
 
@@ -35,7 +37,7 @@ public class WikiProcessor {
         return articleList;
     }
 
-    public List<String> getWikiConcepts() {
+    public List<Pair<String, Double>> getWikiConcepts() {
         return wikiConcepts;
     }
 
@@ -58,7 +60,7 @@ public class WikiProcessor {
 
         buildConcepts();
         fetchArticles();
-        storeArticles();
+        //storeArticles();
     }
 
     /**
@@ -67,16 +69,24 @@ public class WikiProcessor {
      */
     private void buildConcepts() {
         trendConcepts = trend.getConcepts();
-        wikiConcepts = trendConcepts; // return after this for simplest functionality
 
         kgConceptGenerator = new KGConceptGenerator();
-
         kgConcepts = new LinkedList<>();
 
+        int averageCount = 0;
+        for (Pair<String, Integer> concept : trendConcepts) {
+            averageCount += concept.getValue();
+        }
+        if (!trendConcepts.isEmpty()) {
+            averageCount /= trendConcepts.size();
+        }
+
         // get KGConcepts for each trendConcept and put them all together
-        for (String trendConcept : trendConcepts) {
-            for (KGConcept kgConcept : kgConceptGenerator.getKGConcepts(trendConcept, 3)) {
+        for (Pair<String, Integer> trendConcept : trendConcepts) {
+            for (KGConcept kgConcept : kgConceptGenerator.getKGConcepts(trendConcept.getKey(),
+                    trendConcept.getValue() >= averageCount ? 2 : 1)) {
                 if (kgConcept != null) {
+                    kgConcept.setScore(kgConcept.getScore() * trendConcept.getValue());
                     kgConcepts.add(kgConcept);
                 }
             }
@@ -92,7 +102,7 @@ public class WikiProcessor {
 
         wikiConcepts = new LinkedList<>();
         for (KGConcept kgConcept : kgConcepts) {
-            wikiConcepts.add(kgConcept.getName());
+            wikiConcepts.add(new Pair<String, Double>(kgConcept.getName(), kgConcept.getScore()));
         }
     }
 
@@ -102,10 +112,19 @@ public class WikiProcessor {
     private void fetchArticles() {
         articleList = new LinkedList<WikiArticle>();
 
+        double averageScore = 0;
+        for (Pair<String, Double> concept : wikiConcepts) {
+            averageScore += concept.getValue();
+        }
+        if (!wikiConcepts.isEmpty()) {
+            averageScore /= wikiConcepts.size();
+        }
+
         List<WikiArticle> conceptArticles;
-        for (String concept : wikiConcepts) {
+        for (Pair<String, Double> concept : wikiConcepts) {
             try {
-                conceptArticles = WikiFetch.search(concept, 2, 0);
+                conceptArticles = WikiFetch.search(concept.getKey(),
+                        concept.getValue() >= averageScore ? 2 : 1, 0);
                 if (conceptArticles != null) {
                     for (WikiArticle article : conceptArticles) {
                         articleList.add(article);

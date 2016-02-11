@@ -4,6 +4,8 @@ import uk.ac.cam.quebec.kgsearchwrapper.KGConcept;
 import uk.ac.cam.quebec.trends.Trend;
 import uk.ac.cam.quebec.wikiwrapper.WikiArticle;
 
+import javafx.util.Pair;
+
 /**
  * Testing for the wiki processor.
  *
@@ -13,14 +15,14 @@ public class WikiProcessorTest {
 
     public static void main(String[] args) {
         Trend trend = new Trend("president", "us", 0);
-        trend.getConcepts().add("barack");
-        trend.getConcepts().add("president of us");
+        trend.getConcepts().add(new Pair<String, Integer>("barack", 10));
+        trend.getConcepts().add(new Pair<String, Integer>("president of us", 10));
 
         WikiProcessor wikiProcessor = new WikiProcessor();
         wikiProcessor.process(trend);
 
         System.out.println("\n>>>>> CONCEPTS: <<<<<\n");
-        for (String concept : wikiProcessor.getWikiConcepts()) {
+        for (Pair<String, Double> concept : wikiProcessor.getWikiConcepts()) {
             System.out.println(concept);
         }
 
