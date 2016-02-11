@@ -48,7 +48,7 @@ $(document).ready(function(){
 			if (cTrend[0].nodeName == "LI"){
 				
 				//Now make a get request to get the list of page name
-				var trendIndex = cTrend.index("li");
+				var trendIndex = cTrend.index();
 				$.get("TwikfeedServlet?Type=Articles&id="+trendList[trendIndex].id).done(function(data, textStatus) {
 					alert(data);
 		
@@ -69,7 +69,7 @@ $(document).ready(function(){
 			cPage = $(event.target);
 			
 			if (cPage[0].nodeName == "LI"){
-				var pageIndex = cPage.index("li")-pageList.length;
+				var pageIndex = cPage.index();
 				alert(pageIndex);
 			
 				wF.get(0).src = pageList[pageIndex].url;
