@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
-import uk.ac.cam.quebec.core.test.Worker;
 import uk.ac.cam.quebec.trends.Trend;
 import uk.ac.cam.quebec.wikiwrapper.WikiArticle;
 

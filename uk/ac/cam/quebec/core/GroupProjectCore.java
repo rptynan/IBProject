@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.concurrent.PriorityBlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import uk.ac.cam.quebec.core.test.Worker;
 import uk.ac.cam.quebec.dbwrapper.Database;
 import uk.ac.cam.quebec.trends.Trend;
 import uk.ac.cam.quebec.trends.TrendsQueue;
@@ -99,15 +98,14 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
         while(running)
         {
             w = ThreadQueue.take();
+        //Task task = workAllocator.getTask(TaskType.Trend);
+        //w.process(task);
         Trend T = TrendQueue.take();
         w.process(T);
         if(!w.isAlive())
         {
             w.start();
         }
-//w.start();
-        //TwitterProcessor.process(T);
-        //wikiProcessor.process(T);
         }
         } catch (InterruptedException ex) {
          System.out.println("Core loop interupted, core should be closing");

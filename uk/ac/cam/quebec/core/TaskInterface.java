@@ -9,14 +9,13 @@ package uk.ac.cam.quebec.core;
  * This interface is used by the various tasks to request runtime on the core thread pool
  * @author James
  */
-public interface TaskInterface {
+public interface TaskInterface extends Comparable<TaskInterface>{
     /*
     This method should execute the tasks that you want to complete
     */
     public void process();
     /*
-    This method should return the task's prioritysd
+    This method should return the task's priority
     */
     public int priority();
-    
 }

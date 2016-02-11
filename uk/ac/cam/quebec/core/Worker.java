@@ -3,14 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package uk.ac.cam.quebec.core.test;
+package uk.ac.cam.quebec.core;
 
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import uk.ac.cam.quebec.core.GroupProjectCore;
-import uk.ac.cam.quebec.core.TaskType;
 import uk.ac.cam.quebec.trends.Trend;
 import uk.ac.cam.quebec.twitterproc.TwitterProcessor;
 
@@ -20,7 +18,7 @@ import uk.ac.cam.quebec.twitterproc.TwitterProcessor;
  * @author James
  */
 public class Worker extends Thread implements Comparable{
-    private BlockingQueue<Trend> o;
+    private final BlockingQueue<Trend> o;
     private final TaskType type;
     private boolean running;
     private final GroupProjectCore parent;
@@ -37,6 +35,10 @@ public class Worker extends Thread implements Comparable{
     public void process (Trend _o)
     {
         o.add(_o);
+    }
+    public void process(Task _o)
+    {
+        
     }
     public void process(Object _o)
     {
