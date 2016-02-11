@@ -13,6 +13,7 @@ import java.util.logging.Logger;
 import uk.ac.cam.quebec.core.ControlInterface;
 import uk.ac.cam.quebec.core.GroupProjectCore;
 import uk.ac.cam.quebec.dbwrapper.Database;
+import uk.ac.cam.quebec.trends.Trend;
 import uk.ac.cam.quebec.trends.TrendsQueue;
 import uk.ac.cam.quebec.wikiwrapper.WikiException;
 
@@ -28,8 +29,6 @@ public class CoreConsole extends Thread {
     private final TrendsQueue coreTrends;
     private final String[] twitterCreds;
     private boolean running = true;
-
-
 
     public void processCommand(String command) throws WikiException {
         if (command.equalsIgnoreCase("start")) {
@@ -57,7 +56,12 @@ public class CoreConsole extends Thread {
             System.out.println("Wiki wrapper test start");
             uk.ac.cam.quebec.wikiwrapper.test.Test.main(new String[0]);
             System.out.println("Wiki wrapper test end");
-        }else
+        }else if (command.startsWith("add trend "))
+        {   String s = command.substring(10);
+            Trend T = new Trend(s,"World",0);
+            coreTrends.putTrend(T);
+        }
+        else
         {
             System.out.println("Invalid command");
         }
