@@ -21,6 +21,7 @@ public class NewAPIServer  extends APIServerAbstract {
     private final InetSocketAddress addr;
     private final TrendsQueue callback;
     private final HttpServer  server;
+    private boolean running;
     public NewAPIServer(int _port) throws IOException
     {
         this(null,_port,null);
@@ -49,14 +50,34 @@ public class NewAPIServer  extends APIServerAbstract {
     }
     }
     @Override
-    public APIServerAbstract create(Database DB, int port, TrendsQueue callback) throws IOException  {
-      NewAPIServer ret = new NewAPIServer(DB,port,callback);
-      return ret;
+    public void run() {
+        running = true;
+      server.start();
     }
 
     @Override
-    public void run() {
-      server.start();
+    public String getStatus() {
+      if(running())
+      {
+          return "User API server running";
+      }
+      else
+      {
+          return "User API server not running";
+      }
     }
+
+    @Override
+    public boolean running() {
+       return running;
+    }
+
+    @Override
+    public void close() {
+        running = false;
+        System.out.println("User API server stopping");
+        server.stop(30);
+    }
+    
 
 }

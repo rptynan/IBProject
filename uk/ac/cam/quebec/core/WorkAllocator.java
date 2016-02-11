@@ -5,8 +5,11 @@
  */
 package uk.ac.cam.quebec.core;
 
+import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
+import uk.ac.cam.quebec.core.test.Worker;
 import uk.ac.cam.quebec.trends.Trend;
 import uk.ac.cam.quebec.wikiwrapper.WikiArticle;
 
@@ -21,14 +24,24 @@ public class WorkAllocator {
     private final PriorityBlockingQueue<WikiArticle> PageQueue;
     private final PriorityBlockingQueue<Trend> TrendQueue;
     private final PriorityBlockingQueue<Object> CoreQueue;
+    private final Queue<Worker>ThreadQueue;
+    private final List<Thread>ThreadPool;
 
-    public WorkAllocator(PriorityBlockingQueue<Object> _TweetQueue, PriorityBlockingQueue<WikiArticle> _PageQueue, PriorityBlockingQueue<Trend> _TrendQueue) {
+    WorkAllocator(PriorityBlockingQueue<Object> _TweetQueue, PriorityBlockingQueue<WikiArticle> _PageQueue, PriorityBlockingQueue<Trend> _TrendQueue, PriorityBlockingQueue<Worker> _ThreadQueue, List<Thread> _ThreadPool) {
         TweetQueue = _TweetQueue;
         PageQueue = _PageQueue;
         TrendQueue = _TrendQueue;
+        ThreadQueue = _ThreadQueue;
+        ThreadPool = _ThreadPool;
         CoreQueue = new PriorityBlockingQueue<>();
     }
+
     
+    public String getStatus()
+    {
+        String s = "There are: " + TrendQueue.size()+ " trends, "+TweetQueue.size()+" tweets and "+PageQueue.size()+" pages in the queue. There are currently "+ThreadQueue.size()+"/"+ThreadPool.size()+" idle threads.";
+        return s;
+    }
     public Task getTask(TaskType preferredType) {
         Task ret = null;
         Object o = null;

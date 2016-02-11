@@ -24,7 +24,7 @@ import uk.ac.cam.quebec.wikiwrapper.WikiArticle;
  * @author James
  */
 public class GroupProjectCore extends Thread implements TrendsQueue, ControlInterface{
-    private final List<Thread> Threadpool;
+    private final List<Thread> ThreadPool;
     private final PriorityBlockingQueue<Worker> ThreadQueue;
     private final PriorityBlockingQueue<Object> TweetQueue;
     private final PriorityBlockingQueue<WikiArticle> PageQueue;
@@ -44,11 +44,11 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
     {
         TweetQueue = new PriorityBlockingQueue<>();
         PageQueue = new PriorityBlockingQueue<>();
-        TrendQueue = new PriorityBlockingQueue<>();//Todo: replace with priority multiqueue
-        workAllocator = new WorkAllocator(TweetQueue,PageQueue,TrendQueue);
-        Threadpool = new ArrayList<>();
-        DB = _DB;
+        TrendQueue = new PriorityBlockingQueue<>();
         ThreadQueue = new PriorityBlockingQueue<>();
+        ThreadPool = new ArrayList<>();
+        workAllocator = new WorkAllocator(TweetQueue,PageQueue,TrendQueue,ThreadQueue,ThreadPool);
+        DB = _DB;
         UAPI = new NewAPIServer(DB,UAPIPort,this);
         UAPII = UAPI;
         TwitterLink.login(TwitterLoginArgs[0],TwitterLoginArgs[1],TwitterLoginArgs[2],TwitterLoginArgs[3],TwitterLoginArgs[4]);
@@ -67,9 +67,15 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
     }
     private void startUAPI()
     {
+    if(!UAPII.isAlive())
+    {
         UAPII.setDaemon(true);
         UAPII.setName("UserAPIServer");
         UAPII.start();
+    }
+    else{
+        System.err.println("Attempted to start User API server failed, server already running");
+    }
     }
     private void getTrends() throws TwitException
     {   List<String> tr = twitterWrapper.getTrends(location);
@@ -175,23 +181,23 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
             t = new Worker(TaskType.Trend,this);
             t.setDaemon(true);
             t.setName(t.getWorkerType().toString()+" worker thread id: "+i);
-            Threadpool.add(t);
+            ThreadPool.add(t);
             ThreadQueue.add(t);
             t = new Worker(TaskType.Tweet,this);
             t.setDaemon(true);
             t.setName(t.getWorkerType().toString()+" worker thread id: "+i);
-            Threadpool.add(t);
+            ThreadPool.add(t);
             ThreadQueue.add(t);
             t = new Worker(TaskType.Page,this);
             t.setDaemon(true);
             t.setName(t.getWorkerType().toString()+" worker thread id: "+i);
-            Threadpool.add(t);
+            ThreadPool.add(t);
             ThreadQueue.add(t);            
         }
         t = new Worker(TaskType.Core,this);
         t.setDaemon(true);
         t.setName(t.getWorkerType().toString()+" worker thread");
-        Threadpool.add(t);
+        ThreadPool.add(t);
         ThreadQueue.add(t);
     }
     public void reallocateWorker(Worker w)
@@ -200,16 +206,19 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
     }
     @Override
     public String getServerInfo() {
+        String s = "";
         if(running)
         {
-        String s = "";
-        s += "There are: " + TrendQueue.size()+ " trends, "+TweetQueue.size()+" tweets and "+PageQueue.size()+" pages in the queue. There are currently "+ThreadQueue.size()+" threads idle.";
-        return s;
+        s += "Core is running"+System.lineSeparator();
         }
         else
         {
-            return "Core is not running";
+           s += "Core is not running"+System.lineSeparator();
         }
+        s += workAllocator.getStatus()+System.lineSeparator();
+        s += UAPII.getStatus()+System.lineSeparator();
+        return s;
+        
     }
 
     @Override
@@ -221,5 +230,21 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
     @Override
     public boolean isRunning() {
         return running;
+    }
+
+    @Override
+    public void repopulateTrends() {
+        
+        try {
+            getTrends();
+        } catch (TwitException ex) {
+            System.err.println("Error repopulating trends");
+            System.err.println(ex);
+        }
+    }
+
+    @Override
+    public void initialiseUAPI() {
+        startUAPI();
     }
 }

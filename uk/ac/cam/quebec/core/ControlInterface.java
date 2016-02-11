@@ -13,4 +13,6 @@ public interface ControlInterface {
     public void beginClose();
     public String getServerInfo();
     public boolean isRunning();
+    public void initialiseUAPI();
+    public void repopulateTrends();
 }

@@ -106,6 +106,7 @@ public class UserAPIServer extends APIServerAbstract {
 
     }
 
+    @Override
     public synchronized void close() {
         if (running) {
             running = false;
@@ -117,8 +118,19 @@ public class UserAPIServer extends APIServerAbstract {
     }
 
     @Override
-    public APIServerAbstract create(Database DB, int port, TrendsQueue callback) {
-        UserAPIServer tmp = new UserAPIServer(port, DB, callback);
-        return tmp;
+    public boolean running() {
+return running;
+    }
+
+    @Override
+    public String getStatus() {
+        if(running())
+        {
+            return "User API server is running";
+        }
+        else
+        {
+            return "User API server is not running";
+        }
     }
 }

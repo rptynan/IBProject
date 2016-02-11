@@ -14,12 +14,9 @@ import uk.ac.cam.quebec.trends.TrendsQueue;
  * @author James
  */
 public abstract class APIServerAbstract extends Thread{
-    public abstract APIServerAbstract create(Database DB,int port, TrendsQueue callback) throws IOException;
     @Override
     public abstract void run();
-
-    public void begin()
-    {
-        this.start();
-    }
+    public abstract boolean running();
+    public abstract String getStatus();
+    public abstract void close();
 }
