@@ -46,21 +46,33 @@ $(document).ready(function(){
 		var updatePages = function(event){
 			cTrend = $(event.target);
 			if (cTrend[0].nodeName == "LI"){
-				pL.empty();
-				tH.html(cTrend.html()+ "<br>related Wikipedia pages");
+				
 				//Now make a get request to get the list of page name
-				pageList = ["Computer Lab", "Doombar", "Marmite"];
-				var i;
-				for(i=0; i < pageList.length; i++){
-					pL.append("<li>" + pageList[i] + "</li>");
-				}
+				var trendIndex = cTrend.index("li");
+				$.get("TwikfeedServlet?Type=Articles&id="+trendList[trendIndex].id).done(function(data, textStatus) {
+					alert(data);
+		
+					pageList = $.parseJSON(data);
+					pL.empty();
+					tH.html(cTrend.html()+ "<br>related Wikipedia pages");
+			
+				
+					var i;
+					for(i=0; i < pageList.length; i++){
+						pL.append("<li>" + pageList[i].title + "</li>");
+					}
+				}, "text");
 			}
 		}
 		
 		var updatePage = function(event){
 			cPage = $(event.target);
+			
 			if (cPage[0].nodeName == "LI"){
-				wF.get(0).src = "https://en.wikipedia.org/wiki/Tetris";
+				var pageIndex = cPage.index("li")-pageList.length;
+				alert(pageIndex);
+			
+				wF.get(0).src = pageList[pageIndex].url;
 				
 			}
 		}
