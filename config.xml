@@ -8,10 +8,10 @@ and open the template in the editor.
 
 <Configuration>
     <Database>
-        <UserName>DBUser</UserName>
-        <Password>DBPass</Password>
+        <UserName>ibproject</UserName>
+        <Password>password</Password>
         <Path>localhost:3306/ibprojectdb</Path>
-        <ClearOnStart>false</ClearOnStart>
+        <ClearOnStart>true</ClearOnStart>
     </Database>
     <Twitter>
         <OAuth_Key>KEY</OAuth_Key>
