@@ -1,11 +1,11 @@
 package uk.ac.cam.quebec.trends;
 
-import uk.ac.cam.quebec.dbwrapper.Database;
-
 import java.io.Serializable;
-import java.lang.String;
 import java.util.LinkedList;
 import java.util.List;
+
+import javafx.util.Pair;
+import uk.ac.cam.quebec.dbwrapper.Database;
 
 /**
  * Class to represent a single "trend".
@@ -27,8 +27,8 @@ public class Trend implements Serializable, Comparable<Trend> {
 
     private String parsedName;
     private int popularity;
-    private List<String> concepts;
-    private List<String> relatedHashTags;
+    private List<Pair<String, Integer>> concepts;
+    private List<Pair<String, Integer>> relatedHashTags;
 
     public String getName() { return name; }
     public String getLocation() { return location; }
@@ -38,8 +38,8 @@ public class Trend implements Serializable, Comparable<Trend> {
 
     public String getParsedName() { return parsedName; }
     public int getPopularity() { return popularity; }
-    public List<String> getConcepts() { return concepts; }
-    public List<String> getRelatedHashTags() { return relatedHashTags; }
+    public List<Pair<String, Integer>> getConcepts() { return concepts; }
+    public List<Pair<String, Integer>> getRelatedHashTags() { return relatedHashTags; }
 
     /**
      * Create a Trend object.
@@ -74,11 +74,11 @@ public class Trend implements Serializable, Comparable<Trend> {
         this.popularity = popularity;
     }
 
-    public void addConcept(String concept) {
+    public void addConcept(Pair<String, Integer> concept) {
         concepts.add(concept);
     }
 
-    public void addRelatedHashTag(String hashTag) {
+    public void addRelatedHashTag(Pair<String, Integer> hashTag) {
         relatedHashTags.add(hashTag);
     }
 

@@ -31,7 +31,7 @@ public class DatabaseTest {
         // getInstance
         // Get two databases to check they're the same (or acting the same)
         System.out.println("==> Initialising Database(s)");
-        Database.setCredentials("ibproject", null, "jdbc:mysql://localhost:3306/ibprojectdb");
+        Database.setCredentials("ibproject", null, "jdbc:mysql://localhost:3306/ibprojectdb", true);
         Database db1 = Database.getInstance();
         Database db2 = Database.getInstance();
 
@@ -80,7 +80,7 @@ public class DatabaseTest {
         }
         System.out.println("Tweet 3 should have overwritten Tweet 1 (because same id)");
 
-        // putWikiArticles(), getWikiArticles()
+        // putWikiArticles(), getWikiArticles() (by object and id)
         System.out.println("\n==> Testing WikiArticles");
         ArrayList<WikiArticle> wikis1 = new ArrayList<WikiArticle>(2);
         ArrayList<WikiArticle> wikis2 = new ArrayList<WikiArticle>(2);
@@ -98,7 +98,7 @@ public class DatabaseTest {
             db1.putWikiArticles(wikis1, t1);
             db1.putWikiArticles(wikis1, t2);
             db1.putWikiArticles(wikis2, t2);
-            wikiList1 = db2.getWikiArticles(t1);
+            wikiList1 = db2.getWikiArticles(t1.getId());
             wikiList2 = db2.getWikiArticles(t2);
         } catch (DatabaseException exp) {
             exp.printStackTrace();

@@ -21,26 +21,15 @@ $(document).ready(function(){
 		
 		
 		var updateTrends = function(){
-			$.get("TwikfeedServlet?Type=Trends").done(function(data, textStatus) {
-			
-			alert(data);
-		
-			trendList = $.parseJSON(data);
 			pH.empty();
 			tL.empty();
 			pH.html(dDdom.options[dDdom.selectedIndex].value + " Trends");
-			
-			
-			
-			
-		
-		
+			// Now make get request to get the list of trend names
+			trendList = ["Trump", "ArsenalvsManU", "Larry"];
 			var i;
 			for(i=0; i < trendList.length; i++){
-				tL.append("<li>" + trendList[i].name + "</li>");
+				tL.append("<li>" + trendList[i] + "</li>");
 			}
-			}, "text");
-			
 		}
 		
 		var updatePages = function(event){

@@ -1,6 +1,5 @@
 package uk.ac.cam.quebec.util.parsing;
 
-
 /**
  * Parsing Util functions.
  *
@@ -61,5 +60,29 @@ public class UtilParsing {
 	    }
 	}
 	return parsedResult.toString();
+    }
+
+    /**
+     * Remove links from a text.
+     *
+     * @param text
+     * @return The text without any links.
+     */
+    public static String removeLinks(String text) {
+	StringBuilder sb = new StringBuilder();
+	int index = 0;
+	while (index < text.length()) {
+	    String tillEnd = text.substring(index);
+	    if (tillEnd.startsWith("http") || tillEnd.startsWith("www")) {
+		index = text.indexOf(" ", index);
+		if (index == -1) {
+		    index = text.length();
+		}
+	    } else {
+		sb.append(text.charAt(index));
+		index++;
+	    }
+	}
+	return sb.toString().trim().replaceAll(" +", " ");
     }
 }

@@ -57,13 +57,15 @@ public class WikiArticle implements Serializable {
                     .getJSONfromAddress("https://en.wikipedia.org/w/api.php?"
                             + "action=query&prop=extracts&"
                             + "format=json&explaintext=&titles=" + title);
+            
             json = json.getJSONObject("query").getJSONObject("pages");
             JSONArray names = json.names();
             extract = json.getJSONObject(names.getString(0)).getString(
                     "extract");
             id = json.getJSONObject(names.getString(0)).getInt(
                     "pageid");
-
+            // For testing System.out.println("Article: " + this.title);
+ 
         } catch (IOException e) {
             throw new WikiException("Connection to Wikipedia failed.");
         }

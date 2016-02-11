@@ -15,4 +15,17 @@ public class UtilParsingTest {
 	assertEquals(UtilParsing.parseTrendName("@JPMorgan"), "JP Morgan");
     }
 
+    @Test
+    public void removeLinksTest() {
+	assertEquals(UtilParsing.removeLinks("http://www.cl.cam.ac.uk/"), "");
+	assertEquals(UtilParsing.removeLinks("This is http://www.cl.cam.ac.uk/ the CL web page"),
+		"This is the CL web page");
+	assertEquals(UtilParsing.removeLinks("  www.cl.cam.ac.uk/ Link in the start "),
+		"Link in the start");
+	assertEquals(UtilParsing.removeLinks("http://www.cl.cam.ac.uk/ Link in the start"),
+		"Link in the start");
+	assertEquals(UtilParsing.removeLinks("  Link in the end www.cl.cam.ac.uk/"),
+		"Link in the end");
+    }
+
 }
