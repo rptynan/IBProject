@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
 
@@ -22,10 +23,10 @@ public class SentimentAnalyser {
 
     /**
      *
-     * @param textQuery
+     * @param textQuery the text to analyse
      * @return a SentimentAnalysis object for the text query, if it was successful, or null if not
      */
-    public static SentimentAnalysis getAnalysis(String textQuery) {
+    public static SentimentAnalysis getAnalysis(String textQuery) throws HavenException {
         try {
             String urlString = URL_BASE + URLEncoder.encode(textQuery, "UTF-8");
 
@@ -34,33 +35,27 @@ public class SentimentAnalyser {
 
             return new SentimentAnalysis(obj);
         } catch (UnsupportedEncodingException ex) {
-            ex.printStackTrace();
-        }
-
-        return null;
-    }
-
-    private static String getJSONStringFromURL(String urlString) {
-        try {
-            StringBuilder jsonString = new StringBuilder();
-            URL url = new URL(urlString);
-            BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
-
-            int cp;
-            while ((cp = reader.read()) != -1) {
-                jsonString.append((char) cp);
-            }
-
-            return jsonString.toString();
+            throw new HavenException("Cannot encode query to URL", ex);
+        } catch (MalformedURLException ex) {
+            throw new HavenException("URL is incorrect", ex);
         } catch (IOException ex) {
-            ex.printStackTrace();
-            return "";
+            throw new HavenException("Can't read from the API response", ex);
+        } catch (JSONException ex) {
+            throw new HavenException("Could not parse from JSON", ex);
         }
     }
 
-    public static void main(String[] args) throws Exception {
-        String text = "I personally absolutely hate tacos";
+    private static String getJSONStringFromURL(String urlString) throws IOException {
+        StringBuilder jsonString = new StringBuilder();
+        URL url = new URL(urlString);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(url.openStream()));
 
-        getAnalysis(text);
+        int cp;
+        while ((cp = reader.read()) != -1) {
+            jsonString.append((char) cp);
+        }
+
+        return jsonString.toString();
     }
+
 }
