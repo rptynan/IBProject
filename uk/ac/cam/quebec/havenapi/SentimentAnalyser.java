@@ -15,10 +15,10 @@ import java.net.URLEncoder;
  */
 public class SentimentAnalyser {
 
-    private static String API_KEY = "b8f620e6-c509-4828-a53a-12679351abe5";
     private static String URL_BASE =
-            "https://api.havenondemand.com/1/api/sync/analyzesentiment/v1?apikey=" + API_KEY +
-                    "&text=";
+            "https://api.havenondemand.com/1/api/sync/analyzesentiment/v1?apikey="
+                    + APIConstants.getApiKey()
+                    + "&text=";
 
     /**
      *

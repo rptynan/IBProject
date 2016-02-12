@@ -52,7 +52,7 @@ public class KGConceptGenerator {
             url.put("query", query);
             url.put("limit", limit);
             url.put("indent", "true");
-            url.put("key", APIConstants.API_KEY);
+            url.put("key", APIConstants.getApiKey());
 
             HttpRequest request = httpRequestFactory.buildGetRequest(url);
             HttpResponse httpResponse = request.execute();
