@@ -10,7 +10,6 @@ import uk.ac.cam.quebec.trends.Trend;
 import uk.ac.cam.quebec.twitterwrapper.TwitException;
 import uk.ac.cam.quebec.twitterwrapper.TwitterLink;
 import uk.ac.cam.quebec.util.WordCounter;
-import uk.ac.cam.quebec.util.parsing.StopWords;
 import uk.ac.cam.quebec.util.parsing.UtilParsing;
 import uk.ac.cam.quebec.wikiproc.WikiProcessor;
 import winterwell.jtwitter.Status;
@@ -43,19 +42,19 @@ public class TwitterProcessor {
 		db.putTweets(tweets, trend);
 		tweets = db.getTweets(trend); // It is possible to have old tweets in the database.
 	    } catch (DatabaseException e) {
-		System.err.println("Database error");
-		e.printStackTrace();
+		// Throwing exception doesn't necessarily prevent us from continuing execution.
 	    }
 
-	    // TODO (Momchil): Filter duplicate tweets.
 	    trend.setPopularity(calculatePopularity(tweets));
 	    extractConcepts(trend, tweets);
+
+	    WikiProcessor wp = new WikiProcessor();
+	    wp.process(trend);
 	} catch (TwitException e) {
+	    // TODO Auto-generated catch block
 	    System.err.println("Could not create a TwitterLink object");
 	    e.printStackTrace();
 	}
-	WikiProcessor wp = new WikiProcessor();
-	wp.process(trend);
     }
 
     /**
@@ -116,8 +115,8 @@ public class TwitterProcessor {
 			hashTagCounter.addWord(word);
 		    }
 		} else {
-		    if (word.length() > 2 && !StopWords.isStopWord(word)) {
-			// Discard stop words.
+		    if (word.length() > 3) {
+			// Discard short words (a.g. is, the, a, and, ...).
 			wordCounter.addWord(word);
 		    }
 		}

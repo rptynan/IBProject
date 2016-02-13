@@ -4,8 +4,10 @@ import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestFactory;
 import com.google.api.client.http.HttpResponse;
+import com.google.api.client.http.HttpResponseException;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
+import com.google.api.client.util.ExponentialBackOff;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -28,6 +30,7 @@ import javax.annotation.Nonnull;
 public class KGConceptGenerator {
 
     public final static int LIMIT = 10;
+    public final static int RETRY_LIMIT = 5;
 
     private HttpTransport httpTransport;
     private HttpRequestFactory httpRequestFactory;
@@ -52,13 +55,43 @@ public class KGConceptGenerator {
             url.put("query", query);
             url.put("limit", limit);
             url.put("indent", "true");
-            url.put("key", APIConstants.API_KEY);
+            url.put("key", APIConstants.getApiKey());
 
-            HttpRequest request = httpRequestFactory.buildGetRequest(url);
-            HttpResponse httpResponse = request.execute();
+            ExponentialBackOff backoff = new ExponentialBackOff();
+            String responseString = null;
+            for (int retries = 0; retries < RETRY_LIMIT; retries++) {
+                try {
+                    HttpRequest request = httpRequestFactory.buildGetRequest(url);
+                    HttpResponse httpResponse = request.execute();
+                    responseString = httpResponse.parseAsString();
+                    httpResponse.disconnect();
+                    break;
+                } catch (HttpResponseException ex) {
+                    if (ex.getStatusCode() == 429) { // REACHED API LIMIT => DO EXP BACKOFF
+                        long backOffMillis = backoff.nextBackOffMillis();
+                        if (backOffMillis == ExponentialBackOff.STOP) {
+                            // we do not retry, so simply return empty list
+                            return ret;
+                        } else {
+                            // retry, so first sleep for the amount of time chosen by exp backoff
+                            try {
+                                Thread.sleep(backOffMillis);
+                            } catch (InterruptedException e) {
+
+                            }
+                        }
+                    } else {
+                        throw ex;
+                    }
+                }
+            }
+
+            if (responseString == null) {
+                return ret;
+            }
 
             JSONParser parser = new JSONParser();
-            JSONObject response = (JSONObject) parser.parse(httpResponse.parseAsString());
+            JSONObject response = (JSONObject) parser.parse(responseString);
             JSONArray elements = (JSONArray) response.get("itemListElement");
 
             for (Object element : elements) {
