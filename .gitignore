@@ -1,2 +1,3 @@
 *.class
 docs/*
+/lib/JTwitter/lib/scribe-1.3.7.jar

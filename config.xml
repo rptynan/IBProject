@@ -26,8 +26,10 @@ and open the template in the editor.
     <KnowledgeGraph>
         <API_KEY>KEY</API_KEY>
     </KnowledgeGraph>
+    <UserAPI>
+        <UserAPI_Port>90</UserAPI_Port>
+    </UserAPI>
     <Misc>
         <Location>World</Location>
-        <UserAPI_Port>90</UserAPI_Port>
     </Misc>
 </Configuration>
