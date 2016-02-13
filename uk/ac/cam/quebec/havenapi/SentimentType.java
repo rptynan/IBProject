@@ -3,19 +3,13 @@ package uk.ac.cam.quebec.havenapi;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Enum representing a Sentiment type.
- *
- * @author tudor
- */
 public enum SentimentType {
 
     POSITIVE("positive"),
     NEGATIVE("negative"),
     NEUTRAL("neutral");
     private final String sentimentType;
-    private final static Map<String, SentimentType> CONSTANTS =
-            new HashMap<>();
+    private final static Map<String, SentimentType> CONSTANTS = new HashMap<String, SentimentType>();
 
     static {
         for (SentimentType c : values()) {
@@ -32,19 +26,8 @@ public enum SentimentType {
         return this.sentimentType;
     }
 
-    /**
-     * Builds the enum from a string.
-     * The accepted values are "positive", "negative" and "neutral"
-     * @param sentimentType the sentiment type as a string
-     * @return an enum instance representing the given string
-     * @throws HavenException if the string is not a correct sentiment type
-     */
-    public static SentimentType fromString(String sentimentType) throws HavenException {
-        SentimentType ret = CONSTANTS.get(sentimentType);
-        if (ret == null) {
-            throw new HavenException("Not a valid string representation for the SentimentType");
-        }
-        return ret;
+    public static SentimentType fromString(String sentimentType) {
+        return CONSTANTS.get(sentimentType);
     }
 
 }

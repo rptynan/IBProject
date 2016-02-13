@@ -1,6 +1,7 @@
 
 package uk.ac.cam.quebec.core;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import uk.ac.cam.quebec.userapi.APIServerAbstract;
 import java.util.ArrayList;
@@ -17,17 +18,19 @@ import uk.ac.cam.quebec.twitterwrapper.TwitterLink;
 import uk.ac.cam.quebec.userapi.NewAPIServer;
 import uk.ac.cam.quebec.wikiproc.WikiProcessor;
 import uk.ac.cam.quebec.wikiwrapper.WikiArticle;
+//import uk.ac.cam.quebec.kgsearchwrapper.APIConstants;
+import uk.ac.cam.quebec.havenapi.APIConstants;
 
 /**
  * A brief implementation of a first pass at some core logic 
  * @author James
  */
 public class GroupProjectCore extends Thread implements TrendsQueue, ControlInterface{
-    private final List<Thread> ThreadPool;
-    private final PriorityBlockingQueue<Worker> ThreadQueue;
-    private final PriorityBlockingQueue<Object> TweetQueue;
-    private final PriorityBlockingQueue<WikiArticle> PageQueue;
-    private final PriorityBlockingQueue<Trend> TrendQueue;
+    private final List<Thread> ThreadPool = new ArrayList<>();
+    private final PriorityBlockingQueue<Worker> ThreadQueue = new PriorityBlockingQueue<>();
+    private final PriorityBlockingQueue<Object> TweetQueue = new PriorityBlockingQueue<>();
+    private final PriorityBlockingQueue<WikiArticle> PageQueue = new PriorityBlockingQueue<>();
+    private final PriorityBlockingQueue<Trend> TrendQueue = new PriorityBlockingQueue<>();
     private final WorkAllocator workAllocator;
     private final NewAPIServer UAPI;//User API, here for testing only
     private final APIServerAbstract UAPII;//User API Interface
@@ -39,13 +42,23 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
     private final static int ThreadPoolSize = 10;//The thread pool that we want to allocate for each job
     private boolean running;
     private String location;
+    public GroupProjectCore(Configuration config) throws IOException, TwitException
+    {
+        workAllocator = new WorkAllocator(TweetQueue,PageQueue,TrendQueue,ThreadQueue,ThreadPool);
+        DB = config.getDatabase();
+        UAPI = new NewAPIServer(DB,config.getUAPI_Port(),this);
+        UAPII = UAPI;
+        String[] TwitterLoginArgs = config.getTwitterArgs();
+        TwitterLink.login(TwitterLoginArgs[0],TwitterLoginArgs[1],TwitterLoginArgs[2],TwitterLoginArgs[3],TwitterLoginArgs[4]);
+        twitterWrapper = new TwitterLink();
+        twitterProcessor = new TwitterProcessor();
+        wikiProcessor=new WikiProcessor();
+        location = config.getLocation();
+        APIConstants.setCredentials(config.getKnowledgeGraphKey());
+    }
+    
     public GroupProjectCore(String[] TwitterLoginArgs, Database _DB,String _location) throws IOException, TwitException
     {
-        TweetQueue = new PriorityBlockingQueue<>();
-        PageQueue = new PriorityBlockingQueue<>();
-        TrendQueue = new PriorityBlockingQueue<>();
-        ThreadQueue = new PriorityBlockingQueue<>();
-        ThreadPool = new ArrayList<>();
         workAllocator = new WorkAllocator(TweetQueue,PageQueue,TrendQueue,ThreadQueue,ThreadPool);
         DB = _DB;
         UAPI = new NewAPIServer(DB,UAPIPort,this);
@@ -158,16 +171,11 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
     /**
      * Kill everything neatly
      */
-    private void close()
+    private synchronized void close()
     {
         
     }
-    public static void main(String[] args) throws IOException, TwitException
-    {Database DB = Database.getInstance();
-        GroupProjectCore core = new GroupProjectCore(args,DB,"World");
-        core.setDaemon(true);
-        core.run();//Don't want to invoke a new thread from this entry point.
-    }
+
 
     @Override
     public boolean putTrend(Trend trend) {
@@ -246,5 +254,23 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
     @Override
     public void initialiseUAPI() {
         startUAPI();
+    }
+    public static void main(String[] args) throws IOException, TwitException
+    {   
+        Configuration config;
+            try
+            {
+            config = new Configuration(args[0]);
+            }
+            catch (FileNotFoundException ex)
+            {   String[] UAPI = {"90"};
+            String[] SentimentAnalyserArgs = {""};
+            String[] KnowledgeGraphArgs = {""};
+            String location = "world";
+            config = new Configuration(args,null,UAPI,location,SentimentAnalyserArgs,KnowledgeGraphArgs);
+            }
+        GroupProjectCore core = new GroupProjectCore(config);
+        core.setDaemon(true);
+        core.run();//Don't want to invoke a new thread from this entry point.
     }
 }

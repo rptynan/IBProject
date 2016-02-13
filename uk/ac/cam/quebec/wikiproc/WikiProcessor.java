@@ -26,8 +26,6 @@ import javafx.util.Pair;
  */
 public class WikiProcessor {
 
-    private static final int CONCEPTS_LIMIT = 10;
-
     private Trend trend;
     private List<WikiArticle> articleList;
     private List<Pair<String, Double>> wikiConcepts;
@@ -84,12 +82,7 @@ public class WikiProcessor {
         }
 
         // get KGConcepts for each trendConcept and put them all together
-        int limit = CONCEPTS_LIMIT;
         for (Pair<String, Integer> trendConcept : trendConcepts) {
-            --limit;
-            if (limit < 0) {
-                break;
-            }
             for (KGConcept kgConcept : kgConceptGenerator.getKGConcepts(trendConcept.getKey(),
                     trendConcept.getValue() >= averageCount ? 2 : 1)) {
                 if (kgConcept != null) {

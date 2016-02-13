@@ -25,7 +25,7 @@ public class ExampleSearch {
             url.put("query", "Taylor Swift");
             url.put("limit", "10");
             url.put("indent", "true");
-            url.put("key", APIConstants.getApiKey());
+            url.put("key", APIConstants.API_KEY);
             HttpRequest request = requestFactory.buildGetRequest(url);
             HttpResponse httpResponse = request.execute();
             JSONObject response = (JSONObject) parser.parse(httpResponse.parseAsString());

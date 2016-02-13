@@ -8,6 +8,12 @@
       <excludeFolder url="file://$MODULE_DIR$/Tomcat Web App" />
       <excludeFolder url="file://$MODULE_DIR$/checkstyle" />
       <excludeFolder url="file://$MODULE_DIR$/lib/JTwitter" />
+      <excludeFolder url="file://$MODULE_DIR$/uk/ac/cam/quebec/common" />
+      <excludeFolder url="file://$MODULE_DIR$/uk/ac/cam/quebec/core" />
+      <excludeFolder url="file://$MODULE_DIR$/uk/ac/cam/quebec/twitterproc" />
+      <excludeFolder url="file://$MODULE_DIR$/uk/ac/cam/quebec/twitterwrapper" />
+      <excludeFolder url="file://$MODULE_DIR$/uk/ac/cam/quebec/ui" />
+      <excludeFolder url="file://$MODULE_DIR$/uk/ac/cam/quebec/userapi" />
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />

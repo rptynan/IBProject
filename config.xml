@@ -20,6 +20,18 @@ and open the template in the editor.
         <Access_Secret>TOKEN_SECRET</Access_Secret>
         <Account_Name>NAME</Account_Name>
     </Twitter>
+    <SentimentAnalyser>
+        <API_KEY>KEY</API_KEY>
+    </SentimentAnalyser>
+    <KnowledgeGraph>
+        <API_KEY>KEY</API_KEY>
+    </KnowledgeGraph>
+    <UserAPI>
+        <UserAPI_Port>90</UserAPI_Port>
+    </UserAPI>
+    <StopWords>
+        <Path></Path>
+    </StopWords>
     <Misc>
         <Location>World</Location>
     </Misc>
