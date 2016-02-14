@@ -36,7 +36,7 @@ public enum CoreConsoleCommand {
     private CoreConsoleCommand(String option, String pattern) {
         requestOption = option;
         requestPattern = Pattern.compile(pattern);
-        fullPattern = Pattern.compile("("+option + "): " + pattern);
+        fullPattern = Pattern.compile("("+option + ")(: " + pattern+")?", Pattern.CASE_INSENSITIVE);
     }
 
     /**
@@ -66,7 +66,7 @@ public enum CoreConsoleCommand {
     /**
      * The static pattern that should be used to parse a generic request
      */
-    public static final Pattern parsePattern = Pattern.compile("([^\\:]+): (.*)");
+    public static final Pattern parsePattern = Pattern.compile("([^\\:]+)(: (.*))?", Pattern.CASE_INSENSITIVE);
     private static final Map<String, CoreConsoleCommand> lookupMap = new HashMap<>();
 
     /**
@@ -83,7 +83,7 @@ public enum CoreConsoleCommand {
      * @param message The message to get the type of
      * @return the type of the request
      */
-    public static final CoreConsoleCommand getCommandtType(String message) {
+    public static final CoreConsoleCommand getCommandType(String message) {
         if(message==null)
         {
             return InvalidCommand;

@@ -20,7 +20,6 @@ import uk.ac.cam.quebec.trends.TrendsQueue;
 import uk.ac.cam.quebec.wikiwrapper.WikiException;
 import uk.ac.cam.quebec.util.WordCounterTest;
 
-
 /**
  *
  * @author James
@@ -33,16 +32,51 @@ public class CoreConsole extends Thread {
     private final TrendsQueue coreTrends;
     private final Configuration config;
     private boolean running = true;
-    
-        public CoreConsole(GroupProjectCore _core, Configuration _config) {
+
+    public CoreConsole(GroupProjectCore _core, Configuration _config) {
         core = _core;
         coreInter = _core;
         coreTrends = _core;
         config = _config;
     }
 
-    public void processCommand(String command) throws WikiException {
-        CoreConsoleCommand com = CoreConsoleCommand.getCommandtType(command);
+    public void processCommand(String command) {
+        CoreConsoleCommand c = CoreConsoleCommand.getCommandType(command);
+        switch (c) {
+            case StartCommand:
+                startCore();
+                break;
+            case ExitCommand:
+                exit();
+                break;
+            case StatusCommand:
+                System.out.println(coreInter.getServerInfo());
+                break;
+            default:
+                oldProcessCommand(command);
+                break;
+        }
+
+    }
+
+    private void startCore() {
+        if (!coreInter.isRunning()) {
+            System.out.println("Starting Core");
+            core.start();
+        } else {
+            System.out.println("Unable to start core, core already running");
+        }
+    }
+
+    private void exit() {
+        if (coreInter.isRunning()) {
+            System.out.println("Closing Core");
+            coreInter.beginClose();
+        }
+        running = false;
+    }
+
+    private void oldProcessCommand(String command) {
         if (command.equalsIgnoreCase("start")) {
             if (!coreInter.isRunning()) {
                 System.out.println("Starting Core");
@@ -85,17 +119,14 @@ public class CoreConsole extends Thread {
             System.out.println("Starting database test");
             DatabaseTest.test();
             System.out.println("Database test finish");
-        }  else if (command.equalsIgnoreCase("test word counter"))
-        {   System.out.println("Starting word count test");
-        WordCounterTest.test1();
-        System.out.println("Word count test finish");
-        }
-        else {
+        } else if (command.equalsIgnoreCase("test word counter")) {
+            System.out.println("Starting word count test");
+            WordCounterTest.test1();
+            System.out.println("Word count test finish");
+        } else {
             System.out.println("Invalid command");
         }
     }
-
-
 
     @Override
     public void run() {
@@ -124,16 +155,14 @@ public class CoreConsole extends Thread {
     public static void main(String[] args) {
         try {
             Configuration config;
-            try
-            {
-            config = new Configuration(args[0]);
-            }
-            catch (FileNotFoundException ex)
-            {   String[] UAPI = {"90"};
-            String[] SentimentAnalyserArgs = {""};
-            String[] KnowledgeGraphArgs = {""};
-            String location = "world";
-                config = new Configuration(args,null,UAPI,location,SentimentAnalyserArgs,KnowledgeGraphArgs);
+            try {
+                config = new Configuration(args[0]);
+            } catch (FileNotFoundException ex) {
+                String[] UAPI = {"90"};
+                String[] SentimentAnalyserArgs = {""};
+                String[] KnowledgeGraphArgs = {""};
+                String location = "world";
+                config = new Configuration(args, null, UAPI, location, SentimentAnalyserArgs, KnowledgeGraphArgs);
             }
             GroupProjectCore core = new GroupProjectCore(config);
             core.setDaemon(true);
