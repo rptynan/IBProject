@@ -62,4 +62,15 @@ in the docs/ directory.
 
 ##Running
 
+
+For a headless startup:
+Run GroupProjectCore with 1 argument - the path to a completed config.xml file
+
+For a basic debugging console:
+Run CoreConsole with 1 argument - the path to a completed config.xml file
+
+A default config.xml file can be found in this directory
+
+These are depreciated entry points, they should not be used
 Run GroupProjectCore with 5 agruements - the 4 Twitter login keys and the username IBProjectQuebec.
+Run CoreConsole with 5 agruements - the 4 Twitter login keys and the username IBProjectQuebec.
