@@ -19,6 +19,8 @@ import uk.ac.cam.quebec.trends.Trend;
 import uk.ac.cam.quebec.trends.TrendsQueue;
 import uk.ac.cam.quebec.util.WordCounterTest;
 import java.util.regex.Matcher;
+import uk.ac.cam.quebec.twitterwrapper.TwitException;
+import uk.ac.cam.quebec.wikiwrapper.WikiException;
 
 /**
  *
@@ -40,7 +42,7 @@ public class CoreConsole extends Thread {
         config = _config;
     }
 
-    private void processCommand(String command) {
+    private void processCommand(String command) throws WikiException {
         CoreConsoleCommand c = CoreConsoleCommand.getCommandType(command);
         switch (c) {
             case StartCommand:
@@ -54,6 +56,7 @@ public class CoreConsole extends Thread {
                 break;
             case AddTrendCommand:
                 addTrend(c, command);
+                break;
             default:
                 oldProcessCommand(command);
                 break;
@@ -66,13 +69,18 @@ public class CoreConsole extends Thread {
         Matcher m = c.getFullPattern().matcher(command);
         boolean b = m.matches();
         if (b) {
-            String s = m.group("trendName");
-            System.out.println("Adding trend " + s);
-            Trend T = new Trend(s, "World", 0);
+            String trendName = m.group("trendName");
+            String location = config.getLocation();
+            if(m.group("trendLocation")!=null)
+            {
+                location = m.group("trendLocation");
+            }
+            System.out.println("Adding trend " + trendName+ ", for location "+location);
+            Trend T = new Trend(trendName, location, 0);
             if (coreTrends.putTrend(T)) {
-                System.out.println("Trend " + s + " added successfully");
+                System.out.println("Trend " + trendName + " added successfully");
             } else {
-                System.out.println("Failed to add trend " + s);
+                System.out.println("Failed to add trend " + trendName);
             }
         } else {
             System.out.println("Invalid trend name");
@@ -96,7 +104,7 @@ public class CoreConsole extends Thread {
         running = false;
     }
 
-    private void oldProcessCommand(String command) {
+    private void oldProcessCommand(String command) throws WikiException {
         if (command.equalsIgnoreCase("start")) {
             if (!coreInter.isRunning()) {
                 System.out.println("Starting Core");
@@ -172,6 +180,7 @@ public class CoreConsole extends Thread {
      * @param args args[0] should be the path to a properly formatted
      * configuration file args will be the twitter credentials otherwise
      */
+    @SuppressWarnings({"CallToThreadRun", "UseSpecificCatch"})
     public static void main(String[] args) {
         try {
             Configuration config;
@@ -189,7 +198,11 @@ public class CoreConsole extends Thread {
             core.setName("CoreThread");
             CoreConsole c = new CoreConsole(core, config);
             c.run();
-        } catch (Exception ex) {
+        } catch (IOException | TwitException ex) {
+            System.err.println(ex);
+        }
+        catch (Exception ex)
+        {
             System.err.println(ex);
         }
     }
