@@ -55,6 +55,7 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
         wikiProcessor=new WikiProcessor();
         location = config.getLocation();
         APIConstants.setCredentials(config.getKnowledgeGraphKey());
+        uk.ac.cam.quebec.havenapi.APIConstants.setCredentials(config.getSentimentAnalyserKey());
     }
     
     public GroupProjectCore(String[] TwitterLoginArgs, Database _DB,String _location) throws IOException, TwitException

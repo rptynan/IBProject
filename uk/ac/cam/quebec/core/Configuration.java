@@ -45,7 +45,7 @@ public class Configuration {
      * @throws FileNotFoundException If the file is not present at the given
      * path
      */
-    public Configuration(String path) throws FileNotFoundException {
+    public  Configuration(String path) throws FileNotFoundException {
         doc = getConfig(path);
         twitterArgs = getTwitterArgs(doc);
         DB = getDatabase(doc);
