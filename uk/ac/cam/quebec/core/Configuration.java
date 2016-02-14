@@ -23,11 +23,12 @@ import uk.ac.cam.quebec.core.test.CoreConsole;
 import uk.ac.cam.quebec.dbwrapper.Database;
 
 /**
- * Todo: convert this class to a singleton
+ * This class represents the values of the config.xml file;
  * @author James
  */
+// Todo: convert this class to a singleton
 public class Configuration {
-
+    
     private final Document doc;
     private final String location;
     private final String[] twitterArgs;

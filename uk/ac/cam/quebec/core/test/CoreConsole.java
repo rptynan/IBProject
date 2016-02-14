@@ -17,8 +17,8 @@ import uk.ac.cam.quebec.core.GroupProjectCore;
 import uk.ac.cam.quebec.dbwrapper.DatabaseTest;
 import uk.ac.cam.quebec.trends.Trend;
 import uk.ac.cam.quebec.trends.TrendsQueue;
-import uk.ac.cam.quebec.wikiwrapper.WikiException;
 import uk.ac.cam.quebec.util.WordCounterTest;
+import java.util.regex.Matcher;
 
 /**
  *
@@ -40,7 +40,7 @@ public class CoreConsole extends Thread {
         config = _config;
     }
 
-    public void processCommand(String command) {
+    private void processCommand(String command) {
         CoreConsoleCommand c = CoreConsoleCommand.getCommandType(command);
         switch (c) {
             case StartCommand:
@@ -52,11 +52,31 @@ public class CoreConsole extends Thread {
             case StatusCommand:
                 System.out.println(coreInter.getServerInfo());
                 break;
+            case AddTrendCommand:
+                addTrend(c, command);
             default:
                 oldProcessCommand(command);
                 break;
         }
 
+    }
+
+    private void addTrend(CoreConsoleCommand c, String command) {
+        Matcher m0 = c.getMatch();
+        Matcher m = c.getFullPattern().matcher(command);
+        boolean b = m.matches();
+        if (b) {
+            String s = m.group("trendName");
+            System.out.println("Adding trend " + s);
+            Trend T = new Trend(s, "World", 0);
+            if (coreTrends.putTrend(T)) {
+                System.out.println("Trend " + s + " added successfully");
+            } else {
+                System.out.println("Failed to add trend " + s);
+            }
+        } else {
+            System.out.println("Invalid trend name");
+        }
     }
 
     private void startCore() {

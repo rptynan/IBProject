@@ -172,7 +172,7 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
      */
     private synchronized void close()
     {
-        
+        //Todo: put cleanup here
     }
 
 
@@ -254,6 +254,7 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
     public void initialiseUAPI() {
         startUAPI();
     }
+    @SuppressWarnings("CallToThreadRun")
     public static void main(String[] args) throws IOException, TwitException
     {   
         Configuration config;
@@ -262,7 +263,9 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
             config = new Configuration(args[0]);
             }
             catch (FileNotFoundException ex)
-            {   String[] UAPI = {"90"};
+            {   
+            System.err.println("Failed to load config file from "+args[0]+" using fallback values");
+            String[] UAPI = {"90"};
             String[] SentimentAnalyserArgs = {""};
             String[] KnowledgeGraphArgs = {""};
             String location = "world";

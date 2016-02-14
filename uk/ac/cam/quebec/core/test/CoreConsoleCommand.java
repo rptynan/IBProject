@@ -23,22 +23,30 @@ public enum CoreConsoleCommand {
     TwitterTestCommand("test twitter", ""),
     WikiProcTestCommand("test wikiproc",""),
     WikiWrapTestCommand("test wikiwrap",""),
-    AddTrendCommand("add trend","(.*)"),
+    AddTrendCommand("add trend","(?<trendName>.*)"),
     RepopulateTrendCommand("repopulate trends",""),
     TestDatabaseCommand("test database",""),
-    CheckStopWordCommand("check stop word","(.+)"),
+    CheckStopWordCommand("check stop word","(?<stopWord>.+)"),
     TestWordCounterCommand("test word counter",""),
     InvalidCommand("","(.*)");
     private final Pattern requestPattern;
     private final Pattern fullPattern;
     private final String requestOption;
+    private Matcher match = null;
 
     private CoreConsoleCommand(String option, String pattern) {
         requestOption = option;
         requestPattern = Pattern.compile(pattern);
         fullPattern = Pattern.compile("("+option + ")(: " + pattern+")?", Pattern.CASE_INSENSITIVE);
     }
-
+    private void setMatch(Matcher m)
+    {
+        match = m;
+    }
+    public Matcher getMatch()
+    {
+        return match;
+    }
     /**
      * The returns the pattern that should be used to parse the options
      *
@@ -94,7 +102,9 @@ public enum CoreConsoleCommand {
         } else {
             String s = m.group(1);
             if (lookupMap.containsKey(s)) {
-                return lookupMap.get(s);
+                CoreConsoleCommand c = lookupMap.get(s);
+                c.setMatch(m);
+                return c;
             }
         }
         return InvalidCommand;
