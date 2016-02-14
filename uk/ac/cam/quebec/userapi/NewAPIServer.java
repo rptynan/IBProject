@@ -111,7 +111,7 @@ public class NewAPIServer extends APIServerAbstract {
                 if (itemAdded)
                     result += ",";
                 max--;
-                result += "{\"title\":\"" + s.getText() + "\", \"id\":"
+                result += "{\"content\":\"" + s.getText() + "\", \"id\":"
                         + s.getId() + ", \"time\":\"" + s.getCreatedAt().toString() + "\"}";
                 itemAdded = true;
             }
