@@ -8,6 +8,8 @@ package uk.ac.cam.quebec.core;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
@@ -22,7 +24,6 @@ import uk.ac.cam.quebec.dbwrapper.Database;
 
 /**
  * Todo: convert this class to a singleton
- *
  * @author James
  */
 public class Configuration {
@@ -34,6 +35,7 @@ public class Configuration {
     private final Database DB;
     private final String[] SentimentAnalyserArgs;
     private final String[] KnowledgeGraphArgs;
+    private static final Map<String,String> ConfigMap = new HashMap<>();
 
     /**
      * Builds an object containing the various configuration variables
@@ -71,21 +73,31 @@ public class Configuration {
         SentimentAnalyserArgs = _SentimentAnalyserArgs;
         KnowledgeGraphArgs = _KnowledgeGraphArgs;
         location = _location;
+        try{
+        ConfigMap.put("location", _location);
+        ConfigMap.put("UAPI_Port", _UAPI_Args[0]);
+        ConfigMap.put("SentimentAnalyserKey", _SentimentAnalyserArgs[0]);
+        ConfigMap.put("KnowledgeGraphArgs", _KnowledgeGraphArgs[0]);
+        }
+        catch (Exception ex)
+        {
+            System.err.println("Error adding items to ConfigMap: "+ex);
+        }
     }
 
     public boolean valid() {
         return (location != null);
     }
     /**
-     * 
-     * @return 
+     * Returns the default location
+     * @return String location
      */
     public String getLocation()
     {
         return location;
     }
     /**
-     * 
+     * Returns the initialised Database instance
      * @return 
      */
     public Database getDatabase()
@@ -140,7 +152,9 @@ public class Configuration {
         NodeList parents = doc.getElementsByTagName("Misc");
         Element parent = (Element) parents.item(0);
         NodeList Item = parent.getElementsByTagName("Location");
-        return Item.item(0).getTextContent();
+        s = Item.item(0).getTextContent();
+        ConfigMap.put("location", s);
+        return s;
     }
 
     /**
@@ -154,17 +168,28 @@ public class Configuration {
         NodeList parents = doc.getElementsByTagName("Twitter");
             //parents will have more than 1 element if we have multiple twitter
         //accounts 
+        String s;
         Element parent = (Element) parents.item(0);
         NodeList Item = parent.getElementsByTagName("OAuth_Key");
-        twittercreds[0] = Item.item(0).getTextContent();
+        s = Item.item(0).getTextContent();
+        ConfigMap.put("TwitterOAuthKey", s);
+        twittercreds[0] = s;
         Item = parent.getElementsByTagName("OAuth_Secret");
-        twittercreds[1] = Item.item(0).getTextContent();
+        s = Item.item(0).getTextContent();
+        ConfigMap.put("TwitterOAuthSecret", s);
+        twittercreds[1] = s;
         Item = parent.getElementsByTagName("Access_Token");
-        twittercreds[2] = Item.item(0).getTextContent();
+        s = Item.item(0).getTextContent();
+        ConfigMap.put("TwitterAccessToken", s);
+        twittercreds[3] = s;
         Item = parent.getElementsByTagName("Access_Secret");
-        twittercreds[3] = Item.item(0).getTextContent();
+        s = Item.item(0).getTextContent();
+        ConfigMap.put("TwitterAccessSecret", s);
+        twittercreds[3] = s;
         Item = parent.getElementsByTagName("Account_Name");
-        twittercreds[4] = Item.item(0).getTextContent();
+        s = Item.item(0).getTextContent();
+        ConfigMap.put("TwitterAccessSecret", s);
+        twittercreds[4] = s;
         return twittercreds;
     }
 
@@ -204,6 +229,10 @@ public class Configuration {
         {
             return Database.getInstance();
         }
+        ConfigMap.put("DatabaseUserName", args[0]);
+        ConfigMap.put("DatabasePassword", args[1]);
+        ConfigMap.put("DatabasePath", args[2]);
+        ConfigMap.put("DatabaseClearOnStart", args[3]);
         boolean wipe = args[3].equalsIgnoreCase("true");
         Database.setCredentials(args[0], args[1], "jdbc:mysql://" + args[2], wipe);
         Database DB = Database.getInstance();
@@ -216,10 +245,13 @@ public class Configuration {
      */
     private static String[] getSentimentAnalyserArgs(Document doc) {
         String[] ret = new String[1];
+        String s;
         NodeList parents = doc.getElementsByTagName("SentimentAnalyser");
         Element parent = (Element) parents.item(0);
         NodeList Item = parent.getElementsByTagName("API_KEY");
-        ret[0] = Item.item(0).getTextContent();
+        s = Item.item(0).getTextContent();
+        ConfigMap.put("SentimentAnalyserKey", s);
+        ret[0] = s;
         return ret;
     }
     /**
@@ -229,10 +261,13 @@ public class Configuration {
      */
     private static String[] getUAPIArgs(Document doc) {
         String[] ret = new String[1];
+        String s;
         NodeList parents = doc.getElementsByTagName("UserAPI");
         Element parent = (Element) parents.item(0);
         NodeList Item = parent.getElementsByTagName("UserAPI_Port");
-        ret[0] = Item.item(0).getTextContent();
+        s = Item.item(0).getTextContent();
+        ConfigMap.put("UserAPIPort",s);
+        ret[0] = s;
         return ret;
     }
     /**
@@ -242,10 +277,13 @@ public class Configuration {
      */
     private static String[] getKnowledgeGraphArgs(Document doc) {
         String[] ret = new String[1];
+        String s;
         NodeList parents = doc.getElementsByTagName("KnowledgeGraph");
         Element parent = (Element) parents.item(0);
         NodeList Item = parent.getElementsByTagName("API_KEY");
-        ret[0] = Item.item(0).getTextContent();
+        s = Item.item(0).getTextContent();
+        ConfigMap.put("KnowledgeGraphKey", s);
+        ret[0] = s;
         return ret;
     }
 }
