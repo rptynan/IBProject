@@ -56,6 +56,9 @@ public class MyHTTPHandler  implements HttpHandler{
         case ArticlesRequest:
             s = parent.getArticlesAsString(Integer.parseInt(m.group(1)),"Popularity",15);
             break;
+        case TweetsRequest:
+            s = parent.getTweetsAsString(Integer.parseInt(m.group(1)),"Popularity",8);
+            break;
         default:
             s+= " The Request type was: "+type.toString();
     }

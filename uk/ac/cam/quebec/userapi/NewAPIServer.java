@@ -16,6 +16,7 @@ import uk.ac.cam.quebec.dbwrapper.DatabaseException;
 import uk.ac.cam.quebec.trends.Trend;
 import uk.ac.cam.quebec.trends.TrendsQueue;
 import uk.ac.cam.quebec.wikiwrapper.WikiArticle;
+import winterwell.jtwitter.Status;
 
 /**
  *
@@ -86,6 +87,32 @@ public class NewAPIServer extends APIServerAbstract {
                 max--;
                 result += "{\"name\":\"" + t.getName() + "\", \"id\":"
                         + t.getId() + "}";
+                itemAdded = true;
+            }
+            result += "]";
+            return result;
+
+        } catch (DatabaseException e) {
+            return "[]";
+        }
+
+    }
+    
+    public String getTweetsAsString(int id, String sorting, int max) {
+        try {
+            List<Status> statusList = DB.getTweets(id);
+            // flag
+            boolean itemAdded = false;
+            String result = "[";
+            result += statusList.size();
+            for (Status s : statusList) {
+                if (max <= 0)
+                    break;
+                if (itemAdded)
+                    result += ",";
+                max--;
+                result += "{\"title\":\"" + s.getText() + "\", \"id\":"
+                        + s.getId() + ", \"time\":\"" + s.getCreatedAt().toString() + "\"}";
                 itemAdded = true;
             }
             result += "]";
