@@ -18,8 +18,8 @@ import uk.ac.cam.quebec.twitterwrapper.TwitterLink;
 import uk.ac.cam.quebec.userapi.NewAPIServer;
 import uk.ac.cam.quebec.wikiproc.WikiProcessor;
 import uk.ac.cam.quebec.wikiwrapper.WikiArticle;
-//import uk.ac.cam.quebec.kgsearchwrapper.APIConstants;
-import uk.ac.cam.quebec.havenapi.APIConstants;
+import uk.ac.cam.quebec.kgsearchwrapper.APIConstants;
+//import uk.ac.cam.quebec.havenapi.APIConstants;
 
 /**
  * A brief implementation of a first pass at some core logic 

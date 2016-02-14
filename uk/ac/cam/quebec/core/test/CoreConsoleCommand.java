@@ -23,6 +23,8 @@ public enum CoreConsoleCommand {
     TwitterTestCommand("test twitter", ""),
     WikiProcTestCommand("test wikiproc",""),
     WikiWrapTestCommand("test wikiwrap",""),
+    SentimentAnalysisTestCommand("test sentiment",""),
+    KnowledgeGraphTestCommand("test knowledge graph",""),
     AddTrendCommand("add trend","(?<trendName>[^\\,]*)(, (?<trendLocation>\\w+))?"),
     RepopulateTrendCommand("repopulate trends",""),
     TestDatabaseCommand("test database",""),

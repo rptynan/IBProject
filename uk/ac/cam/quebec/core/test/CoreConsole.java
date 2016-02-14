@@ -19,6 +19,9 @@ import uk.ac.cam.quebec.trends.Trend;
 import uk.ac.cam.quebec.trends.TrendsQueue;
 import uk.ac.cam.quebec.util.WordCounterTest;
 import java.util.regex.Matcher;
+import uk.ac.cam.quebec.havenapi.HavenException;
+import uk.ac.cam.quebec.havenapi.SentimentAnalyserTest;
+import uk.ac.cam.quebec.kgsearchwrapper.KGConceptGeneratorTest;
 import uk.ac.cam.quebec.twitterwrapper.TwitException;
 import uk.ac.cam.quebec.wikiwrapper.WikiException;
 
@@ -42,7 +45,7 @@ public class CoreConsole extends Thread {
         config = _config;
     }
 
-    private void processCommand(String command) throws WikiException {
+    private void processCommand(String command) throws WikiException, HavenException {
         CoreConsoleCommand c = CoreConsoleCommand.getCommandType(command);
         switch (c) {
             case StartCommand:
@@ -56,6 +59,16 @@ public class CoreConsole extends Thread {
                 break;
             case AddTrendCommand:
                 addTrend(c, command);
+                break;
+            case SentimentAnalysisTestCommand:
+                System.out.println("Sentiment analysis test start");
+                SentimentAnalyserTest.main(new String[0]);
+                System.out.println("Sentiment analysis test end");
+                break;
+            case KnowledgeGraphTestCommand:
+                System.out.println("Knowledge graph test start");
+                KGConceptGeneratorTest.main(new String[0]);
+                System.out.println("Knowledge graph test end");
                 break;
             default:
                 oldProcessCommand(command);
@@ -105,20 +118,7 @@ public class CoreConsole extends Thread {
     }
 
     private void oldProcessCommand(String command) throws WikiException {
-        if (command.equalsIgnoreCase("start")) {
-            if (!coreInter.isRunning()) {
-                System.out.println("Starting Core");
-                core.start();
-            }
-        } else if (command.equalsIgnoreCase("exit")) {
-            if (coreInter.isRunning()) {
-                System.out.println("Closing Core");
-                coreInter.beginClose();
-            }
-            running = false;
-        } else if (command.equalsIgnoreCase("status")) {
-            System.out.println(coreInter.getServerInfo());
-        } else if (command.equalsIgnoreCase("test twitter")) {
+        if (command.equalsIgnoreCase("test twitter")) {
             System.out.println("Twitter test start");
             uk.ac.cam.quebec.twitterwrapper.test.Test.main(config.getTwitterArgs());
             System.out.println("Twitter test end");
