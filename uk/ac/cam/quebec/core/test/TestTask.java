@@ -5,8 +5,9 @@
  */
 package uk.ac.cam.quebec.core.test;
 
+import java.util.Collection;
+import uk.ac.cam.quebec.core.Task;
 import uk.ac.cam.quebec.core.TaskInterface;
-import uk.ac.cam.quebec.core.TaskType;
 
 /**
  *
@@ -20,8 +21,9 @@ public class TestTask implements TaskInterface{
     }
 
     @Override
-    public void process() {
+    public Collection<Task> process() {
         System.err.println("Test task for object: "+object.toString()+" has been called");
+        return null;
     }
 
     @Override
