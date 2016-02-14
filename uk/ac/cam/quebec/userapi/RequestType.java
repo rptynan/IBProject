@@ -23,7 +23,8 @@ public enum RequestType {
     DefaultRequest("", "(.)*"),
     InvalidRequest("inv", "(.)*"),
     TrendsRequest("Trends","(.)*"),
-    ArticlesRequest("Articles","id=(\\d+)(.)*");
+    ArticlesRequest("Articles","id=(\\d+)(.)*"),
+    TweetsRequest("Tweets","id=(\\d+)(.)*");
     private final Pattern requestPattern;
     private final Pattern fullPattern;
     private final String requestOption;
