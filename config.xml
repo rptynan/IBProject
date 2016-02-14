@@ -30,7 +30,7 @@ and open the template in the editor.
         <UserAPI_Port>90</UserAPI_Port>
     </UserAPI>
     <StopWords>
-        <Path></Path>
+        <Path>words.txt</Path>
     </StopWords>
     <Misc>
         <Location>World</Location>

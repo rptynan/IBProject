@@ -17,9 +17,13 @@ import uk.ac.cam.quebec.core.GroupProjectCore;
 import uk.ac.cam.quebec.dbwrapper.DatabaseTest;
 import uk.ac.cam.quebec.trends.Trend;
 import uk.ac.cam.quebec.trends.TrendsQueue;
-import uk.ac.cam.quebec.wikiwrapper.WikiException;
 import uk.ac.cam.quebec.util.WordCounterTest;
-
+import java.util.regex.Matcher;
+import uk.ac.cam.quebec.havenapi.HavenException;
+import uk.ac.cam.quebec.havenapi.SentimentAnalyserTest;
+import uk.ac.cam.quebec.kgsearchwrapper.KGConceptGeneratorTest;
+import uk.ac.cam.quebec.twitterwrapper.TwitException;
+import uk.ac.cam.quebec.wikiwrapper.WikiException;
 
 /**
  *
@@ -33,30 +37,88 @@ public class CoreConsole extends Thread {
     private final TrendsQueue coreTrends;
     private final Configuration config;
     private boolean running = true;
-    
-        public CoreConsole(GroupProjectCore _core, Configuration _config) {
+
+    public CoreConsole(GroupProjectCore _core, Configuration _config) {
         core = _core;
         coreInter = _core;
         coreTrends = _core;
         config = _config;
     }
 
-    public void processCommand(String command) throws WikiException {
-        CoreConsoleCommand com = CoreConsoleCommand.getCommandtType(command);
-        if (command.equalsIgnoreCase("start")) {
-            if (!coreInter.isRunning()) {
-                System.out.println("Starting Core");
-                core.start();
+    private void processCommand(String command) throws WikiException, HavenException {
+        CoreConsoleCommand c = CoreConsoleCommand.getCommandType(command);
+        switch (c) {
+            case StartCommand:
+                startCore();
+                break;
+            case ExitCommand:
+                exit();
+                break;
+            case StatusCommand:
+                System.out.println(coreInter.getServerInfo());
+                break;
+            case AddTrendCommand:
+                addTrend(c, command);
+                break;
+            case SentimentAnalysisTestCommand:
+                System.out.println("Sentiment analysis test start");
+                SentimentAnalyserTest.main(new String[0]);
+                System.out.println("Sentiment analysis test end");
+                break;
+            case KnowledgeGraphTestCommand:
+                System.out.println("Knowledge graph test start");
+                KGConceptGeneratorTest.main(new String[0]);
+                System.out.println("Knowledge graph test end");
+                break;
+            default:
+                oldProcessCommand(command);
+                break;
+        }
+
+    }
+
+    private void addTrend(CoreConsoleCommand c, String command) {
+        Matcher m0 = c.getMatch();
+        Matcher m = c.getFullPattern().matcher(command);
+        boolean b = m.matches();
+        if (b) {
+            String trendName = m.group("trendName");
+            String location = config.getLocation();
+            if(m.group("trendLocation")!=null)
+            {
+                location = m.group("trendLocation");
             }
-        } else if (command.equalsIgnoreCase("exit")) {
-            if (coreInter.isRunning()) {
-                System.out.println("Closing Core");
-                coreInter.beginClose();
+            System.out.println("Adding trend " + trendName+ ", for location "+location);
+            Trend T = new Trend(trendName, location, 0);
+            if (coreTrends.putTrend(T)) {
+                System.out.println("Trend " + trendName + " added successfully");
+            } else {
+                System.out.println("Failed to add trend " + trendName);
             }
-            running = false;
-        } else if (command.equalsIgnoreCase("status")) {
-            System.out.println(coreInter.getServerInfo());
-        } else if (command.equalsIgnoreCase("test twitter")) {
+        } else {
+            System.out.println("Invalid trend name");
+        }
+    }
+
+    private void startCore() {
+        if (!coreInter.isRunning()) {
+            System.out.println("Starting Core");
+            core.start();
+        } else {
+            System.out.println("Unable to start core, core already running");
+        }
+    }
+
+    private void exit() {
+        if (coreInter.isRunning()) {
+            System.out.println("Closing Core");
+            coreInter.beginClose();
+        }
+        running = false;
+    }
+
+    private void oldProcessCommand(String command) throws WikiException {
+        if (command.equalsIgnoreCase("test twitter")) {
             System.out.println("Twitter test start");
             uk.ac.cam.quebec.twitterwrapper.test.Test.main(config.getTwitterArgs());
             System.out.println("Twitter test end");
@@ -85,17 +147,14 @@ public class CoreConsole extends Thread {
             System.out.println("Starting database test");
             DatabaseTest.test();
             System.out.println("Database test finish");
-        }  else if (command.equalsIgnoreCase("test word counter"))
-        {   System.out.println("Starting word count test");
-        WordCounterTest.test1();
-        System.out.println("Word count test finish");
-        }
-        else {
+        } else if (command.equalsIgnoreCase("test word counter")) {
+            System.out.println("Starting word count test");
+            WordCounterTest.test1();
+            System.out.println("Word count test finish");
+        } else {
             System.out.println("Invalid command");
         }
     }
-
-
 
     @Override
     public void run() {
@@ -121,26 +180,29 @@ public class CoreConsole extends Thread {
      * @param args args[0] should be the path to a properly formatted
      * configuration file args will be the twitter credentials otherwise
      */
+    @SuppressWarnings({"CallToThreadRun", "UseSpecificCatch"})
     public static void main(String[] args) {
         try {
             Configuration config;
-            try
-            {
-            config = new Configuration(args[0]);
-            }
-            catch (FileNotFoundException ex)
-            {   String[] UAPI = {"90"};
-            String[] SentimentAnalyserArgs = {""};
-            String[] KnowledgeGraphArgs = {""};
-            String location = "world";
-                config = new Configuration(args,null,UAPI,location,SentimentAnalyserArgs,KnowledgeGraphArgs);
+            try {
+                config = new Configuration(args[0]);
+            } catch (FileNotFoundException ex) {
+                String[] UAPI = {"90"};
+                String[] SentimentAnalyserArgs = {""};
+                String[] KnowledgeGraphArgs = {""};
+                String location = "world";
+                config = new Configuration(args, null, UAPI, location, SentimentAnalyserArgs, KnowledgeGraphArgs);
             }
             GroupProjectCore core = new GroupProjectCore(config);
             core.setDaemon(true);
             core.setName("CoreThread");
             CoreConsole c = new CoreConsole(core, config);
             c.run();
-        } catch (Exception ex) {
+        } catch (IOException | TwitException ex) {
+            System.err.println(ex);
+        }
+        catch (Exception ex)
+        {
             System.err.println(ex);
         }
     }

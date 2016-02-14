@@ -18,8 +18,8 @@ import uk.ac.cam.quebec.twitterwrapper.TwitterLink;
 import uk.ac.cam.quebec.userapi.NewAPIServer;
 import uk.ac.cam.quebec.wikiproc.WikiProcessor;
 import uk.ac.cam.quebec.wikiwrapper.WikiArticle;
-//import uk.ac.cam.quebec.kgsearchwrapper.APIConstants;
-import uk.ac.cam.quebec.havenapi.APIConstants;
+import uk.ac.cam.quebec.kgsearchwrapper.APIConstants;
+//import uk.ac.cam.quebec.havenapi.APIConstants;
 
 /**
  * A brief implementation of a first pass at some core logic 
@@ -31,7 +31,7 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
     private final PriorityBlockingQueue<Object> TweetQueue = new PriorityBlockingQueue<>();
     private final PriorityBlockingQueue<WikiArticle> PageQueue = new PriorityBlockingQueue<>();
     private final PriorityBlockingQueue<Trend> TrendQueue = new PriorityBlockingQueue<>();
-    private final WorkAllocator workAllocator;
+    private final WorkAllocator workAllocator= new WorkAllocator(TweetQueue,PageQueue,TrendQueue,ThreadQueue,ThreadPool);;
     private final NewAPIServer UAPI;//User API, here for testing only
     private final APIServerAbstract UAPII;//User API Interface
     private final TwitterLink twitterWrapper;
@@ -40,11 +40,11 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
     private final Database DB;
     private final static int UAPIPort = 90;
     private final static int ThreadPoolSize = 10;//The thread pool that we want to allocate for each job
+    private final Configuration config;
     private boolean running;
     private String location;
-    public GroupProjectCore(Configuration config) throws IOException, TwitException
-    {
-        workAllocator = new WorkAllocator(TweetQueue,PageQueue,TrendQueue,ThreadQueue,ThreadPool);
+    public GroupProjectCore(Configuration _config) throws IOException, TwitException
+    {   config = _config;
         DB = config.getDatabase();
         UAPI = new NewAPIServer(DB,config.getUAPI_Port(),this);
         UAPII = UAPI;
@@ -55,11 +55,11 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
         wikiProcessor=new WikiProcessor();
         location = config.getLocation();
         APIConstants.setCredentials(config.getKnowledgeGraphKey());
+        uk.ac.cam.quebec.havenapi.APIConstants.setCredentials(config.getSentimentAnalyserKey());
     }
     
     public GroupProjectCore(String[] TwitterLoginArgs, Database _DB,String _location) throws IOException, TwitException
-    {
-        workAllocator = new WorkAllocator(TweetQueue,PageQueue,TrendQueue,ThreadQueue,ThreadPool);
+    {   config = null;
         DB = _DB;
         UAPI = new NewAPIServer(DB,UAPIPort,this);
         UAPII = UAPI;
@@ -173,7 +173,7 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
      */
     private synchronized void close()
     {
-        
+        //Todo: put cleanup here
     }
 
 
@@ -255,6 +255,7 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
     public void initialiseUAPI() {
         startUAPI();
     }
+    @SuppressWarnings("CallToThreadRun")
     public static void main(String[] args) throws IOException, TwitException
     {   
         Configuration config;
@@ -263,7 +264,9 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
             config = new Configuration(args[0]);
             }
             catch (FileNotFoundException ex)
-            {   String[] UAPI = {"90"};
+            {   
+            System.err.println("Failed to load config file from "+args[0]+" using fallback values");
+            String[] UAPI = {"90"};
             String[] SentimentAnalyserArgs = {""};
             String[] KnowledgeGraphArgs = {""};
             String location = "world";
