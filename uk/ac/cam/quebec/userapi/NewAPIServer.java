@@ -104,14 +104,13 @@ public class NewAPIServer extends APIServerAbstract {
             // flag
             boolean itemAdded = false;
             String result = "[";
-            result += statusList.size();
             for (Status s : statusList) {
                 if (max <= 0)
                     break;
                 if (itemAdded)
                     result += ",";
                 max--;
-                result += "{\"content\":\"" + s.getText() + "\", \"id\":"
+                result += "{\"content\":\"" + s.getText().replaceAll("\"","") + "\", \"id\":"
                         + s.getId() + ", \"time\":\"" + s.getCreatedAt().toString() + "\"}";
                 itemAdded = true;
             }
