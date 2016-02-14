@@ -31,7 +31,7 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
     private final PriorityBlockingQueue<Object> TweetQueue = new PriorityBlockingQueue<>();
     private final PriorityBlockingQueue<WikiArticle> PageQueue = new PriorityBlockingQueue<>();
     private final PriorityBlockingQueue<Trend> TrendQueue = new PriorityBlockingQueue<>();
-    private final WorkAllocator workAllocator;
+    private final WorkAllocator workAllocator= new WorkAllocator(TweetQueue,PageQueue,TrendQueue,ThreadQueue,ThreadPool);;
     private final NewAPIServer UAPI;//User API, here for testing only
     private final APIServerAbstract UAPII;//User API Interface
     private final TwitterLink twitterWrapper;
@@ -40,11 +40,11 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
     private final Database DB;
     private final static int UAPIPort = 90;
     private final static int ThreadPoolSize = 10;//The thread pool that we want to allocate for each job
+    private final Configuration config;
     private boolean running;
     private String location;
-    public GroupProjectCore(Configuration config) throws IOException, TwitException
-    {
-        workAllocator = new WorkAllocator(TweetQueue,PageQueue,TrendQueue,ThreadQueue,ThreadPool);
+    public GroupProjectCore(Configuration _config) throws IOException, TwitException
+    {   config = _config;
         DB = config.getDatabase();
         UAPI = new NewAPIServer(DB,config.getUAPI_Port(),this);
         UAPII = UAPI;
@@ -58,8 +58,7 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
     }
     
     public GroupProjectCore(String[] TwitterLoginArgs, Database _DB,String _location) throws IOException, TwitException
-    {
-        workAllocator = new WorkAllocator(TweetQueue,PageQueue,TrendQueue,ThreadQueue,ThreadPool);
+    {   config = null;
         DB = _DB;
         UAPI = new NewAPIServer(DB,UAPIPort,this);
         UAPII = UAPI;

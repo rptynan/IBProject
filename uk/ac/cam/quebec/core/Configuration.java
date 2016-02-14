@@ -182,7 +182,7 @@ public class Configuration {
         Item = parent.getElementsByTagName("Access_Token");
         s = Item.item(0).getTextContent();
         ConfigMap.put("TwitterAccessToken", s);
-        twittercreds[3] = s;
+        twittercreds[2] = s;
         Item = parent.getElementsByTagName("Access_Secret");
         s = Item.item(0).getTextContent();
         ConfigMap.put("TwitterAccessSecret", s);
