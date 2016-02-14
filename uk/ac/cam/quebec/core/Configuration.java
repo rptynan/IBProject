@@ -52,6 +52,7 @@ public class Configuration {
         UAPI_Args = getUAPIArgs(doc);
         SentimentAnalyserArgs = getSentimentAnalyserArgs(doc);
         KnowledgeGraphArgs = getKnowledgeGraphArgs(doc);
+        getStopWordsPath(doc);
     }
 
     /**
@@ -285,5 +286,19 @@ public class Configuration {
         ConfigMap.put("KnowledgeGraphKey", s);
         ret[0] = s;
         return ret;
+    }
+    /**
+     * Gets the path to the list of stop words
+     * @param doc The config.xml document
+     * @return the path
+     */
+    private static String getStopWordsPath(Document doc)
+    {   String s;
+         NodeList parents = doc.getElementsByTagName("StopWords");
+        Element parent = (Element) parents.item(0);
+        NodeList Item = parent.getElementsByTagName("Path");
+        s = Item.item(0).getTextContent();
+        ConfigMap.put("StopWordsPath", s);
+        return s;
     }
 }
