@@ -5,6 +5,8 @@
  */
 package uk.ac.cam.quebec.core.test;
 
+import java.util.Collection;
+import uk.ac.cam.quebec.core.Task;
 import uk.ac.cam.quebec.core.TaskInterface;
 import uk.ac.cam.quebec.trends.Trend;
 import uk.ac.cam.quebec.twitterproc.TwitterProcessor;
@@ -19,10 +21,7 @@ public class TrendTask implements TaskInterface{
     {
         trend = _trend;
     }
-    @Override
-    public void process() {
-        TwitterProcessor.process(trend);
-    }
+
 
     @Override
     public int priority() {
@@ -32,6 +31,12 @@ public class TrendTask implements TaskInterface{
     @Override
     public int compareTo(TaskInterface o) {
         return this.priority()-o.priority();
+    }
+
+    @Override
+    public Collection<Task> process() {
+       TwitterProcessor.process(trend);
+       return null;
     }
     
 }

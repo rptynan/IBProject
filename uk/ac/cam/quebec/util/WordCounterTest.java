@@ -15,7 +15,7 @@ import uk.ac.cam.quebec.util.parsing.UtilParsing;
  * @author tudor
  */
 
-class WordCounterTest {
+public class WordCounterTest {
 
     static String text1 = "hello and welcome to ibgroup project";
     static String text2 = "hi and welcome to ibgroup project";
