@@ -24,7 +24,8 @@ public class WorkAllocator {
     private final PriorityBlockingQueue<Object> TweetQueue;
     private final PriorityBlockingQueue<WikiArticle> PageQueue;
     private final PriorityBlockingQueue<Trend> TrendQueue;
-    private final PriorityBlockingQueue<Object> CoreQueue;
+    private final PriorityBlockingQueue<TaskInterface> TrendTaskQueue;
+    private final PriorityBlockingQueue<TaskInterface> CoreQueue;
     private final Queue<Worker> ThreadQueue;
     private final List<Thread> ThreadPool;
 
@@ -35,6 +36,7 @@ public class WorkAllocator {
         ThreadQueue = _ThreadQueue;
         ThreadPool = _ThreadPool;
         CoreQueue = new PriorityBlockingQueue<>();
+        TrendTaskQueue = new PriorityBlockingQueue<>();
     }
 
     public String getStatus() {
@@ -42,8 +44,25 @@ public class WorkAllocator {
         return s;
     }
 
+    public boolean putTask(Task t) {
+        TaskType type = t.getTaskType();
+        switch (type) {
+            case Page:
+                return false;
+            case Trend:
+                return false;
+            case Tweet:
+                return false;
+            case Core:
+                return CoreQueue.add(t.getTaskInterface());
+            default:
+                return false;
+        }
+    }
+
     public Task getTask(TaskType preferredType) {
         Task ret = null;
+        TaskInterface t;
         Object o = null;
         switch (preferredType) {
             case Tweet:
@@ -56,7 +75,7 @@ public class WorkAllocator {
                 o = TrendQueue.poll();
                 break;
             case Core:
-                o = CoreQueue.poll();
+                 t = CoreQueue.poll();
                 break;
         }
         if (o != null) {

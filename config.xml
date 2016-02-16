@@ -32,7 +32,16 @@ and open the template in the editor.
     <StopWords>
         <Path>words.txt</Path>
     </StopWords>
+    <Trends>
+        <TrendsPerLocation>10</TrendsPerLocation>
+        <TrendRefreshTime>10</TrendRefreshTime>
+    </Trends>
     <Misc>
+        <Location>World</Location>
+        <Location>World</Location>
+        <Location>World</Location>
+        <Location>World</Location>
+        <Location>World</Location>
         <Location>World</Location>
         <ThreadPoolSize>10</ThreadPoolSize>
     </Misc>

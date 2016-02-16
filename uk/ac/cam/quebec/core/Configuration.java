@@ -54,7 +54,8 @@ public class Configuration {
         UAPI_Args = getUAPIArgs(doc);
         SentimentAnalyserArgs = getSentimentAnalyserArgs(doc);
         KnowledgeGraphArgs = getKnowledgeGraphArgs(doc);
-        getStopWordsPath(doc);
+        parseStopWords(doc);
+        getTrendsArgs(doc);
     }
 
     /**
@@ -68,6 +69,7 @@ public class Configuration {
      * @param _SentimentAnalyserArgs
      * @param _KnowledgeGraphArgs
      */
+    @Deprecated
     public Configuration(String[] _twitterArgs, String[] _DBArgs, String[] _UAPI_Args, String _location, String[] _SentimentAnalyserArgs, String[] _KnowledgeGraphArgs) {
         doc = null;
         twitterArgs = _twitterArgs;
@@ -84,6 +86,7 @@ public class Configuration {
         ConfigMap.put("UAPI_Port", _UAPI_Args[0]);
         ConfigMap.put("SentimentAnalyserKey", _SentimentAnalyserArgs[0]);
         ConfigMap.put("KnowledgeGraphArgs", _KnowledgeGraphArgs[0]);
+        getTrendsArgs(null);
         }
         catch (Exception ex)
         {
@@ -113,11 +116,26 @@ public class Configuration {
         ret[4]=getValue("TwitterAccountName");
         return ret;
     }
+    public static String[] getLocations()
+    {   int locationNumbers = Integer.parseInt(getValue("locationNumbers"));
+        String[] ret = new String[locationNumbers];
+        ret[0] = getValue("Location");
+        for(int i=0;i<locationNumbers;i++)
+        {
+            ret[i+1]=getValue("Location"+i);
+        }
+        return ret;
+    }
+    @Deprecated
+    public static String getLocation()
+    {
+        return getDefaultLocation();
+    }
      /**
      * Returns the default location
      * @return String location
      */
-    public static String getLocation()
+    public static String getDefaultLocation()
     {
         return getValue("Location");
     }
@@ -141,6 +159,17 @@ public class Configuration {
     public static String getValue(String key)
     {
         return ConfigMap.get(key);
+    }
+    public static int getTrendsPerLocation()
+    {
+        String s = ConfigMap.get("TrendsPerLocation");
+        return Integer.parseInt(s);
+        
+    }
+    public static int getTrendRefreshTime()
+    {
+        String s = ConfigMap.get("TrendRefreshTime");
+        return Integer.parseInt(s);
     }
     /**
      * Function to get the config.xml file
@@ -175,9 +204,17 @@ public class Configuration {
         NodeList parents = doc.getElementsByTagName("Misc");
         Element parent = (Element) parents.item(0);
         NodeList Item = parent.getElementsByTagName("Location");
+        int locationNumbers = Item.getLength();
         s = Item.item(0).getTextContent();
         ConfigMap.put("Location", s);
+        for(int i=0; i<(locationNumbers-1);i++)
+        {
+        s = Item.item(i+1).getTextContent();
+        ConfigMap.put("Location"+i, s);    
+        }
+        ConfigMap.put("locationNumbers", String.valueOf(locationNumbers));        
         ret[0]=s;
+        
         try{//just incase someone doesn't have the latest config.xml
         Item = parent.getElementsByTagName("ThreadPoolSize");
         s = Item.item(0).getTextContent();
@@ -334,5 +371,28 @@ public class Configuration {
         s = Item.item(0).getTextContent();
         ConfigMap.put("StopWordsPath", s);
         return s;
+    }
+
+    private static void parseStopWords(Document doc) {
+        getStopWordsPath(doc);
+    }
+    
+    private static void getTrendsArgs(Document doc)
+    {   String s;
+    try{
+        NodeList parents = doc.getElementsByTagName("Trends");
+        Element parent = (Element) parents.item(0);
+        NodeList Item = parent.getElementsByTagName("TrendsPerLocation");
+        s = Item.item(0).getTextContent();
+        ConfigMap.put("TrendsPerLocation", s);
+        Item = parent.getElementsByTagName("TrendRefreshTime");
+        s = Item.item(0).getTextContent();
+        ConfigMap.put("TrendRefreshTime", s);
+    }
+    catch (NullPointerException ex)//Incase someone has not updated their config file
+    {
+        ConfigMap.put("TrendsPerLocation", "10");
+        ConfigMap.put("TrendRefreshTime", "10");
+    }
     }
 }
