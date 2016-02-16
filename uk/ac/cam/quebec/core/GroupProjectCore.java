@@ -6,6 +6,7 @@ import uk.ac.cam.quebec.userapi.APIServerAbstract;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import uk.ac.cam.quebec.dbwrapper.Database;
@@ -26,7 +27,7 @@ import uk.ac.cam.quebec.util.parsing.StopWords;
  *
  * @author James
  */
-public class GroupProjectCore extends Thread implements TrendsQueue, ControlInterface {
+public class GroupProjectCore extends Thread implements TrendsQueue, ControlInterface, WorkerInterface {
 
     private final List<Thread> ThreadPool = new ArrayList<>();
     private final PriorityBlockingQueue<Worker> ThreadQueue = new PriorityBlockingQueue<>();
@@ -44,6 +45,7 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
     private final Configuration config;
     private boolean running;
     private final String defaultLocation;
+    private TrendRefreshTask refreshTask = null;
 
     public GroupProjectCore(Configuration _config) throws IOException, TwitException {
         config = _config;
@@ -102,11 +104,10 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
         String[] locations = config.getLocations();
         for (String location : locations) {
             List<String> tr = twitterWrapper.getTrends(location);
-                Trend trend = null;
+            Trend trend = null;
             int trendLimit = config.getTrendsPerLocation();
             for (String s : tr) {
-                if(trendLimit==0)
-                {
+                if (trendLimit == 0) {
                     break;
                 }
                 trend = new Trend(s, location, 4);
@@ -127,7 +128,7 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
             while (running) {
                 w = ThreadQueue.take();
                 Task task = workAllocator.getTask(w.getWorkerType());
-                w.process(task);
+                boolean process = w.process(task);
                 //Trend T = TrendQueue.take();
                 //w.process(T);
                 if (!w.isAlive()) {
@@ -138,12 +139,14 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
             System.out.println("Core loop interupted, core should be closing");
         }
     }
-    private Task makeTrendRefreshTask()
-    {   int delay = config.getTrendRefreshTime();
-        TrendRefreshTask t = new TrendRefreshTask(delay,this);
-        Task t0 = new Task(t,TaskType.Core);
+
+    private Task makeTrendRefreshTask() {
+        int delay = config.getTrendRefreshTime();
+        refreshTask = new TrendRefreshTask(delay, this);
+        Task t0 = new Task(refreshTask, TaskType.Core);
         return t0;
     }
+
     /**
      * This is for when we want to make it really multithreaded
      */
@@ -223,6 +226,7 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
         ThreadQueue.add(t);
     }
 
+    @Override
     public void reallocateWorker(Worker w) {
         ThreadQueue.add(w);
     }
@@ -236,7 +240,10 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
             s += "Core is not running" + System.lineSeparator();
         }
         s += workAllocator.getStatus() + System.lineSeparator();
-        s += UAPII.getStatus();
+        s += UAPII.getStatus() + System.lineSeparator();
+        long time = timeUntilRepopulate();
+        s += String.format("%d min, %d sec until repopulation", TimeUnit.MILLISECONDS.toMinutes(time),
+                TimeUnit.MILLISECONDS.toSeconds(time) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(time)));
         return s;
 
     }
@@ -264,6 +271,11 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
     }
 
     @Override
+    public boolean addTask(Task t) {
+        return workAllocator.putTask(t);
+    }
+
+    @Override
     public void initialiseUAPI() {
         startUAPI();
     }
@@ -282,5 +294,10 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
         GroupProjectCore core = new GroupProjectCore(config);
         core.setDaemon(true);
         core.run();//Don't want to invoke a new thread from this entry point.
+    }
+
+    @Override
+    public long timeUntilRepopulate() {
+        return refreshTask.remainingTime();
     }
 }

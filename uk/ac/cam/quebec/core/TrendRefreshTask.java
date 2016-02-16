@@ -19,6 +19,8 @@ public class TrendRefreshTask implements TaskInterface{
     private final int delay;
     private final ControlInterface parent;
     private static final int priority = 1000;//lowest priority core task
+    private long sleeptime =0 ;
+    private long sleepstart = 0;
     public TrendRefreshTask(int _delay, ControlInterface _parent)
     {
         delay = _delay;
@@ -31,14 +33,21 @@ public class TrendRefreshTask implements TaskInterface{
         Task t = new Task(this,TaskType.Core);
         parent.repopulateTrends();
         try {
-            TimeUnit.MINUTES.sleep(delay);
+            sleepstart = System.currentTimeMillis();
+            sleeptime = TimeUnit.MINUTES.toMillis(delay);
+            Thread.sleep(sleeptime);
+            
         } catch (InterruptedException ex) {
             
         }
         ret.add(t);
         return ret;
     }
-
+    public long remainingTime()
+    {
+        return sleeptime+sleepstart-System.currentTimeMillis();
+        
+    }
     @Override
     public int priority() {
         return this.priority();

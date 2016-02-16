@@ -5,6 +5,7 @@
  */
 package uk.ac.cam.quebec.core;
 
+import java.util.Collection;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.logging.Level;
@@ -22,7 +23,7 @@ public class Worker extends Thread implements Comparable{
     private BlockingQueue<Task> o;//Todo: replace with semaphores
     private final TaskType type;
     private boolean running;
-    private final GroupProjectCore parent;
+    private final WorkerInterface parent;
     public Worker (TaskType _type,GroupProjectCore _parent)
     {
         o = new ArrayBlockingQueue<>(1);
@@ -75,7 +76,18 @@ public class Worker extends Thread implements Comparable{
         {
         try {
             Task t = o.take();
-            t.getTaskInterface().process();
+            Collection<Task> process = t.getTaskInterface().process();
+            if(process != null)
+            {
+               for(Task t0: process)
+               {
+                   boolean addTask = parent.addTask(t);
+                   if(!addTask)
+                   {
+                       System.err.println("Error adding task from task");
+                   }
+               }
+            }
         } catch (Exception ex) {
             System.err.println("Error processing task");
             Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);

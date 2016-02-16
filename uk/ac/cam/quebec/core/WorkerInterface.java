@@ -9,11 +9,10 @@ package uk.ac.cam.quebec.core;
  *
  * @author James
  */
-public interface ControlInterface {
-    public void beginClose();
-    public String getServerInfo();
-    public boolean isRunning();
-    public void initialiseUAPI();
-    public void repopulateTrends();
-    public long timeUntilRepopulate();
+public interface WorkerInterface {
+
+    public boolean addTask(Task t);
+
+    public void reallocateWorker(Worker aThis);
+    
 }
