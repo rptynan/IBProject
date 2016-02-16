@@ -36,6 +36,7 @@ public class Configuration {
     private final Database DB;
     private final String[] SentimentAnalyserArgs;
     private final String[] KnowledgeGraphArgs;
+    private static String[] StopWords;
     private static final Map<String,String> ConfigMap = new HashMap<>();
 
     /**
