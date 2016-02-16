@@ -93,6 +93,8 @@ public class TwitterProcessor {
      */
     @VisibleForTesting
     static void extractConcepts(Trend trend, List<Status> tweets) {
+	// TODO (Momchil): Push parsed name with infinite priority.
+
 	if (tweets == null) {
 	    return;
 	}

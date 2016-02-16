@@ -9,6 +9,9 @@ import uk.ac.cam.quebec.twitterwrapper.TwitterLink;
 import uk.ac.cam.quebec.util.parsing.UtilParsing;
 import winterwell.jtwitter.Status;
 
+/**
+ * @author Momchil
+ */
 public class ExtractConceptsTest {
 
     public static void main(String[] args) {
