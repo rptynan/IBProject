@@ -1,5 +1,7 @@
 package uk.ac.cam.quebec.twitterproc;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import javafx.util.Pair;
@@ -10,6 +12,7 @@ import uk.ac.cam.quebec.trends.Trend;
 import uk.ac.cam.quebec.twitterwrapper.TwitException;
 import uk.ac.cam.quebec.twitterwrapper.TwitterLink;
 import uk.ac.cam.quebec.util.WordCounter;
+import uk.ac.cam.quebec.util.parsing.StopWords;
 import uk.ac.cam.quebec.util.parsing.UtilParsing;
 import uk.ac.cam.quebec.wikiproc.WikiProcessor;
 import winterwell.jtwitter.Status;
@@ -42,8 +45,7 @@ public class TwitterProcessor {
 		db.putTweets(tweets, trend);
 		tweets = db.getTweets(trend); // It is possible to have old tweets in the database.
 	    } catch (DatabaseException e) {
-            e.printStackTrace();
-		// Throwing exception doesn't necessarily prevent us from continuing execution.
+		e.printStackTrace();
 	    }
 
 	    trend.setPopularity(calculatePopularity(tweets));
@@ -92,15 +94,18 @@ public class TwitterProcessor {
      * @param tweets The tweets related to this trend.
      */
     @VisibleForTesting
-    static void extractConcepts(Trend trend, List<Status> tweets) {
-	if (tweets == null) {
+    static void extractConcepts(Trend trend, List<Status> tweetsBatch) {
+	trend.addConcept(new Pair<String, Integer>(trend.getParsedName(), Integer.MAX_VALUE));
+
+	if (tweetsBatch == null) {
 	    return;
 	}
 
+	List<String> tweets = filter(tweetsBatch);
 	WordCounter wordCounter = new WordCounter();
 	WordCounter hashTagCounter = new WordCounter();
-	for (Status tweet : tweets) {
-	    String text = UtilParsing.removeLinks(tweet.getDisplayText());
+	for (String tweet : tweets) {
+	    String text = UtilParsing.removeLinks(tweet);
 	    String[] words = text.replaceAll("[^a-zA-Z0-9@#-]", " ")
 		    		 .trim()
 		    		 .split("\\s+");
@@ -110,13 +115,14 @@ public class TwitterProcessor {
 		    continue;
 		} else if (word.startsWith("#")) {
 		    // Certain hash tag.
-		    if (!trend.getParsedName().equals(UtilParsing.parseTrendName(word))) {
+		    if (!trend.getParsedName().toLowerCase().equals(
+			    UtilParsing.parseTrendName(word).toLowerCase())) {
 			// If the hash tag is different from the current trend, add it as a
 			// relevant trend.
 			hashTagCounter.addWord(word);
 		    }
 		} else {
-		    if (word.length() > 3) {
+		    if (word.length() > 2 && !StopWords.isStopWord(word)) {
 			// Discard short words (a.g. is, the, a, and, ...).
 			wordCounter.addWord(word);
 		    }
@@ -139,6 +145,21 @@ public class TwitterProcessor {
 		trend.addRelatedHashTag(orderedHashTags[i]);
 	    }
 	}
+    }
+
+    /**
+     * The Twitter API and the Database can give us two or more same tweets. We want to remove
+     * the duplicates. 
+     *
+     * @param tweets
+     * @return Filtered List of tweets (represented just as strings that must be unique).
+     */
+    private static List<String> filter(List<Status> tweets) {
+	HashSet<String> cache = new HashSet<String>();
+	for (Status tweet : tweets) {
+	    cache.add(tweet.getDisplayText());
+	}
+	return new ArrayList<String>(cache);
     }
 
 }

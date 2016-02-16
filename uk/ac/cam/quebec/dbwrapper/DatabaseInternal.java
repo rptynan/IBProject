@@ -116,6 +116,7 @@ class DatabaseInternal extends Database {
             stmt.execute("CREATE TABLE IF NOT EXISTS wikiarticles ("
                     + "title VARCHAR(300) NOT NULL,"
                     + "updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,"
+                    + "relevance DOUBLE NOT NULL,"
                     + "object MEDIUMBLOB NOT NULL,"
                     + "wikiarticle_id INT UNSIGNED NOT NULL PRIMARY KEY)");
             // trends_wikiarticles_junction
@@ -288,16 +289,18 @@ class DatabaseInternal extends Database {
                 connection.setAutoCommit(false);
 
                 // Insert articles
-                stmt = connection.prepareStatement("INSERT INTO wikiarticles (title,"
-                        + "object, wikiarticle_id) VALUES (?, ?, ?) "
-                        + "ON DUPLICATE KEY UPDATE title = VALUES(title), "
+                stmt = connection.prepareStatement("INSERT INTO wikiarticles "
+                        + "(title, relevance, object, wikiarticle_id) VALUES (?, ?, ?, ?) "
+                        + "ON DUPLICATE KEY UPDATE "
+                        + "title = VALUES(title), relevance = VALUES(relevance), "
                         + "object = VALUES(object), wikiarticle_id = VALUES(wikiarticle_id)");
 
                 int num = 0;
                 for (WikiArticle wk : articles) {
                     stmt.setString(1, wk.getTitle());
-                    stmt.setObject(2, wk);
-                    stmt.setInt(3, wk.getId());
+                    stmt.setDouble(2, wk.getRelevance());
+                    stmt.setObject(3, wk);
+                    stmt.setInt(4, wk.getId());
                     stmt.addBatch();
                     num++;
                     // Some DB drivers don't like big batches
@@ -357,7 +360,8 @@ class DatabaseInternal extends Database {
                         + "FROM wikiarticles INNER JOIN trends_wikiarticles_junction "
                         + "ON wikiarticles.wikiarticle_id = "
                         + "trends_wikiarticles_junction.wikiarticle_id "
-                        + "WHERE trend_id = " + trend_id);
+                        + "WHERE trend_id = " + trend_id
+                        + " ORDER BY wikiarticles.relevance DESC");
             }
 
             while (rs.next()) {
