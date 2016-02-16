@@ -59,15 +59,18 @@ body {
   margin-left: -20px;
 }
 
-.nav-sidebar > li > a, .nav-sidebar .dropdown {
+/* Give padding to all elements */
+.nav-sidebar > li > a, .nav-sidebar .dropdown, .nav-sidebar .btn-group {
   padding-right: 20px;
   padding-left: 20px;
 }
 
+/* Padding for the popup part of dropdown  (Confusing yes..) */
 .nav-sidebar .dropdown-menu  {
   left: 20px;
 }
 
+/* Nice highlights for every link */
 .nav-sidebar > .active > a,
 .nav-sidebar > .active > a:hover,
 .nav-sidebar > .active > a:focus {
@@ -75,6 +78,10 @@ body {
   background-color: #428bca;
 }
 
+/* Trying to make buttons all fit inline TODO */
+.nav-sidebar > .btn-group-sm > .btn {
+    padding: 5px 3px;
+}
 
 /*
  * Main content
