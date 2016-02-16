@@ -32,7 +32,7 @@ public class DatabaseTest {
     }
     /**
      * This is the function where the tests are run
-     * 
+     *
      * SuprressWarnings is for Status constructor which is to only be used for
      * testing.
      */
@@ -40,7 +40,7 @@ public class DatabaseTest {
     public static void test() {// getInstance
         // Get two databases to check they're the same (or acting the same)
         System.out.println("==> Initialising Database(s)");
-        
+
         Database db1 = Database.getInstance();
         Database db2 = Database.getInstance();
 
@@ -97,9 +97,13 @@ public class DatabaseTest {
         List<WikiArticle> wikiList2 = null;
         try {
             wikis1.add(0, new WikiArticle("Standard ML"));
+            wikis1.get(0).setRelevance(new Double(10));
             wikis1.add(1, new WikiArticle("Lawrence Paulson"));
+            wikis1.get(1).setRelevance(new Double(8));
             wikis2.add(0, new WikiArticle("Conway's Game of Life"));
+            wikis2.get(0).setRelevance(new Double(43));
             wikis2.add(1, new WikiArticle("John Horton Conway"));
+            wikis2.get(1).setRelevance(new Double(1));
         } catch (WikiException exp) {
             exp.printStackTrace();
         }
@@ -114,13 +118,14 @@ public class DatabaseTest {
         }
         System.out.println("Articles for Trend " + t1.getId());
         for (WikiArticle wk : wikiList1) {
-            System.out.println(wk.getTitle() + " " + wk.getId());
+            System.out.println(wk.getTitle() + " " + wk.getId() + " " + wk.getRelevance());
         }
         System.out.println("Articles for Trend " + t2.getId());
         for (WikiArticle wk : wikiList2) {
-            System.out.println(wk.getTitle() + " " + wk.getId());
+            System.out.println(wk.getTitle() + " " + wk.getId() + " " + wk.getRelevance());
         }
         System.out.println("Trend " + t1.getId() + " should have ML articles");
         System.out.println("Trend " + t2.getId() + " should have ML and GOL articles");
+        System.out.println("Trends should be in descending order of relevance");
     }
 }
