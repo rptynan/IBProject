@@ -44,5 +44,6 @@ and open the template in the editor.
         <Location>World</Location>
         <Location>World</Location>
         <ThreadPoolSize>10</ThreadPoolSize>
+        <ProjectRoot>.\</ProjectRoot>
     </Misc>
 </Configuration>

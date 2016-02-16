@@ -78,11 +78,22 @@ public class CoreConsole extends Thread {
             case HelpCommand:
                 processHelpCommand(c,command);
                 break;
+            case CheckStyleCommand:
+                checkProjectStyle(c,command);
+                break;
+            case InvalidCommand:
+                System.out.println("Invalid command");
+                break;
             default:
                 oldProcessCommand(command);
                 break;
         }
 
+    }
+    private void checkProjectStyle(CoreConsoleCommand c, String command)
+    {   System.out.println("Starting style check");
+        //String project root = config.getValue("ProjectRoot");
+        //checkstyle.main(root+"checkstyle\google_checks.xml",root);
     }
     private void processHelpCommand(CoreConsoleCommand c, String command)
     {   Set<String> keySet = CoreConsoleCommand.getLookupMap().keySet();

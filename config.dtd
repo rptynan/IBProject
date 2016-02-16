@@ -20,7 +20,7 @@
 -->
 
 <!--- Put your DTDDoc comment here. -->
-<!ELEMENT Configuration (Database|Twitter|SentimentAnalyser|KnowledgeGraph|UserAPI|StopWords|Misc)*>
+<!ELEMENT Configuration (Database|Twitter|SentimentAnalyser|KnowledgeGraph|UserAPI|StopWords|Trends|Misc)*>
 
 <!--- Put your DTDDoc comment here. -->
 <!ELEMENT Database (UserName|Password|Path|ClearOnStart)*>
@@ -74,10 +74,22 @@
 <!ELEMENT StopWords (Path)*>
 
 <!--- Put your DTDDoc comment here. -->
-<!ELEMENT Misc (Location|ThreadPoolSize)*>
+<!ELEMENT Trends (TrendsPerLocation|TrendRefreshTime)*>
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT TrendsPerLocation (#PCDATA)>
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT TrendRefreshTime (#PCDATA)>
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT Misc (Location|ThreadPoolSize|ProjectRoot)*>
 
 <!--- Put your DTDDoc comment here. -->
 <!ELEMENT Location (#PCDATA)>
 
 <!--- Put your DTDDoc comment here. -->
 <!ELEMENT ThreadPoolSize (#PCDATA)>
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT ProjectRoot (#PCDATA)>

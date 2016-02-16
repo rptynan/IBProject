@@ -205,20 +205,20 @@ public class Configuration {
      */
     private static String[] getMisc(Document doc) {
         String s;
-        String[] ret = new String[2];
+        String[] ret = new String[3];
         NodeList parents = doc.getElementsByTagName("Misc");
         Element parent = (Element) parents.item(0);
         NodeList Item = parent.getElementsByTagName("Location");
         int locationNumbers = Item.getLength();
         s = Item.item(0).getTextContent();
         ConfigMap.put("Location", s);
+        ret[0]=s;
         for(int i=0; i<(locationNumbers-1);i++)
         {
         s = Item.item(i+1).getTextContent();
         ConfigMap.put("Location"+i, s);    
         }
-        ConfigMap.put("locationNumbers", String.valueOf(locationNumbers));        
-        ret[0]=s;
+        ConfigMap.put("locationNumbers", String.valueOf(locationNumbers));
         
         try{//just incase someone doesn't have the latest config.xml
         Item = parent.getElementsByTagName("ThreadPoolSize");
@@ -231,6 +231,19 @@ public class Configuration {
         }
         ConfigMap.put("ThreadPoolSize", s);
         ret[1]=s;
+        
+        try{//just incase someone doesn't have the latest config.xml
+        Item = parent.getElementsByTagName("ProjectRoot");
+        s = Item.item(0).getTextContent();
+        
+        }
+        catch (NullPointerException ex)
+        {
+            s=".\\";
+        }
+        ConfigMap.put("ProjectRoot", s);
+        ret[2]=s;
+        
         return ret;
     }
 

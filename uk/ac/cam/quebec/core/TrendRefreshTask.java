@@ -57,5 +57,18 @@ public class TrendRefreshTask implements TaskInterface{
     public int compareTo(TaskInterface o) {
         return this.priority()-o.priority();
     }
+    public String getStatus()
+    {
+        if(sleepstart==0)
+        {
+            return "Refresh task is not running";
+        }
+        else
+        {   long time = remainingTime();
+            String s= String.format("%d min, %d sec until repopulation", TimeUnit.MILLISECONDS.toMinutes(time),
+                TimeUnit.MILLISECONDS.toSeconds(time) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(time)));
+            return s;
+        }
+    }
     
 }

@@ -31,6 +31,7 @@ public enum CoreConsoleCommand {
     CheckStopWordCommand("check stop word","(?<stopWord>.+)"),
     TestWordCounterCommand("test word counter",""),
     HelpCommand("help","(?<Command>\\w+)?"),
+    CheckStyleCommand("check style",""),
     InvalidCommand("","(.*)");
     private final Pattern requestPattern;
     private final Pattern fullPattern;

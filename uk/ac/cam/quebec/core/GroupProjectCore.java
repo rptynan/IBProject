@@ -45,7 +45,7 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
     private final Configuration config;
     private boolean running;
     private final String defaultLocation;
-    private TrendRefreshTask refreshTask = null;
+    private final TrendRefreshTask refreshTask;
 
     public GroupProjectCore(Configuration _config) throws IOException, TwitException {
         config = _config;
@@ -62,11 +62,12 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
         uk.ac.cam.quebec.havenapi.APIConstants.setCredentials(config.getSentimentAnalyserKey());
         ThreadPoolSize = config.getThreadPoolSize();
         stopWords = new StopWords();
+        refreshTask = makeTrendRefreshTask();
     }
 
     public GroupProjectCore(String[] TwitterLoginArgs, Database _DB, String _location) throws IOException, TwitException {
         int UAPIPort = 90;
-        config = null;
+        config = new Configuration(TwitterLoginArgs,new String[1], new String[1]);
         DB = _DB;
         UAPI = new NewAPIServer(DB, UAPIPort, this);
         UAPII = UAPI;
@@ -77,6 +78,7 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
         wikiProcessor = new WikiProcessor();
         defaultLocation = _location;
         stopWords = new StopWords();
+        refreshTask = makeTrendRefreshTask();
     }
 
     @Override
@@ -124,10 +126,11 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
     private void mainLoop() {
         try {
             Worker w;
-            workAllocator.putTask(makeTrendRefreshTask());
+            Task task = new Task(refreshTask,TaskType.Core);
+            workAllocator.putTask(task);
             while (running) {
                 w = ThreadQueue.take();
-                Task task = workAllocator.getTask(w.getWorkerType());
+                task = workAllocator.getTask(w.getWorkerType());
                 boolean process = w.process(task);
                 //Trend T = TrendQueue.take();
                 //w.process(T);
@@ -140,11 +143,10 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
         }
     }
 
-    private Task makeTrendRefreshTask() {
+    private TrendRefreshTask makeTrendRefreshTask() {
         int delay = config.getTrendRefreshTime();
-        refreshTask = new TrendRefreshTask(delay, this);
-        Task t0 = new Task(refreshTask, TaskType.Core);
-        return t0;
+        TrendRefreshTask tmp = new TrendRefreshTask(delay, this);
+        return tmp;
     }
 
     /**
@@ -241,12 +243,8 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
         }
         s += workAllocator.getStatus() + System.lineSeparator();
         s += UAPII.getStatus() + System.lineSeparator();
-        long time = timeUntilRepopulate();
-        s += String.format("%d min, %d sec until repopulation", TimeUnit.MILLISECONDS.toMinutes(time),
-                TimeUnit.MILLISECONDS.toSeconds(time) - TimeUnit.MINUTES.toSeconds(TimeUnit.MILLISECONDS.toMinutes(time)));
-        return s;
-
-    }
+        s += refreshTask.getStatus();
+        return s;}
 
     @Override
     public void beginClose() {
@@ -298,6 +296,6 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
 
     @Override
     public long timeUntilRepopulate() {
-        return refreshTask.remainingTime();
+        return refreshTask.remainingTime();      
     }
 }
