@@ -1,5 +1,7 @@
 package uk.ac.cam.quebec.twitterproc;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import javafx.util.Pair;
@@ -92,17 +94,18 @@ public class TwitterProcessor {
      * @param tweets The tweets related to this trend.
      */
     @VisibleForTesting
-    static void extractConcepts(Trend trend, List<Status> tweets) {
+    static void extractConcepts(Trend trend, List<Status> tweetsBatch) {
 	trend.addConcept(new Pair<String, Integer>(trend.getParsedName(), Integer.MAX_VALUE));
 
-	if (tweets == null) {
+	if (tweetsBatch == null) {
 	    return;
 	}
 
+	List<String> tweets = filter(tweetsBatch);
 	WordCounter wordCounter = new WordCounter();
 	WordCounter hashTagCounter = new WordCounter();
-	for (Status tweet : tweets) {
-	    String text = UtilParsing.removeLinks(tweet.getDisplayText());
+	for (String tweet : tweets) {
+	    String text = UtilParsing.removeLinks(tweet);
 	    String[] words = text.replaceAll("[^a-zA-Z0-9@#-]", " ")
 		    		 .trim()
 		    		 .split("\\s+");
@@ -142,6 +145,21 @@ public class TwitterProcessor {
 		trend.addRelatedHashTag(orderedHashTags[i]);
 	    }
 	}
+    }
+
+    /**
+     * The Twitter API and the Database can give us two or more same tweets. We want to remove
+     * the duplicates. 
+     *
+     * @param tweets
+     * @return Filtered List of tweets (represented just as strings that must be unique).
+     */
+    private static List<String> filter(List<Status> tweets) {
+	HashSet<String> cache = new HashSet<String>();
+	for (Status tweet : tweets) {
+	    cache.add(tweet.getDisplayText());
+	}
+	return new ArrayList<String>(cache);
     }
 
 }
