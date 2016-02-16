@@ -74,7 +74,10 @@
 <!ELEMENT StopWords (Path)*>
 
 <!--- Put your DTDDoc comment here. -->
-<!ELEMENT Misc (Location)*>
+<!ELEMENT Misc (Location|ThreadPoolSize)*>
 
 <!--- Put your DTDDoc comment here. -->
 <!ELEMENT Location (#PCDATA)>
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT ThreadPoolSize (#PCDATA)>

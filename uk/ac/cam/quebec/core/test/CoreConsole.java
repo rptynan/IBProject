@@ -78,7 +78,6 @@ public class CoreConsole extends Thread {
     }
 
     private void addTrend(CoreConsoleCommand c, String command) {
-        Matcher m0 = c.getMatch();
         Matcher m = c.getFullPattern().matcher(command);
         boolean b = m.matches();
         if (b) {
@@ -187,6 +186,7 @@ public class CoreConsole extends Thread {
             try {
                 config = new Configuration(args[0]);
             } catch (FileNotFoundException ex) {
+                System.err.println("Config file not found, falling back on defaults");
                 String[] UAPI = {"90"};
                 String[] SentimentAnalyserArgs = {""};
                 String[] KnowledgeGraphArgs = {""};

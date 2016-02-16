@@ -34,5 +34,6 @@ and open the template in the editor.
     </StopWords>
     <Misc>
         <Location>World</Location>
+        <ThreadPoolSize>10</ThreadPoolSize>
     </Misc>
 </Configuration>

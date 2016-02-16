@@ -30,7 +30,7 @@ import uk.ac.cam.quebec.dbwrapper.Database;
 public class Configuration {
     
     private final Document doc;
-    private final String location;
+    private final String[] misc;
     private final String[] twitterArgs;
     private final String[] UAPI_Args;
     private final Database DB;
@@ -49,7 +49,7 @@ public class Configuration {
         doc = getConfig(path);
         twitterArgs = getTwitterArgs(doc);
         DB = getDatabase(doc);
-        location = getLocation(doc);
+        misc = getMisc(doc);
         UAPI_Args = getUAPIArgs(doc);
         SentimentAnalyserArgs = getSentimentAnalyserArgs(doc);
         KnowledgeGraphArgs = getKnowledgeGraphArgs(doc);
@@ -74,9 +74,12 @@ public class Configuration {
         UAPI_Args = _UAPI_Args;
         SentimentAnalyserArgs = _SentimentAnalyserArgs;
         KnowledgeGraphArgs = _KnowledgeGraphArgs;
-        location = _location;
+        misc = new String[2];
+        misc[0] = _location;
+        misc[1] = "10";
         try{
-        ConfigMap.put("location", _location);
+        ConfigMap.put("Location", _location);
+        ConfigMap.put("ThreadPoolSize", misc[1]);
         ConfigMap.put("UAPI_Port", _UAPI_Args[0]);
         ConfigMap.put("SentimentAnalyserKey", _SentimentAnalyserArgs[0]);
         ConfigMap.put("KnowledgeGraphArgs", _KnowledgeGraphArgs[0]);
@@ -87,17 +90,10 @@ public class Configuration {
         }
     }
 
-    public boolean valid() {
-        return (location != null);
+    public static boolean valid() {
+        return ConfigMap.size()>0;
     }
-    /**
-     * Returns the default location
-     * @return String location
-     */
-    public String getLocation()
-    {
-        return location;
-    }
+   
     /**
      * Returns the initialised Database instance
      * @return 
@@ -106,21 +102,44 @@ public class Configuration {
     {
         return DB;
     }
-    public int getUAPI_Port()
-    {
-        return Integer.parseInt(UAPI_Args[0]);
+    
+    public static String[] getTwitterArgs()
+    {   String[] ret = new String[5];
+        ret[0]=getValue("TwitterOAuthKey");
+        ret[1]=getValue("TwitterOAuthSecret");
+        ret[2]=getValue("TwitterAccessToken");
+        ret[3]=getValue("TwitterAccessSecret");
+        ret[4]=getValue("TwitterAccountName");
+        return ret;
     }
-    public String[] getTwitterArgs()
+     /**
+     * Returns the default location
+     * @return String location
+     */
+    public static String getLocation()
     {
-        return twitterArgs;
+        return getValue("Location");
     }
-    public String getSentimentAnalyserKey()
-    {
-        return SentimentAnalyserArgs[0];
+    public static int getUAPI_Port()
+    {   String s = getValue("UserAPIPort");
+        return Integer.parseInt(s);
     }
-    public String getKnowledgeGraphKey()
+    public static String getSentimentAnalyserKey()
     {
-        return KnowledgeGraphArgs[0];
+        return getValue("SentimentAnalyserKey");
+    }
+    public static String getKnowledgeGraphKey()
+    {
+        return getValue("KnowledgeGraphKey");
+    }
+    public static int getThreadPoolSize()
+    {
+        String s = ConfigMap.get("ThreadPoolSize");
+        return Integer.parseInt(s);
+    }
+    public static String getValue(String key)
+    {
+        return ConfigMap.get(key);
     }
     /**
      * Function to get the config.xml file
@@ -149,14 +168,27 @@ public class Configuration {
      * @param doc the XML config file
      * @return the location to use
      */
-    private static String getLocation(Document doc) {
-        String s = "";
+    private static String[] getMisc(Document doc) {
+        String s;
+        String[] ret = new String[2];
         NodeList parents = doc.getElementsByTagName("Misc");
         Element parent = (Element) parents.item(0);
         NodeList Item = parent.getElementsByTagName("Location");
         s = Item.item(0).getTextContent();
-        ConfigMap.put("location", s);
-        return s;
+        ConfigMap.put("Location", s);
+        ret[0]=s;
+        try{//just incase someone doesn't have the latest config.xml
+        Item = parent.getElementsByTagName("ThreadPoolSize");
+        s = Item.item(0).getTextContent();
+        
+        }
+        catch (NullPointerException ex)
+        {
+            s="10";
+        }
+        ConfigMap.put("ThreadPoolSize", s);
+        ret[1]=s;
+        return ret;
     }
 
     /**
@@ -190,7 +222,7 @@ public class Configuration {
         twittercreds[3] = s;
         Item = parent.getElementsByTagName("Account_Name");
         s = Item.item(0).getTextContent();
-        ConfigMap.put("TwitterAccessSecret", s);
+        ConfigMap.put("TwitterAccountName", s);
         twittercreds[4] = s;
         return twittercreds;
     }

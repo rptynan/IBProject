@@ -38,8 +38,7 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
     private final TwitterProcessor twitterProcessor;
     private final WikiProcessor wikiProcessor;
     private final Database DB;
-    private final static int UAPIPort = 90;
-    private final static int ThreadPoolSize = 10;//The thread pool that we want to allocate for each job
+    private final int ThreadPoolSize;//The thread pool that we want to allocate for each job
     private final Configuration config;
     private boolean running;
     private String location;
@@ -56,13 +55,16 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
         location = config.getLocation();
         APIConstants.setCredentials(config.getKnowledgeGraphKey());
         uk.ac.cam.quebec.havenapi.APIConstants.setCredentials(config.getSentimentAnalyserKey());
+        ThreadPoolSize= config.getThreadPoolSize();
     }
     
     public GroupProjectCore(String[] TwitterLoginArgs, Database _DB,String _location) throws IOException, TwitException
-    {   config = null;
+    {   int UAPIPort = 90;
+        config = null;
         DB = _DB;
         UAPI = new NewAPIServer(DB,UAPIPort,this);
         UAPII = UAPI;
+        ThreadPoolSize=10;
         TwitterLink.login(TwitterLoginArgs[0],TwitterLoginArgs[1],TwitterLoginArgs[2],TwitterLoginArgs[3],TwitterLoginArgs[4]);
         twitterWrapper = new TwitterLink();
         twitterProcessor = new TwitterProcessor();
