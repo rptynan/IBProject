@@ -9,7 +9,9 @@ import uk.ac.cam.quebec.wikiwrapper.WikiArticle;
 import uk.ac.cam.quebec.wikiwrapper.WikiException;
 import uk.ac.cam.quebec.wikiwrapper.WikiFetch;
 
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -62,6 +64,7 @@ public class WikiProcessor {
 
         buildConcepts();
         fetchArticles();
+        removeDuplicateArticlesAndSort();
         storeArticles();
     }
 
@@ -109,15 +112,41 @@ public class WikiProcessor {
 
         wikiConcepts = new LinkedList<>();
         for (KGConcept kgConcept : kgConcepts) {
-            wikiConcepts.add(new Pair<String, Double>(kgConcept.getName(), kgConcept.getScore()));
+            wikiConcepts.add(new Pair<>(kgConcept.getName(), kgConcept.getScore()));
         }
+    }
+
+    public void removeDuplicateArticlesAndSort() {
+        HashMap<Integer, Integer> position = new HashMap<>();
+
+        List<WikiArticle> copy = articleList;
+        articleList = new ArrayList<>();
+
+        for (WikiArticle article : copy) {
+            Integer id = article.getId();
+            if (position.containsKey(id)) {
+                int pos = position.get(id);
+                articleList.get(pos).increaseRelevance(article.getRelevance());
+            } else {
+                articleList.add(article);
+                position.put(id, articleList.size() - 1);
+            }
+        }
+
+        // sort articles by relevance
+        articleList.sort(new Comparator<WikiArticle>() {
+            @Override
+            public int compare(WikiArticle o1, WikiArticle o2) {
+                return Double.compare(o2.getRelevance(), o1.getRelevance());
+            }
+        });
     }
 
     /**
      * Fetch the relevant Wiki articles.
      */
     private void fetchArticles() {
-        articleList = new LinkedList<WikiArticle>();
+        articleList = new LinkedList<>();
 
         double averageScore = 0;
         for (Pair<String, Double> concept : wikiConcepts) {
@@ -132,8 +161,12 @@ public class WikiProcessor {
             try {
                 conceptArticles = WikiFetch.search(concept.getKey(),
                         concept.getValue() >= averageScore ? 2 : 1, 0);
+
+                double relevance = concept.getValue();
                 if (conceptArticles != null) {
                     for (WikiArticle article : conceptArticles) {
+                        article.setRelevance(relevance);
+                        relevance *= 0.9;
                         articleList.add(article);
                     }
                 }

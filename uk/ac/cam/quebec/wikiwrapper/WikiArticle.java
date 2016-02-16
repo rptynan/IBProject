@@ -41,6 +41,23 @@ public class WikiArticle implements Serializable {
     private List<WikiEdit> edits = new LinkedList<WikiEdit>();
 
     /**
+     * Processing stuff
+     */
+    private Double relevance;
+
+    public Double getRelevance() {
+        return relevance;
+    }
+
+    public void setRelevance(Double relevance) {
+        this.relevance = relevance;
+    }
+
+    public void increaseRelevance(Double increase) {
+        this.relevance += increase;
+    }
+
+    /**
      * Constructor for an article. For performance reasons only the extract is
      * gathered on initialisation.
      * 
