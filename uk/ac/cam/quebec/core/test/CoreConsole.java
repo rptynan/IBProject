@@ -9,6 +9,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import uk.ac.cam.quebec.core.Configuration;
@@ -23,6 +24,7 @@ import uk.ac.cam.quebec.havenapi.HavenException;
 import uk.ac.cam.quebec.havenapi.SentimentAnalyserTest;
 import uk.ac.cam.quebec.kgsearchwrapper.KGConceptGeneratorTest;
 import uk.ac.cam.quebec.twitterwrapper.TwitException;
+import uk.ac.cam.quebec.util.parsing.StopWords;
 import uk.ac.cam.quebec.wikiwrapper.WikiException;
 
 /**
@@ -71,7 +73,10 @@ public class CoreConsole extends Thread {
                 System.out.println("Knowledge graph test end");
                 break;
             case CheckStopWordCommand:
-                checkStopWord(c,command);
+                checkStopWord(c, command);
+                break;
+            case HelpCommand:
+                processHelpCommand(c,command);
                 break;
             default:
                 oldProcessCommand(command);
@@ -79,31 +84,43 @@ public class CoreConsole extends Thread {
         }
 
     }
-    private void checkStopWord(CoreConsoleCommand c, String command)
-    {
+    private void processHelpCommand(CoreConsoleCommand c, String command)
+    {   Set<String> keySet = CoreConsoleCommand.getLookupMap().keySet();
+        System.out.println("Valid console commands are:");
+        String s = "";
+        for(String key :keySet)
+        {
+            s+=" "+key+",";
+        }
+        System.out.println();
+    }
+    private void checkStopWord(CoreConsoleCommand c, String command) {
         Matcher m = c.getFullPattern().matcher(command);
         boolean b = m.matches();
-        if(b)
-        {String word = m.group("stopWord");
-        //StopWord stopper = new StopWord();
-            
-        }
-        else
-        {
-            System.out.println("Failed to parse stop word in: "+command);
+        if (b) {
+            String word = m.group("stopWord");
+            boolean b0 = StopWords.isStopWord(word);
+            if (b0) {
+                System.out.println(word + " is a stop word");
+            } else {
+                System.out.println(word + " is not a stop word");
+            }
+
+        } else {
+            System.out.println("Failed to parse stop word in: " + command);
         }
     }
+
     private void addTrend(CoreConsoleCommand c, String command) {
         Matcher m = c.getFullPattern().matcher(command);
         boolean b = m.matches();
         if (b) {
             String trendName = m.group("trendName");
             String location = config.getLocation();
-            if(m.group("trendLocation")!=null)
-            {
+            if (m.group("trendLocation") != null) {
                 location = m.group("trendLocation");
             }
-            System.out.println("Adding trend " + trendName+ ", for location "+location);
+            System.out.println("Adding trend " + trendName + ", for location " + location);
             Trend T = new Trend(trendName, location, 0);
             if (coreTrends.putTrend(T)) {
                 System.out.println("Trend " + trendName + " added successfully");
@@ -214,9 +231,7 @@ public class CoreConsole extends Thread {
             c.run();
         } catch (IOException | TwitException ex) {
             System.err.println(ex);
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             System.err.println(ex);
         }
     }

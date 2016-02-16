@@ -45,7 +45,11 @@ public class Worker extends Thread implements Comparable{
      * @return If the task was successfully set for processing
     */
     public boolean process(Task _task)
-    {   try{
+    {   if(_task==null)
+    {System.err.println("Null task assigned");
+        return false;
+    }
+        try{
         o.add(_task);
         return true;
     }
@@ -53,7 +57,10 @@ public class Worker extends Thread implements Comparable{
     {   //this means the Queue is full
         return false;
     }
-            
+        catch (Exception ex)
+        {
+            throw ex;//debugging hook
+        }
     }
     public boolean processObject(Object _o)
     {TestTask tst = new TestTask(_o);

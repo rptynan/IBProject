@@ -5,11 +5,16 @@
  */
 package uk.ac.cam.quebec.core;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
@@ -33,10 +38,10 @@ public class Configuration {
     private final String[] misc;
     private final String[] twitterArgs;
     private final String[] UAPI_Args;
-    private final Database DB;
     private final String[] SentimentAnalyserArgs;
     private final String[] KnowledgeGraphArgs;
-    private static String[] StopWords;
+    private static Database DB;
+    private static final Set<String> stopWords = new HashSet<String>();
     private static final Map<String,Integer> locationLookup = new HashMap<>();
     private static final Map<String,String> ConfigMap = new HashMap<>();
 
@@ -102,7 +107,7 @@ public class Configuration {
      * Returns the initialised Database instance
      * @return 
      */
-    public Database getDatabase()
+    public static Database getDatabase()
     {
         return DB;
     }
@@ -378,7 +383,17 @@ public class Configuration {
     }
 
     private static void parseStopWords(Document doc) {
-        getStopWordsPath(doc);
+        String path = getStopWordsPath(doc);
+        File file = new File(path);
+	try {
+	    BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+	    String line = null;
+	    while ((line = br.readLine()) != null) {
+		stopWords.add(line);
+	    }
+	} catch (IOException e) {
+            //stopwords parsing failed
+	}
     }
     
     private static void getTrendsArgs(Document doc)

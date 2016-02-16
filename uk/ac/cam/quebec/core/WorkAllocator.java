@@ -8,6 +8,7 @@ package uk.ac.cam.quebec.core;
 import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.PriorityBlockingQueue;
+import java.util.concurrent.Semaphore;
 import uk.ac.cam.quebec.core.test.TestTask;
 import uk.ac.cam.quebec.core.test.TrendTask;
 import uk.ac.cam.quebec.trends.Trend;
@@ -26,6 +27,7 @@ public class WorkAllocator {
     private final PriorityBlockingQueue<TaskInterface> CoreQueue;
     private final Queue<Worker> ThreadQueue;
     private final List<Thread> ThreadPool;
+    private final Semaphore taskCount= new Semaphore(0);
     
 
     WorkAllocator(PriorityBlockingQueue<Object> _TweetQueue, PriorityBlockingQueue<WikiArticle> _PageQueue, PriorityBlockingQueue<Worker> _ThreadQueue, List<Thread> _ThreadPool) {
@@ -33,12 +35,12 @@ public class WorkAllocator {
         PageQueue = _PageQueue;
         ThreadQueue = _ThreadQueue;
         ThreadPool = _ThreadPool;
-        CoreQueue = new PriorityBlockingQueue<>();
-        TrendTaskQueue = new PriorityBlockingQueue<>();
+        CoreQueue = new MyPriorityBlockingQueue<>(taskCount);
+        TrendTaskQueue = new MyPriorityBlockingQueue<>(taskCount);
     }
 
     public String getStatus() {
-        String s = "There are: " + TrendTaskQueue.size() + " trends, " + TweetQueue.size() + " tweets and " + PageQueue.size() + " pages in the queue. There are currently " + ThreadQueue.size() + "/" + ThreadPool.size() + " idle threads.";
+        String s = "There are: " + TrendTaskQueue.size() + " trends, " + TweetQueue.size() + " tweets and " + PageQueue.size() + " pages in the queue ("+taskCount.availablePermits()+" permits avaliable). There are currently " + ThreadQueue.size() + "/" + ThreadPool.size() + " idle threads.";
         return s;
     }
     public boolean putTrend(Trend t)
@@ -61,7 +63,8 @@ public class WorkAllocator {
         }
     }
 
-    public Task getTask(TaskType preferredType) {
+    public Task getTask(TaskType preferredType) throws InterruptedException {
+        taskCount.acquire();
         Task ret = null;
         TaskInterface t = null;
         Object o = null;

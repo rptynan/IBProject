@@ -7,6 +7,7 @@ package uk.ac.cam.quebec.core;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -30,7 +31,7 @@ public class TrendRefreshTask implements TaskInterface{
         Task t = new Task(this,TaskType.Core);
         parent.repopulateTrends();
         try {
-            Thread.sleep(delay);
+            TimeUnit.MINUTES.sleep(delay);
         } catch (InterruptedException ex) {
             
         }
