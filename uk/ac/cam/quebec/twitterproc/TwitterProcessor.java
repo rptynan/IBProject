@@ -10,6 +10,7 @@ import uk.ac.cam.quebec.trends.Trend;
 import uk.ac.cam.quebec.twitterwrapper.TwitException;
 import uk.ac.cam.quebec.twitterwrapper.TwitterLink;
 import uk.ac.cam.quebec.util.WordCounter;
+import uk.ac.cam.quebec.util.parsing.StopWords;
 import uk.ac.cam.quebec.util.parsing.UtilParsing;
 import uk.ac.cam.quebec.wikiproc.WikiProcessor;
 import winterwell.jtwitter.Status;
@@ -42,8 +43,7 @@ public class TwitterProcessor {
 		db.putTweets(tweets, trend);
 		tweets = db.getTweets(trend); // It is possible to have old tweets in the database.
 	    } catch (DatabaseException e) {
-            e.printStackTrace();
-		// Throwing exception doesn't necessarily prevent us from continuing execution.
+		e.printStackTrace();
 	    }
 
 	    trend.setPopularity(calculatePopularity(tweets));
@@ -93,7 +93,7 @@ public class TwitterProcessor {
      */
     @VisibleForTesting
     static void extractConcepts(Trend trend, List<Status> tweets) {
-	// TODO (Momchil): Push parsed name with infinite priority.
+	trend.addConcept(new Pair<String, Integer>(trend.getParsedName(), Integer.MAX_VALUE));
 
 	if (tweets == null) {
 	    return;
@@ -112,13 +112,14 @@ public class TwitterProcessor {
 		    continue;
 		} else if (word.startsWith("#")) {
 		    // Certain hash tag.
-		    if (!trend.getParsedName().equals(UtilParsing.parseTrendName(word))) {
+		    if (!trend.getParsedName().toLowerCase().equals(
+			    UtilParsing.parseTrendName(word).toLowerCase())) {
 			// If the hash tag is different from the current trend, add it as a
 			// relevant trend.
 			hashTagCounter.addWord(word);
 		    }
 		} else {
-		    if (word.length() > 3) {
+		    if (word.length() > 2 && !StopWords.isStopWord(word)) {
 			// Discard short words (a.g. is, the, a, and, ...).
 			wordCounter.addWord(word);
 		    }

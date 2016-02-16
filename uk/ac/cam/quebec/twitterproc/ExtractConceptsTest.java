@@ -29,7 +29,7 @@ public class ExtractConceptsTest {
 	    System.out.println("Number of tweets: " + tweets.size());
 	    System.out.println("Print tweets");
 	    for (Status tweet : tweets) {
-		System.out.println(tweet.getDisplayText());
+		System.out.println(tweet.getId() + " " + tweet.getDisplayText());
 	    }
 
 	    TwitterProcessor.extractConcepts(trend, tweets);
