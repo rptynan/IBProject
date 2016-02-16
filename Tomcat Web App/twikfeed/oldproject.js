@@ -1,7 +1,7 @@
 $(document).ready(function(){
 	
-	
-	// assign the elements shorter names
+		var dD = $("#dropdown");
+		var pH = $("#placeHeading");
 		var tL = $("#trendList");
 		var tH = $("#trendHeading");
 		var pL = $("#pageList");
@@ -10,71 +10,63 @@ $(document).ready(function(){
 		var tD = $("#tweetsDiv");
 		var twH = $("#tweetsHeader");
 		var twL = $("#tweetsList");
-		var dS = $("#dSelected");
-		// initialise stuff
-		var dDdom;
+		var dDdom = dD.get(0);
 		var trendList = [];
 		var pageList = [];
 		var tweetList = [];
 		var cTrend;
 		var cPage;
 		var cState = "Wikipedia";
-		var trendIndex = -1;
-		var pageIndex = -1;
-		var lTrend;
-		var lPage;
 		eD.hide();
 		tD.hide();
 		
 		
 		
-		// Handle startup or a selection of a new location
+		
 		var updateTrends = function(){
 			$.get("TwikfeedServlet?Type=Trends").done(function(data, textStatus) {
 			
+			alert(data);
 		
 			trendList = $.parseJSON(data);
-		
+			pH.empty();
 			tL.empty();
+			pH.html(dDdom.options[dDdom.selectedIndex].value + " Trends");
+			
+			
+			
+			
+		
+		
 			var i;
 			for(i=0; i < trendList.length; i++){
-				tL.append("<li><a href=\"#\">" + trendList[i].name + "</a></li>");
+				tL.append("<li>" + trendList[i].name + "</li>");
 			}
 			}, "text");
 			
 		}
-		// Handle the selection of a trend
-		var updatePages = function(event){
-			
-			cTrend = $(event.target).parent();
-			if (cTrend[0].nodeName == "LI"){
-				if(trendIndex >= 0){
-					//reset old selected trend
-					lTrend.removeClass("active");
-					lTrend.html("<a href=\"#\">" + trendList[trendIndex].name + "</a>");
-				}
-				//Now make a get request to get the list of page name
-				trendIndex = cTrend.index();
-				
-				cTrend.html("<a href=\"\">"+trendList[trendIndex].name+"<span class=\"sr-only\">(current)</span></a>");
-				cTrend.addClass("active");
-				// Call to load articles
-				$.get("TwikfeedServlet?Type=Articles&id="+trendList[trendIndex].id).done(function(data, textStatus) {
 		
+		var updatePages = function(event){
+			cTrend = $(event.target);
+			if (cTrend[0].nodeName == "LI"){
+				
+				//Now make a get request to get the list of page name
+				var trendIndex = cTrend.index();
+				$.get("TwikfeedServlet?Type=Articles&id="+trendList[trendIndex].id).done(function(data, textStatus) {
+					alert(data);
 		
 					pageList = $.parseJSON(data);
 					pL.empty();
-					tH.html(cTrend.find("a").html());
+					tH.html(cTrend.html()+ "<br>related Wikipedia pages");
 			
 				
 					var i;
 					for(i=0; i < pageList.length; i++){
-						pL.append("<li><a href=\"#\">" + pageList[i].title + "</a></li>");
+						pL.append("<li>" + pageList[i].title + "</li>");
 					}
 				}, "text");
-				// Call to load tweets
 				$.get("TwikfeedServlet?Type=Tweets&id="+trendList[trendIndex].id).done(function(data, textStatus) {
-	
+					alert(data);
 		
 					tweetList = $.parseJSON(data);
 					twH.html(trendList[trendIndex].name + "Tweets");
@@ -86,30 +78,28 @@ $(document).ready(function(){
 					
 					
 				}, "text");
-				
-				lTrend = cTrend;
 			}
 		}
-		// Handle the selection of an article
+		
 		var updatePage = function(event){
-			cPage = $(event.target).parent();
+			cPage = $(event.target);
 			
 			if (cPage[0].nodeName == "LI"){
-				if(pageIndex >= 0){
-					//reset old selected page
-					lPage.removeClass("active");
-					lPage.html("<a href=\"#\">" + pageList[pageIndex].title + "</a>");
-				}
-				pageIndex = cPage.index();
-	
-				cPage.html("<a href=\"\">" + pageList[pageIndex].title + "<span class=\"sr-only\">(current)</span></a>");
-				cPage.addClass("active");
+				var pageIndex = cPage.index();
+				alert(pageIndex);
 			
 				wF.get(0).src = pageList[pageIndex].url;
-				lPage = cPage;
+				
 			}
 		}
-		// Handle changes between the views
+		
+		
+			
+		updateTrends();
+		dD.change(updateTrends);
+		(tL.get(0)).onclick = updatePages;	
+		(pL.get(0)).onclick = updatePage;
+		
 		$("#bTweets").click(function(){
 			if(cState != "Tweets"){
 				wF.hide();
@@ -134,18 +124,6 @@ $(document).ready(function(){
 				cState = "Wikipedia";
 			}
 		});
-		
-		// Allow locations to be selected
-		$('#dropDown li a').on('click', function(){
-			
-			dS.html($(this).html());
-		});
-		
-		// Make it happen
-		updateTrends();
-		(tL.get(0)).onclick = updatePages;
-		(pL.get(0)).onclick = updatePage;
-		
 	});
 		
 		

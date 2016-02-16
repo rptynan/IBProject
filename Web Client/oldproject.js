@@ -1,24 +1,22 @@
 $(document).ready(function(){
 	
-		var dD;
-		var pH;
+		var dD = $("#dropdown");
+		var pH = $("#placeHeading");
 		var tL = $("#trendList");
 		var tH = $("#trendHeading");
-		var pL;
+		var pL = $("#pageList");
 		var wF = $("#wikiFrame");
 		var eD = $("#editsDiv");
 		var tD = $("#tweetsDiv");
-		var twH;
-		var twL;
-		var dDdom;
+		var twH = $("#tweetsHeader");
+		var twL = $("#tweetsList");
+		var dDdom = dD.get(0);
 		var trendList = [];
 		var pageList = [];
 		var tweetList = [];
 		var cTrend;
 		var cPage;
 		var cState = "Wikipedia";
-		var trendIndex = -1;
-		var lTrend;
 		eD.hide();
 		tD.hide();
 		
@@ -31,8 +29,9 @@ $(document).ready(function(){
 			alert(data);
 		
 			trendList = $.parseJSON(data);
-		
+			pH.empty();
 			tL.empty();
+			pH.html(dDdom.options[dDdom.selectedIndex].value + " Trends");
 			
 			
 			
@@ -41,26 +40,18 @@ $(document).ready(function(){
 		
 			var i;
 			for(i=0; i < trendList.length; i++){
-				tL.append("<li><a>" + trendList[i].name + "</a></li>");
+				tL.append("<li>" + trendList[i].name + "</li>");
 			}
 			}, "text");
 			
 		}
 		
 		var updatePages = function(event){
-			
-			cTrend = $(event.target).parent();
+			cTrend = $(event.target);
 			if (cTrend[0].nodeName == "LI"){
-				if(trendIndex >= 0){
-					lTrend.removeClass("active");
-					lTrend.html("<a>" + trendList[trendIndex].name + "</a>");
-				}
-				//Now make a get request to get the list of page name
-				trendIndex = cTrend.index();
 				
-				cTrend.html("<a href=\"#\">"+trendList[trendIndex].name+"<span class=\"sr-only\">(current)</span></a>");
-				cTrend.addClass("active");
-				/*
+				//Now make a get request to get the list of page name
+				var trendIndex = cTrend.index();
 				$.get("TwikfeedServlet?Type=Articles&id="+trendList[trendIndex].id).done(function(data, textStatus) {
 					alert(data);
 		
@@ -87,8 +78,6 @@ $(document).ready(function(){
 					
 					
 				}, "text");
-				*/
-				lTrend = cTrend;
 			}
 		}
 		
@@ -103,9 +92,38 @@ $(document).ready(function(){
 				
 			}
 		}
-		updateTrends();
-		(tL.get(0)).onclick = updatePages;
 		
+		
+			
+		updateTrends();
+		dD.change(updateTrends);
+		(tL.get(0)).onclick = updatePages;	
+		(pL.get(0)).onclick = updatePage;
+		
+		$("#bTweets").click(function(){
+			if(cState != "Tweets"){
+				wF.hide();
+				eD.hide();
+				tD.show();
+				cState = "Tweets";
+			}
+		});
+		$("#bEdits").click(function(){
+			if(cState != "Edits"){
+				wF.hide();
+				eD.show();
+				tD.hide();
+				cState = "Edits";
+			}
+		});
+		$("#bWiki").click(function(){
+			if(cState != "Wikipedia"){
+				wF.show();
+				eD.hide();
+				tD.hide();
+				cState = "Wikipedia";
+			}
+		});
 	});
 		
 		
