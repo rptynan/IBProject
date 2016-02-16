@@ -8,9 +8,12 @@ $(document).ready(function(){
 		var wF = $("#wikiFrame");
 		var eD = $("#editsDiv");
 		var tD = $("#tweetsDiv");
+		var twH = $("#tweetsHeader");
+		var twL = $("#tweetsList");
 		var dDdom = dD.get(0);
 		var trendList = [];
 		var pageList = [];
+		var tweetList = [];
 		var cTrend;
 		var cPage;
 		var cState = "Wikipedia";
@@ -61,6 +64,19 @@ $(document).ready(function(){
 					for(i=0; i < pageList.length; i++){
 						pL.append("<li>" + pageList[i].title + "</li>");
 					}
+				}, "text");
+				$.get("TwikfeedServlet?Type=Tweets&id="+trendList[trendIndex].id).done(function(data, textStatus) {
+					alert(data);
+		
+					tweetList = $.parseJSON(data);
+					twH.html(trendList[trendIndex].name + "Tweets");
+					twL.empty();
+					var i;
+					for(i=0; i < tweetList.length; i++){
+						twL.append("<li>" + tweetList[i].content + "<br>" + tweetList[i].time + "</li>");
+					}
+					
+					
 				}, "text");
 			}
 		}

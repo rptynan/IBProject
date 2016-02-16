@@ -42,6 +42,7 @@ public class TwitterProcessor {
 		db.putTweets(tweets, trend);
 		tweets = db.getTweets(trend); // It is possible to have old tweets in the database.
 	    } catch (DatabaseException e) {
+            e.printStackTrace();
 		// Throwing exception doesn't necessarily prevent us from continuing execution.
 	    }
 

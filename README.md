@@ -1,5 +1,13 @@
 # IBProject
 
+## Setting up Tomcat
+
+1. Download and install Tomcat 8.0 for your OS https://tomcat.apache.org/download-80.cgi .
+2. Copy the twikfeed.war file from the Tomcat Web App file in the repository to the webapps folder in your server.
+3. Run the server. A twikfeed folder should have been generated in your webapps folder conataining META-INF and WEB-INF. 
+4. Copy the index.html, jQuery.js and project.js files from the twikfeed folder in the repository to your twikfeed folder.
+5. Run the Core (on port 90),the Database and the Tomcat server and then visit http://localhost:8080/twikfeed/ .
+
 ## Style Checking
 Run the bash script `./checkstyle/check.sh <files to check>`, or alternatively
 import `checkstyle/google_checks.xml` into your own style-checker.

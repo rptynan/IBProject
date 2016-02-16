@@ -1,5 +1,7 @@
 package com.winterwell.jgeoplanet;
 
+import java.io.Serializable;
+
 import winterwell.json.JSONException;
 import winterwell.json.JSONObject;
 
@@ -12,7 +14,9 @@ import winterwell.json.JSONObject;
  * </p>
  * @author Joe Halliwell <joe@winterwell.com>
  */
-public class BoundingBox {
+public class BoundingBox implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
 	final Location northEast;
 	final Location southWest;

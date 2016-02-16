@@ -93,7 +93,7 @@ class DatabaseInternal extends Database {
             stmt = connection.createStatement();
             // Drop the tables on startup, clears any data in db!
             if (dropTables) {
-                stmt.execute("DROP tables trends, wikiarticles, tweets, "
+                stmt.execute("DROP tables IF EXISTS trends, wikiarticles, tweets, "
                         + "trends_wikiarticles_junction");
             }
 
