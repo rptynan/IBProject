@@ -37,6 +37,7 @@ public class Configuration {
     private final String[] SentimentAnalyserArgs;
     private final String[] KnowledgeGraphArgs;
     private static String[] StopWords;
+    private static final Map<String,Integer> locationLookup = new HashMap<>();
     private static final Map<String,String> ConfigMap = new HashMap<>();
 
     /**
@@ -56,32 +57,31 @@ public class Configuration {
         KnowledgeGraphArgs = getKnowledgeGraphArgs(doc);
         parseStopWords(doc);
         getTrendsArgs(doc);
+        buildTwitterLocationMap();
     }
 
     /**
-     * Builds an object containing the various configuration variables This
-     * entry point lets you specify the variables manually
+     * Builds an object containing the default configuration values
      *
      * @param _twitterArgs
-     * @param _DBArgs
-     * @param _UAPI_Args
-     * @param _location
      * @param _SentimentAnalyserArgs
      * @param _KnowledgeGraphArgs
      */
     @Deprecated
-    public Configuration(String[] _twitterArgs, String[] _DBArgs, String[] _UAPI_Args, String _location, String[] _SentimentAnalyserArgs, String[] _KnowledgeGraphArgs) {
+    public Configuration(String[] _twitterArgs, String[] _SentimentAnalyserArgs, String[] _KnowledgeGraphArgs) {
         doc = null;
         twitterArgs = _twitterArgs;
-        DB = getDatabase(_DBArgs);
+        String[] _UAPI_Args = new String[1];
+        _UAPI_Args[0] = "90";
+        DB = getDefaultDatabase();
         UAPI_Args = _UAPI_Args;
         SentimentAnalyserArgs = _SentimentAnalyserArgs;
         KnowledgeGraphArgs = _KnowledgeGraphArgs;
         misc = new String[2];
-        misc[0] = _location;
+        misc[0] = "world";
         misc[1] = "10";
         try{
-        ConfigMap.put("Location", _location);
+        ConfigMap.put("Location", misc[0]);
         ConfigMap.put("ThreadPoolSize", misc[1]);
         ConfigMap.put("UAPI_Port", _UAPI_Args[0]);
         ConfigMap.put("SentimentAnalyserKey", _SentimentAnalyserArgs[0]);
@@ -120,7 +120,7 @@ public class Configuration {
     {   int locationNumbers = Integer.parseInt(getValue("locationNumbers"));
         String[] ret = new String[locationNumbers];
         ret[0] = getValue("Location");
-        for(int i=0;i<locationNumbers;i++)
+        for(int i=0;i<(locationNumbers-1);i++)
         {
             ret[i+1]=getValue("Location"+i);
         }
@@ -274,7 +274,7 @@ public class Configuration {
     private static Database getDatabase(Document doc) {
         if(doc==null)
         {
-            return Database.getInstance();
+            return getDefaultDatabase();
         }
         String[] ret = new String[4];
         NodeList parents = doc.getElementsByTagName("Database");
@@ -299,7 +299,7 @@ public class Configuration {
     private static Database getDatabase(String[] args) {
         if(args ==null)
         {
-            return Database.getInstance();
+            return getDefaultDatabase();
         }
         ConfigMap.put("DatabaseUserName", args[0]);
         ConfigMap.put("DatabasePassword", args[1]);
@@ -309,6 +309,10 @@ public class Configuration {
         Database.setCredentials(args[0], args[1], "jdbc:mysql://" + args[2], wipe);
         Database DB = Database.getInstance();
         return DB;
+    }
+    private static Database getDefaultDatabase()
+    {
+            return Database.getInstance();
     }
     /**
      * Gets the Arguments for the sentiment analyser
@@ -394,5 +398,17 @@ public class Configuration {
         ConfigMap.put("TrendsPerLocation", "10");
         ConfigMap.put("TrendRefreshTime", "10");
     }
+    }
+    private static void buildTwitterLocationMap()
+    {
+        locationLookup.put("World", 1);
+        locationLookup.put("UK", 23424975);
+        locationLookup.put("USA", 23424977);
+        locationLookup.put("Australia", 23424748);
+        locationLookup.put("Ireland", 23424803);
+        locationLookup.put("India", 23424848);
+        locationLookup.put("Seattle", 2490383);
+        locationLookup.put("London", 44418);
+        
     }
 }

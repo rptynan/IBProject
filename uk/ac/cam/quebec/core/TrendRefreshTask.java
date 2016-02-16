@@ -17,7 +17,7 @@ import java.util.logging.Logger;
 public class TrendRefreshTask implements TaskInterface{
     private final int delay;
     private final ControlInterface parent;
-    private static final int priority = 1;
+    private static final int priority = 1000;//lowest priority core task
     public TrendRefreshTask(int _delay, ControlInterface _parent)
     {
         delay = _delay;

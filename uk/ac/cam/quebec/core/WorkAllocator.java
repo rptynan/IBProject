@@ -7,7 +7,6 @@ package uk.ac.cam.quebec.core;
 
 import java.util.List;
 import java.util.Queue;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.PriorityBlockingQueue;
 import uk.ac.cam.quebec.core.test.TestTask;
 import uk.ac.cam.quebec.core.test.TrendTask;
@@ -23,16 +22,15 @@ public class WorkAllocator {
 
     private final PriorityBlockingQueue<Object> TweetQueue;
     private final PriorityBlockingQueue<WikiArticle> PageQueue;
-    private final PriorityBlockingQueue<Trend> TrendQueue;
     private final PriorityBlockingQueue<TaskInterface> TrendTaskQueue;
     private final PriorityBlockingQueue<TaskInterface> CoreQueue;
     private final Queue<Worker> ThreadQueue;
     private final List<Thread> ThreadPool;
+    
 
-    WorkAllocator(PriorityBlockingQueue<Object> _TweetQueue, PriorityBlockingQueue<WikiArticle> _PageQueue, PriorityBlockingQueue<Trend> _TrendQueue, PriorityBlockingQueue<Worker> _ThreadQueue, List<Thread> _ThreadPool) {
+    WorkAllocator(PriorityBlockingQueue<Object> _TweetQueue, PriorityBlockingQueue<WikiArticle> _PageQueue, PriorityBlockingQueue<Worker> _ThreadQueue, List<Thread> _ThreadPool) {
         TweetQueue = _TweetQueue;
         PageQueue = _PageQueue;
-        TrendQueue = _TrendQueue;
         ThreadQueue = _ThreadQueue;
         ThreadPool = _ThreadPool;
         CoreQueue = new PriorityBlockingQueue<>();
@@ -40,17 +38,20 @@ public class WorkAllocator {
     }
 
     public String getStatus() {
-        String s = "There are: " + TrendQueue.size() + " trends, " + TweetQueue.size() + " tweets and " + PageQueue.size() + " pages in the queue. There are currently " + ThreadQueue.size() + "/" + ThreadPool.size() + " idle threads.";
+        String s = "There are: " + TrendTaskQueue.size() + " trends, " + TweetQueue.size() + " tweets and " + PageQueue.size() + " pages in the queue. There are currently " + ThreadQueue.size() + "/" + ThreadPool.size() + " idle threads.";
         return s;
     }
-
+    public boolean putTrend(Trend t)
+    {   TrendTask task = new TrendTask(t);
+        return TrendTaskQueue.add(task);
+    }
     public boolean putTask(Task t) {
         TaskType type = t.getTaskType();
         switch (type) {
             case Page:
                 return false;
             case Trend:
-                return false;
+                return TrendTaskQueue.add(t.getTaskInterface());
             case Tweet:
                 return false;
             case Core:
@@ -62,7 +63,7 @@ public class WorkAllocator {
 
     public Task getTask(TaskType preferredType) {
         Task ret = null;
-        TaskInterface t;
+        TaskInterface t = null;
         Object o = null;
         switch (preferredType) {
             case Tweet:
@@ -72,11 +73,16 @@ public class WorkAllocator {
                 o = PageQueue.poll();
                 break;
             case Trend:
-                o = TrendQueue.poll();
+                t = TrendTaskQueue.poll();
                 break;
             case Core:
-                 t = CoreQueue.poll();
+                t = CoreQueue.poll();
                 break;
+        }
+        if(t!=null)
+        {
+            ret = new Task(t, preferredType);
+            return ret;
         }
         if (o != null) {
             TestTask tst = new TestTask(o);
@@ -84,22 +90,22 @@ public class WorkAllocator {
             return ret;
         }
         if (!CoreQueue.isEmpty()) {
-            TestTask tst = new TestTask(CoreQueue.poll());
-            ret = new Task(tst, TaskType.Core);
-            return ret;
+            t = CoreQueue.poll();
+                ret = new Task(t,TaskType.Core);
+                return ret;
         }
-        if (!TrendQueue.isEmpty()) {
-            TrendTask tst = new TrendTask(TrendQueue.poll());
-            ret = new Task(tst, TaskType.Trend);
+        if (!TrendTaskQueue.isEmpty()) {
+            t = TrendTaskQueue.poll();
+            ret = new Task(t, TaskType.Trend);
             return ret;
         }
         if (!TweetQueue.isEmpty()) {
-            TestTask tst = new TestTask(TrendQueue.poll());
+            TestTask tst = new TestTask(TweetQueue.poll());
             ret = new Task(tst, TaskType.Tweet);
             return ret;
         }
         if (!PageQueue.isEmpty()) {
-            TestTask tst = new TestTask(TrendQueue.poll());
+            TestTask tst = new TestTask(PageQueue.poll());
             ret = new Task(tst, TaskType.Page);
             return ret;
         }

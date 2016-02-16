@@ -70,13 +70,29 @@ public class CoreConsole extends Thread {
                 KGConceptGeneratorTest.main(new String[0]);
                 System.out.println("Knowledge graph test end");
                 break;
+            case CheckStopWordCommand:
+                checkStopWord(c,command);
+                break;
             default:
                 oldProcessCommand(command);
                 break;
         }
 
     }
-
+    private void checkStopWord(CoreConsoleCommand c, String command)
+    {
+        Matcher m = c.getFullPattern().matcher(command);
+        boolean b = m.matches();
+        if(b)
+        {String word = m.group("stopWord");
+        //StopWord stopper = new StopWord();
+            
+        }
+        else
+        {
+            System.out.println("Failed to parse stop word in: "+command);
+        }
+    }
     private void addTrend(CoreConsoleCommand c, String command) {
         Matcher m = c.getFullPattern().matcher(command);
         boolean b = m.matches();
@@ -187,11 +203,9 @@ public class CoreConsole extends Thread {
                 config = new Configuration(args[0]);
             } catch (FileNotFoundException ex) {
                 System.err.println("Config file not found, falling back on defaults");
-                String[] UAPI = {"90"};
                 String[] SentimentAnalyserArgs = {""};
                 String[] KnowledgeGraphArgs = {""};
-                String location = "world";
-                config = new Configuration(args, null, UAPI, location, SentimentAnalyserArgs, KnowledgeGraphArgs);
+                config = new Configuration(args, SentimentAnalyserArgs, KnowledgeGraphArgs);
             }
             GroupProjectCore core = new GroupProjectCore(config);
             core.setDaemon(true);

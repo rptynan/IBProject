@@ -31,9 +31,8 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
     private final PriorityBlockingQueue<Worker> ThreadQueue = new PriorityBlockingQueue<>();
     private final PriorityBlockingQueue<Object> TweetQueue = new PriorityBlockingQueue<>();
     private final PriorityBlockingQueue<WikiArticle> PageQueue = new PriorityBlockingQueue<>();
-    private final PriorityBlockingQueue<Trend> TrendQueue = new PriorityBlockingQueue<>();
-    private final WorkAllocator workAllocator = new WorkAllocator(TweetQueue, PageQueue, TrendQueue, ThreadQueue, ThreadPool);
-    ;
+    private final WorkAllocator workAllocator = new WorkAllocator(TweetQueue, PageQueue, ThreadQueue, ThreadPool);
+    
     private final NewAPIServer UAPI;//User API, here for testing only
     private final APIServerAbstract UAPII;//User API Interface
     private final TwitterLink twitterWrapper;
@@ -43,7 +42,7 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
     private final int ThreadPoolSize;//The thread pool that we want to allocate for each job
     private final Configuration config;
     private boolean running;
-    private String defaultLocation;
+    private final String defaultLocation;
 
     public GroupProjectCore(Configuration _config) throws IOException, TwitException {
         config = _config;
@@ -81,7 +80,7 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
         this.setName("CoreThread");
         startUAPI();
         populateThreadPool();
-        repopulateTrends();
+        //repopulateTrends();
         mainLoop();
         close();
     }
@@ -100,7 +99,7 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
         String[] locations = config.getLocations();
         for (String location : locations) {
             List<String> tr = twitterWrapper.getTrends(location);
-            Trend trend = null;
+                Trend trend = null;
             int trendLimit = config.getTrendsPerLocation();
             for (String s : tr) {
                 if(trendLimit==0)
@@ -108,7 +107,7 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
                     break;
                 }
                 trend = new Trend(s, location, 4);
-                TrendQueue.add(trend);
+                workAllocator.putTrend(trend);
                 trendLimit--;
             }
         }
@@ -121,13 +120,13 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
     private void mainLoop() {
         try {
             Worker w;
-            
+            workAllocator.putTask(makeTrendRefreshTask());
             while (running) {
                 w = ThreadQueue.take();
-        //Task task = workAllocator.getTask(w.getWorkerType());
-                //w.process(task);
-                Trend T = TrendQueue.take();
-                w.process(T);
+                Task task = workAllocator.getTask(w.getWorkerType());
+                w.process(task);
+                //Trend T = TrendQueue.take();
+                //w.process(T);
                 if (!w.isAlive()) {
                     w.start();
                 }
@@ -154,7 +153,7 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
                 switch (w.getWorkerType())//Then we try to assign it the apropriate job for the thread
                 {
                     case Trend:
-                        o = TrendQueue.poll();
+                        //o = TrendQueue.poll();
                         if (o != null)//but if there is no work avaliable then do someone else's job
                         {
                             break;
@@ -192,7 +191,7 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
 
     @Override
     public boolean putTrend(Trend trend) {
-        return TrendQueue.add(trend);
+        return workAllocator.putTrend(trend);
     }
 
     private void populateThreadPool() {
@@ -273,11 +272,9 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
             config = new Configuration(args[0]);
         } catch (FileNotFoundException ex) {
             System.err.println("Failed to load config file from " + args[0] + " using fallback values");
-            String[] UAPI = {"90"};
             String[] SentimentAnalyserArgs = {""};
             String[] KnowledgeGraphArgs = {""};
-            String location = "world";
-            config = new Configuration(args, null, UAPI, location, SentimentAnalyserArgs, KnowledgeGraphArgs);
+            config = new Configuration(args, SentimentAnalyserArgs, KnowledgeGraphArgs);
         }
         GroupProjectCore core = new GroupProjectCore(config);
         core.setDaemon(true);
