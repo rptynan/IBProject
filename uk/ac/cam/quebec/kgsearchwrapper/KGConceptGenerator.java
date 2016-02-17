@@ -50,7 +50,7 @@ public class KGConceptGenerator {
     @Nonnull
     public List<KGConcept> getKGConcepts(String query, int limit) {
         LinkedList<KGConcept> ret = new LinkedList<>();
-        if (query == null || query == "" || limit <= 0) {
+        if (query == null || query.isEmpty() || limit <= 0) {
             return ret;
         }
         try {
