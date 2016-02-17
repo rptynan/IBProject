@@ -6,7 +6,6 @@ import uk.ac.cam.quebec.userapi.APIServerAbstract;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.PriorityBlockingQueue;
-import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import uk.ac.cam.quebec.dbwrapper.Database;
@@ -31,9 +30,7 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
 
     private final List<Thread> ThreadPool = new ArrayList<>();
     private final PriorityBlockingQueue<Worker> ThreadQueue = new PriorityBlockingQueue<>();
-    private final PriorityBlockingQueue<Object> TweetQueue = new PriorityBlockingQueue<>();
-    private final PriorityBlockingQueue<WikiArticle> PageQueue = new PriorityBlockingQueue<>();
-    private final WorkAllocator workAllocator = new WorkAllocator(TweetQueue, PageQueue, ThreadQueue, ThreadPool);
+    private final WorkAllocator workAllocator = new WorkAllocator(ThreadQueue, ThreadPool);
     private final NewAPIServer UAPI;//User API, here for testing only
     private final APIServerAbstract UAPII;//User API Interface
     private final TwitterLink twitterWrapper;//Always goood
@@ -87,7 +84,6 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
         this.setName("CoreThread");
         startUAPI();
         populateThreadPool();
-        //repopulateTrends();
         mainLoop();
         close();
     }
@@ -132,8 +128,6 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
                 w = ThreadQueue.take();
                 task = workAllocator.getTask(w.getWorkerType());
                 boolean process = w.process(task);
-                //Trend T = TrendQueue.take();
-                //w.process(T);
                 if (!w.isAlive()) {
                     w.start();
                 }
@@ -147,47 +141,6 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
         int delay = config.getTrendRefreshTime();
         TrendRefreshTask tmp = new TrendRefreshTask(delay, this);
         return tmp;
-    }
-
-    /**
-     * This is for when we want to make it really multithreaded
-     */
-    private void mainLoopOld() {
-        Worker w;
-        while (running) {
-            try {
-                w = ThreadQueue.take();//we want to block until a thread is free
-                Object o = null;
-                switch (w.getWorkerType())//Then we try to assign it the apropriate job for the thread
-                {
-                    case Trend:
-                        //o = TrendQueue.poll();
-                        if (o != null)//but if there is no work avaliable then do someone else's job
-                        {
-                            break;
-                        }
-                    case Tweet:
-                        o = TweetQueue.poll();
-                        if (o != null) {
-                            break;
-                        }
-                    case Page:
-                        o = PageQueue.poll();
-                        if (o != null) {
-                            break;
-                        }
-                    default:
-                        //Todo: add multiqueue take here
-                        break;
-                }
-                if (o != null) {
-                    w.processObject(o);
-                }
-            } catch (InterruptedException ex) {
-                Logger.getLogger(GroupProjectCore.class.getName()).log(Level.SEVERE, null, ex);
-                running = false;//something interupts us then we should close down.
-            }
-        }
     }
 
     /**
@@ -215,7 +168,7 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
             t.setName(t.getWorkerType().toString() + " worker thread id: " + i);
             ThreadPool.add(t);
             ThreadQueue.add(t);
-            t = new Worker(TaskType.Page, this);
+            t = new Worker(TaskType.Wiki, this);
             t.setDaemon(true);
             t.setName(t.getWorkerType().toString() + " worker thread id: " + i);
             ThreadPool.add(t);
@@ -259,7 +212,6 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
 
     @Override
     public void repopulateTrends() {
-
         try {
             getTrends();
         } catch (TwitException ex) {

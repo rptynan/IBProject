@@ -11,7 +11,6 @@ import java.util.concurrent.BlockingQueue;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import uk.ac.cam.quebec.core.test.TestTask;
-import uk.ac.cam.quebec.core.test.TrendTask;
 import uk.ac.cam.quebec.trends.Trend;
 
 /**

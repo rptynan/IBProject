@@ -11,7 +11,7 @@ package uk.ac.cam.quebec.core;
  */
 public enum TaskType {
     Trend,
-    Page,
+    Wiki,
     Tweet,
     Core
 }
