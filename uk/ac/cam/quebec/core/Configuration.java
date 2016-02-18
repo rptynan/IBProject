@@ -29,22 +29,19 @@ import uk.ac.cam.quebec.dbwrapper.Database;
 
 /**
  * This class represents the values of the config.xml file;
+ *
  * @author James
  */
 // Todo: convert this class to a singleton
 public class Configuration {
-    
+
     private final Document doc;
     private final String[] misc;
-    private final String[] twitterArgs;
-    private final String[] UAPI_Args;
-    private final String[] SentimentAnalyserArgs;
-    private final String[] KnowledgeGraphArgs;
     private static Database DB;
     private static final Set<String> stopWords = new HashSet<>();
-    private static final Map<String,Integer> locationLookup = new HashMap<>();
-    private static final Map<String,String> ConfigMap = new HashMap<>();
-
+    private static final Map<String, Integer> locationLookup = new HashMap<>();
+    private static final Map<String, String> ConfigMap = new HashMap<>();
+    private static boolean valid = false;
     /**
      * Builds an object containing the various configuration variables
      *
@@ -52,129 +49,160 @@ public class Configuration {
      * @throws FileNotFoundException If the file is not present at the given
      * path
      */
-    public  Configuration(String path) throws FileNotFoundException {
+    public Configuration(String path) throws FileNotFoundException {
         doc = getConfig(path);
-        twitterArgs = getTwitterArgs(doc);
+        getTwitterArgs(doc);
         DB = getDatabase(doc);
         misc = getMisc(doc);
-        UAPI_Args = getUAPIArgs(doc);
-        SentimentAnalyserArgs = getSentimentAnalyserArgs(doc);
-        KnowledgeGraphArgs = getKnowledgeGraphArgs(doc);
+        getUAPIArgs(doc);
+        getSentimentAnalyserArgs(doc);
+        getKnowledgeGraphArgs(doc);
         parseStopWords(doc);
         getTrendsArgs(doc);
         buildTwitterLocationMap();
+        valid = true;
+    }
+
+    /**
+     *  Builds an object containing the default configuration values
+     * @deprecated
+     */
+    @Deprecated
+    public Configuration()
+    {
+        this(new String[5],new String[1],new String[1]);
     }
     /**
-     * Builds an object containing the default configuration values
-     *
-     * @param _twitterArgs
-     * @param _SentimentAnalyserArgs
-     * @param _KnowledgeGraphArgs
+     * Builds an object containing the default configuration values and secret keys
+     * 
+     * @param _twitterArgs a String[5] containing the twitter credentials
+     * @param _SentimentAnalyserArgs a String[1] containing the api key
+     * @param _KnowledgeGraphArgs a String[1] containing the api key
      */
     @Deprecated
     public Configuration(String[] _twitterArgs, String[] _SentimentAnalyserArgs, String[] _KnowledgeGraphArgs) {
         doc = null;
-        twitterArgs = _twitterArgs;
         String[] _UAPI_Args = new String[1];
         _UAPI_Args[0] = "90";
         DB = getDefaultDatabase();
-        UAPI_Args = _UAPI_Args;
-        SentimentAnalyserArgs = _SentimentAnalyserArgs;
-        KnowledgeGraphArgs = _KnowledgeGraphArgs;
         misc = new String[2];
         misc[0] = "world";
         misc[1] = "10";
-        try{
-        ConfigMap.put("Location", misc[0]);
-        ConfigMap.put("ThreadPoolSize", misc[1]);
-        ConfigMap.put("UAPI_Port", _UAPI_Args[0]);
-        ConfigMap.put("SentimentAnalyserKey", _SentimentAnalyserArgs[0]);
-        ConfigMap.put("KnowledgeGraphArgs", _KnowledgeGraphArgs[0]);
-        getTrendsArgs(null);
-        }
-        catch (Exception ex)
-        {
-            System.err.println("Error adding items to ConfigMap: "+ex);
+        try {
+            ConfigMap.put("Location", misc[0]);
+            ConfigMap.put("ThreadPoolSize", misc[1]);
+            ConfigMap.put("UAPI_Port", _UAPI_Args[0]);
+            ConfigMap.put("SentimentAnalyserKey", _SentimentAnalyserArgs[0]);
+            ConfigMap.put("KnowledgeGraphArgs", _KnowledgeGraphArgs[0]);
+            getTrendsArgs(null);
+            ConfigMap.put("TwitterOAuthKey", _twitterArgs[0]);
+            ConfigMap.put("TwitterOAuthSecret", _twitterArgs[1]);
+            ConfigMap.put("TwitterAccessToken", _twitterArgs[2]);
+            ConfigMap.put("TwitterAccessSecret", _twitterArgs[3]);
+            ConfigMap.put("TwitterAccountName", _twitterArgs[4]);
+            valid = true;
+        } catch (Exception ex) {
+            System.err.println("Error adding items to ConfigMap: " + ex);
         }
     }
 
-    public static boolean valid() {
-        return ConfigMap.size()>0;
+    public static boolean isValid() {
+        return valid;
     }
-   
+
     /**
      * Returns the initialised Database instance
-     * @return 
+     *
+     * @return
      */
-    public static Database getDatabase()
-    {
+    public static Database getDatabase() {
         return DB;
     }
-    
-    public static String[] getTwitterArgs()
-    {   String[] ret = new String[5];
-        ret[0]=getValue("TwitterOAuthKey");
-        ret[1]=getValue("TwitterOAuthSecret");
-        ret[2]=getValue("TwitterAccessToken");
-        ret[3]=getValue("TwitterAccessSecret");
-        ret[4]=getValue("TwitterAccountName");
+    @Deprecated
+    public static String[] getTwitterArgs() {
+    return getDefaultTwitterArgs();
+    }
+    public static String[] getDefaultTwitterArgs() {
+        String[] ret = new String[5];
+        ret[0] = getValue("TwitterOAuthKey");
+        ret[1] = getValue("TwitterOAuthSecret");
+        ret[2] = getValue("TwitterAccessToken");
+        ret[3] = getValue("TwitterAccessSecret");
+        ret[4] = getValue("TwitterAccountName");
         return ret;
     }
-    public static String[] getLocations()
-    {   int locationNumbers = Integer.parseInt(getValue("locationNumbers"));
+    public static String[] getTwitterArgs(int i) {
+        if(i<=0)
+        {
+            return getDefaultTwitterArgs();
+        }
+        int j = i-1;
+        String[] ret = new String[5];
+        ret[0] = getValue("TwitterOAuthKey"+j);
+        ret[1] = getValue("TwitterOAuthSecret"+j);
+        ret[2] = getValue("TwitterAccessToken"+j);
+        ret[3] = getValue("TwitterAccessSecret"+j);
+        ret[4] = getValue("TwitterAccountName"+j);
+        return ret;
+    }
+    
+    public static String[] getLocations() {
+        int locationNumbers = Integer.parseInt(getValue("locationNumbers"));
         String[] ret = new String[locationNumbers];
         ret[0] = getValue("Location");
-        for(int i=0;i<(locationNumbers-1);i++)
-        {
-            ret[i+1]=getValue("Location"+i);
+        for (int i = 0; i < (locationNumbers - 1); i++) {
+            ret[i + 1] = getValue("Location" + i);
         }
         return ret;
     }
+
     @Deprecated
-    public static String getLocation()
-    {
+    public static String getLocation() {
         return getDefaultLocation();
     }
-     /**
+
+    /**
      * Returns the default location
+     *
      * @return String location
      */
-    public static String getDefaultLocation()
-    {
+    public static String getDefaultLocation() {
         return getValue("Location");
     }
-    public static int getUAPI_Port()
-    {   String s = getValue("UserAPIPort");
+
+    public static int getUAPI_Port() {
+        String s = getValue("UserAPIPort");
         return Integer.parseInt(s);
     }
-    public static String getSentimentAnalyserKey()
-    {
+
+    public static String getSentimentAnalyserKey() {
         return getValue("SentimentAnalyserKey");
     }
-    public static String getKnowledgeGraphKey()
-    {
+
+    public static String getKnowledgeGraphKey() {
         return getValue("KnowledgeGraphKey");
     }
-    public static int getThreadPoolSize()
-    {
+
+    public static int getThreadPoolSize() {
         String s = ConfigMap.get("ThreadPoolSize");
         return Integer.parseInt(s);
     }
-    public static String getValue(String key)
-    {
+
+    public static String getValue(String key) {
         return ConfigMap.get(key);
     }
-    public static int getTrendsPerLocation()
-    {
+
+    public static int getTrendsPerLocation() {
         String s = ConfigMap.get("TrendsPerLocation");
         return Integer.parseInt(s);
-        
+
     }
-    public static int getTrendRefreshTime()
-    {
+
+    public static int getTrendRefreshTime() {
         String s = ConfigMap.get("TrendRefreshTime");
         return Integer.parseInt(s);
     }
+
     /**
      * Function to get the config.xml file
      *
@@ -211,38 +239,33 @@ public class Configuration {
         int locationNumbers = Item.getLength();
         s = Item.item(0).getTextContent();
         ConfigMap.put("Location", s);
-        ret[0]=s;
-        for(int i=0; i<(locationNumbers-1);i++)
-        {
-        s = Item.item(i+1).getTextContent();
-        ConfigMap.put("Location"+i, s);    
+        ret[0] = s;
+        for (int i = 0; i < (locationNumbers - 1); i++) {
+            s = Item.item(i + 1).getTextContent();
+            ConfigMap.put("Location" + i, s);
         }
         ConfigMap.put("locationNumbers", String.valueOf(locationNumbers));
-        
-        try{//just incase someone doesn't have the latest config.xml
-        Item = parent.getElementsByTagName("ThreadPoolSize");
-        s = Item.item(0).getTextContent();
-        
-        }
-        catch (NullPointerException ex)
-        {
-            s="10";
+
+        try {//just incase someone doesn't have the latest config.xml
+            Item = parent.getElementsByTagName("ThreadPoolSize");
+            s = Item.item(0).getTextContent();
+
+        } catch (NullPointerException ex) {
+            s = "10";
         }
         ConfigMap.put("ThreadPoolSize", s);
-        ret[1]=s;
-        
-        try{//just incase someone doesn't have the latest config.xml
-        Item = parent.getElementsByTagName("ProjectRoot");
-        s = Item.item(0).getTextContent();
-        
-        }
-        catch (NullPointerException ex)
-        {
-            s=".\\";
+        ret[1] = s;
+
+        try {//just incase someone doesn't have the latest config.xml
+            Item = parent.getElementsByTagName("ProjectRoot");
+            s = Item.item(0).getTextContent();
+
+        } catch (NullPointerException ex) {
+            s = ".\\";
         }
         ConfigMap.put("ProjectRoot", s);
-        ret[2]=s;
-        
+        ret[2] = s;
+
         return ret;
     }
 
@@ -255,8 +278,9 @@ public class Configuration {
     private static String[] getTwitterArgs(Document doc) {
         String[] twittercreds = new String[5];
         NodeList parents = doc.getElementsByTagName("Twitter");
-            //parents will have more than 1 element if we have multiple twitter
+        //parents will have more than 1 element if we have multiple twitter
         //accounts 
+        int i = parents.getLength();
         String s;
         Element parent = (Element) parents.item(0);
         NodeList Item = parent.getElementsByTagName("OAuth_Key");
@@ -279,6 +303,27 @@ public class Configuration {
         s = Item.item(0).getTextContent();
         ConfigMap.put("TwitterAccountName", s);
         twittercreds[4] = s;
+
+        for (int j = 0; j < (i - 1); j++) {
+            parent = (Element) parents.item(j + 1);
+            Item = parent.getElementsByTagName("OAuth_Key");
+            s = Item.item(0).getTextContent();
+            ConfigMap.put("TwitterOAuthKey" + j, s);
+            Item = parent.getElementsByTagName("OAuth_Secret");
+            s = Item.item(0).getTextContent();
+            ConfigMap.put("TwitterOAuthSecret" + j, s);
+            Item = parent.getElementsByTagName("Access_Token");
+            s = Item.item(0).getTextContent();
+            ConfigMap.put("TwitterAccessToken" + j, s);
+            Item = parent.getElementsByTagName("Access_Secret");
+            s = Item.item(0).getTextContent();
+            ConfigMap.put("TwitterAccessSecret" + j, s);
+            Item = parent.getElementsByTagName("Account_Name");
+            s = Item.item(0).getTextContent();
+            ConfigMap.put("TwitterAccountName" + j, s);
+
+        }
+        ConfigMap.put("TwitterAccountCount", String.valueOf(i));
         return twittercreds;
     }
 
@@ -289,8 +334,7 @@ public class Configuration {
      * @return the database instance
      */
     private static Database getDatabase(Document doc) {
-        if(doc==null)
-        {
+        if (doc == null) {
             return getDefaultDatabase();
         }
         String[] ret = new String[4];
@@ -314,8 +358,7 @@ public class Configuration {
      * @return the database instance
      */
     private static Database getDatabase(String[] args) {
-        if(args ==null)
-        {
+        if (args == null) {
             return getDefaultDatabase();
         }
         ConfigMap.put("DatabaseUserName", args[0]);
@@ -327,12 +370,14 @@ public class Configuration {
         Database DB = Database.getInstance();
         return DB;
     }
-    private static Database getDefaultDatabase()
-    {
-            return Database.getInstance();
+
+    private static Database getDefaultDatabase() {
+        return Database.getInstance();
     }
+
     /**
      * Gets the Arguments for the sentiment analyser
+     *
      * @param doc The config.xml document
      * @return A string[1] array containing the arguments
      */
@@ -347,8 +392,10 @@ public class Configuration {
         ret[0] = s;
         return ret;
     }
+
     /**
      * Gets the arguments for the UAPI
+     *
      * @param doc The config.xml document
      * @return A String[1] containing the arguments
      */
@@ -359,12 +406,14 @@ public class Configuration {
         Element parent = (Element) parents.item(0);
         NodeList Item = parent.getElementsByTagName("UserAPI_Port");
         s = Item.item(0).getTextContent();
-        ConfigMap.put("UserAPIPort",s);
+        ConfigMap.put("UserAPIPort", s);
         ret[0] = s;
         return ret;
     }
+
     /**
      * Gets the arguments for the Knowledge Graph
+     *
      * @param doc The config.xml document
      * @return A String[1] containing the arguments
      */
@@ -379,14 +428,16 @@ public class Configuration {
         ret[0] = s;
         return ret;
     }
+
     /**
      * Gets the path to the list of stop words
+     *
      * @param doc The config.xml document
      * @return the path
      */
-    private static String getStopWordsPath(Document doc)
-    {   String s;
-         NodeList parents = doc.getElementsByTagName("StopWords");
+    private static String getStopWordsPath(Document doc) {
+        String s;
+        NodeList parents = doc.getElementsByTagName("StopWords");
         Element parent = (Element) parents.item(0);
         NodeList Item = parent.getElementsByTagName("Path");
         s = Item.item(0).getTextContent();
@@ -397,37 +448,36 @@ public class Configuration {
     private static void parseStopWords(Document doc) {
         String path = getStopWordsPath(doc);
         File file = new File(path);
-	try {
-	    BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
-	    String line = null;
-	    while ((line = br.readLine()) != null) {
-		stopWords.add(line);
-	    }
-	} catch (IOException e) {
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(file)));
+            String line = null;
+            while ((line = br.readLine()) != null) {
+                stopWords.add(line);
+            }
+        } catch (IOException e) {
             //stopwords parsing failed
-	}
+        }
     }
-    
-    private static void getTrendsArgs(Document doc)
-    {   String s;
-    try{
-        NodeList parents = doc.getElementsByTagName("Trends");
-        Element parent = (Element) parents.item(0);
-        NodeList Item = parent.getElementsByTagName("TrendsPerLocation");
-        s = Item.item(0).getTextContent();
-        ConfigMap.put("TrendsPerLocation", s);
-        Item = parent.getElementsByTagName("TrendRefreshTime");
-        s = Item.item(0).getTextContent();
-        ConfigMap.put("TrendRefreshTime", s);
+
+    private static void getTrendsArgs(Document doc) {
+        String s;
+        try {
+            NodeList parents = doc.getElementsByTagName("Trends");
+            Element parent = (Element) parents.item(0);
+            NodeList Item = parent.getElementsByTagName("TrendsPerLocation");
+            s = Item.item(0).getTextContent();
+            ConfigMap.put("TrendsPerLocation", s);
+            Item = parent.getElementsByTagName("TrendRefreshTime");
+            s = Item.item(0).getTextContent();
+            ConfigMap.put("TrendRefreshTime", s);
+        } catch (NullPointerException ex)//Incase someone has not updated their config file
+        {
+            ConfigMap.put("TrendsPerLocation", "10");
+            ConfigMap.put("TrendRefreshTime", "10");
+        }
     }
-    catch (NullPointerException ex)//Incase someone has not updated their config file
-    {
-        ConfigMap.put("TrendsPerLocation", "10");
-        ConfigMap.put("TrendRefreshTime", "10");
-    }
-    }
-    private static void buildTwitterLocationMap()
-    {
+
+    private static void buildTwitterLocationMap() {
         locationLookup.put("World", 1);
         locationLookup.put("UK", 23424975);
         locationLookup.put("USA", 23424977);
@@ -436,6 +486,29 @@ public class Configuration {
         locationLookup.put("India", 23424848);
         locationLookup.put("Seattle", 2490383);
         locationLookup.put("London", 44418);
+
+    }
+    public static void main(String[] args)
+    {   Configuration config;
+        if(args.length==1)
+        {
+        try {
+            System.out.println("Trying to load config file from location: "+args[0]);
+            config = new Configuration(args[0]);
+        } catch (FileNotFoundException ex) {
+            System.out.println("Unable to find configuration file");
+        }
+        }
+        else if(args.length==7)
+        {
+            //config new Configuration(args);
+        }
+        else
+        {
+            System.out.println("Falling back on blank config");
+        config = new Configuration();
         
+        }
+        System.out.println("Is configuration class valid?" +Configuration.isValid());
     }
 }

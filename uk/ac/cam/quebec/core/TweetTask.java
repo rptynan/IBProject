@@ -12,31 +12,31 @@ import uk.ac.cam.quebec.trends.Trend;
  *
  * @author James
  */
-public class TweetTask implements TaskInterface{
+public class TweetTask extends GenericTask{
     private final Trend trend;
     public TweetTask(Trend t)
     {
         trend = t;
     }
    @Override
-    public int priority() {
+    public int getPriority() {
       return trend.getPriority();
     }
 
     @Override
     public int compareTo(TaskInterface o) {
-        return this.priority()-o.priority();
+        return this.getPriority()-o.getPriority();
     }
 
     @Override
     public Collection<Task> process() {
         System.out.println("Tweet task called for trend: "+trend.getParsedName());
-       //TwitterProcessor.process(trend);
+       
        return null;
-       /*WikiTask t = new WikiTask(trend);
-       Task tsk = new Task(t,TaskType.Wiki);
-       ArrayList<Task> ret = new ArrayList<>();
-       return ret;
-        */
     } 
+
+    @Override
+    public String getStatus() {
+        return "Tweet processing task for trend: "+trend.getParsedName();
+    }
 }

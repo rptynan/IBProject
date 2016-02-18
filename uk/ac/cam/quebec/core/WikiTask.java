@@ -14,29 +14,25 @@ import uk.ac.cam.quebec.wikiproc.WikiProcessor;
  *
  * @author James
  */
-public class WikiTask implements TaskInterface{
+public class WikiTask extends GenericTask{
         private final Trend trend;
     public WikiTask(Trend _trend)
     {
         trend = _trend;
     }
-
-
     @Override
-    public int priority() {
+    public int getPriority() {
       return trend.getPriority();
     }
-
-    @Override
-    public int compareTo(TaskInterface o) {
-        return this.priority()-o.priority();
-    }
-
     @Override
     public Collection<Task> process() {
        WikiProcessor wp = new WikiProcessor();
        wp.process(trend);
        return null;
     }
-    
+        @Override
+    public String getStatus()
+    {
+        return "Wiki processing task for trend: "+trend.getParsedName();
+    }
 }

@@ -5,6 +5,8 @@
  */
 package uk.ac.cam.quebec.core;
 
+import uk.ac.cam.quebec.twitterwrapper.TwitException;
+
 /**
  *
  * @author James
@@ -14,6 +16,6 @@ public interface ControlInterface {
     public String getServerInfo();
     public boolean isRunning();
     public void initialiseUAPI();
-    public void repopulateTrends();
+    public void repopulateTrends() throws TwitException;
     public long timeUntilRepopulate();
 }
