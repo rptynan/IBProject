@@ -21,15 +21,17 @@ import java.util.List;
 public class DatabaseTest {
 
     /**
-     * Just a test.
+     * setCrendetials test
      *
      */
     public static void main(String[] args) {
-    Database.setCredentials("ibproject", null, "jdbc:mysql://localhost:3306/ibprojectdb", true);
-    //By seperating the set credentials call from the tests we can invoke the 
-    //tests from elsewhere
-    test();
+        Database.setCredentials("ibproject", null,
+                "jdbc:mysql://localhost:3306/ibprojectdb", true);
+        // By seperating the set credentials call from the tests we can invoke the
+        // tests from elsewhere
+        test();
     }
+
     /**
      * This is the function where the tests are run
      *
@@ -49,23 +51,31 @@ public class DatabaseTest {
         System.out.println("\n==> Testing Trends");
         Trend t1 = new Trend("TestTrend1", "USA", 42);
         Trend t2 = new Trend("TestTrend2", "UK", 43);
-        List<Trend> trendList = null;
+        List<Trend> trendList1 = null;
+        List<Trend> trendList2 = null;
         try {
             db1.putTrend(t1);
             db1.putTrend(t2);
             t1.incrementProcessCount();
             db1.putTrend(t1);
-            trendList = db2.getTrends();
+            trendList1 = db2.getTrends();
+            trendList2 = db2.getTrends("UK");
         } catch (DatabaseException exp) {
             exp.printStackTrace();
         }
-        for (Trend t : trendList) {
+        for (Trend t : trendList1) {
             System.out.println(t.getName() + " " + t.getLocation()
                     + " " + t.getPriority() + " " + t.getProcessCount()
                     + " " + t.getId());
         }
         System.out.println("Check ID of trends inserted: " + t1.getId() + " " + t2.getId());
         System.out.println("Check processCount of trend " + t1.getId() + " is 1");
+        for (Trend t : trendList2) {
+            System.out.println(t.getName() + " " + t.getLocation()
+                    + " " + t.getPriority() + " " + t.getProcessCount()
+                    + " " + t.getId());
+        }
+        System.out.println("Should only show trends from UK");
 
         // putTweets(), getTweets()
         System.out.println("\n==> Testing Tweets");

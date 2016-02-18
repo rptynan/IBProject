@@ -16,8 +16,8 @@
   </head>
 
   <body>
-
-     <nav class="navbar navbar-inverse navbar-fixed-top">
+    <!-- Top Navbar -->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
       <div class="container-fluid">
         <!-- Left title -->
         <div class="navbar-header">
@@ -26,9 +26,9 @@
         <div id="navbar">
           <!-- Centre options -->
           <ul class="nav navbar-nav">
-            <li id = "bWiki"><a href="#">Wikipedia Article</a></li>
-            <li id = "bEdits"><a href="#">Wikipedia Edits</a></li>
-            <li id = "bTweets"><a href="#">Related Tweets</a></li>
+            <li id="bWiki"><a href="#">Wikipedia Article</a></li>
+            <li id="bEdits"><a href="#">Wikipedia Edits</a></li>
+            <li id="bTweets"><a href="#">Related Tweets</a></li>
           </ul>
           <!-- Right search bar -->
           <form class="navbar-form navbar-right">
@@ -48,15 +48,15 @@
           <div class="nav nav-sidebar">
             <div class="dropdown">
               <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                <div style = "margin:0" id = "dSelected">World</div>
+                World
                 <span class="caret"></span>
               </button>
-              <ul id = "dropDown"class="dropdown-menu" aria-labelledby="dropdownMenu1">
+              <ul id="dropDown" class="dropdown-menu" aria-labelledby="dropdownMenu1">
                 <li><a href="#">World</a></li>
                 <li><a href="#">UK</a></li>
-				<li><a href="#">Ireland</a></li>
+                <li><a href="#">Ireland</a></li>
                 <li><a href="#">USA</a></li>
-				<li><a href="#">Australia</a></li>
+                <li><a href="#">Australia</a></li>
               </ul>
             </div>
           </div>
@@ -70,29 +70,29 @@
             </div>
           </div>
           <!-- Trends list -->
-          <ul id = "trendList" class="nav nav-sidebar">
-		  <!--
+          <ul id="trendList" class="nav nav-sidebar">
+            <!-- List injected like this:
             <li class="active"><a href="#">Trend1<span class="sr-only">(current)</span></a></li>
             <li><a href="">Trend2</a></li>
-            <li><a href="">Trend3</a></li>
-            <li><a href="">Trend4</a></li>
-			-->
+            -->
           </ul>
         </div>
 
         <!-- Middle iframe -->
         <div class="col-xs-8 col-xs-offset-2 main">
+          <!-- Article -->
           <iframe id="wikiFrame" src="https://en.wikipedia.org/wiki/Computer_Laboratory,_University_of_Cambridge"></iframe>
-        
-			<div class="wrapper" align = "center" id ="editsDiv">
-				<h4>No article selected to supply edits for.</h4>
-			</div>
-			<div class="wrapper" align = "center"id ="tweetsDiv">
-				<h4 id = "tweetsHeader">No trend selected to supply tweets for.</h4>
-			<ul class = "niceList" id="tweetsList">
-			</ul>
-			</div>
-		</div>
+          <!-- Edits -->
+          <div class="wrapper" align = "center" id ="editsDiv">
+            <h4>No article selected to supply edits for.</h4>
+          </div>
+          <!-- Tweets -->
+          <div class="wrapper" align = "center"id ="tweetsDiv">
+            <h4 id = "tweetsHeader">No trend selected to supply tweets for.</h4>
+            <ul class = "niceList" id="tweetsList">
+            </ul>
+          </div>
+        </div>
 
         <!-- Right Nav -->
         <div class="col-xs-2 col-xs-offset-10 sidebar">
@@ -109,25 +109,22 @@
           </div>
           <!-- Relate wiki page list -->
           <ul class="nav nav-sidebar" id = "pageList">
-		  <!--
+            <!-- List injected like this:
             <li class="active"><a href="#">Page1<span class="sr-only">(current)</span></a></li>
             <li><a href="">Page2</a></li>
-            <li><a href="">Page3</a></li>
-            <li><a href="">Page4</a></li>
-			<-->
+            -->
           </ul>
         </div>
 
       </div>
     </div>
 
-
     <!-- JS placed at end to load page faster -->
-	
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <!-- Bootstrap JS -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
-	<script type = "text/javascript" src = "project.js" ></script>
+    <!-- Ours -->
+    <script type = "text/javascript" src = "project.js" ></script>
   </body>
 </html>

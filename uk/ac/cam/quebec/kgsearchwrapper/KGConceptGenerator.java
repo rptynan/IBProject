@@ -50,17 +50,20 @@ public class KGConceptGenerator {
     @Nonnull
     public List<KGConcept> getKGConcepts(String query, int limit) {
         LinkedList<KGConcept> ret = new LinkedList<>();
+        if (query == null || query.isEmpty() || limit <= 0) {
+            return ret;
+        }
         try {
-            GenericUrl url = new GenericUrl("https://kgsearch.googleapis.com/v1/entities:search");
-            url.put("query", query);
-            url.put("limit", limit);
-            url.put("indent", "true");
-            url.put("key", APIConstants.getApiKey());
-
             ExponentialBackOff backoff = new ExponentialBackOff();
             String responseString = null;
             for (int retries = 0; retries < RETRY_LIMIT; retries++) {
                 try {
+                    GenericUrl url = new GenericUrl("https://kgsearch.googleapis.com/v1/entities:search");
+                    url.put("query", query);
+                    url.put("limit", limit);
+                    url.put("indent", "true");
+                    url.put("key", APIConstants.getApiKey());
+
                     HttpRequest request = httpRequestFactory.buildGetRequest(url);
                     HttpResponse httpResponse = request.execute();
                     responseString = httpResponse.parseAsString();

@@ -172,6 +172,11 @@ class DatabaseInternal extends Database {
     }
 
     public List<Trend> getTrends() throws DatabaseException {
+        // Pass wildcard as location to get all trends
+        return getTrends("%");
+    }
+
+    public List<Trend> getTrends(String location) throws DatabaseException {
         ArrayList<Trend> result = new ArrayList<Trend>();
         Statement stmt = null;
         ResultSet rs = null;
@@ -180,7 +185,8 @@ class DatabaseInternal extends Database {
             // Creates forward & read only ResultSet by default
             stmt = connection.createStatement();
             synchronized (conMutex) {
-                rs = stmt.executeQuery("SELECT object FROM trends");
+                rs = stmt.executeQuery("SELECT object FROM trends "
+                        + "WHERE location LIKE \"" + location + "\"");
             }
 
             while (rs.next()) {

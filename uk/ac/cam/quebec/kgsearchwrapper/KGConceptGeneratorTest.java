@@ -13,7 +13,7 @@ public class KGConceptGeneratorTest {
 
         String[] queries = new String[] {
                 "donald trump", "taylor swift", "how old is barack obama",
-                "chelsea", "cambridge"
+                "chelsea", "cambridge", ""
         };
 
         for (String query : queries) {
