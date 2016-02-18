@@ -30,13 +30,21 @@ public class ConceptCapitalsAndCount implements ConceptFinder {
 
     @Override
     public synchronized void addText(String text) {
-        String[] words = UtilParsing.splitIntoWords(text);
+        String[] words = UtilParsing.splitIntoWords(UtilParsing.removeLinks(text));
         LinkedList<String> capitalWords = new LinkedList<>();
 
+        boolean added_prev = true;
         for (String word : words) {
             if (word != null && !word.isEmpty() && (Character.isUpperCase(word.charAt(0))
-        	|| !Character.isLetter(word.charAt(0)))) {
+        	|| !Character.isLetter(word.charAt(0))) && !word.startsWith("@") &&
+                    !word.startsWith("#") && word.length() > 3) {
+                if (!added_prev) {
+                    capitalWords.add(WordCounter.IGNORED_WORD);
+                }
                 capitalWords.add(word);
+                added_prev = true;
+            } else {
+                added_prev = false;
             }
         }
 
