@@ -93,7 +93,7 @@ public class WikiArticle implements Serializable {
             JSONObject json = WikiFetch
                     .getJSONfromAddress("https://en.wikipedia.org/w/api.php?"
                             + "action=query&prop=extracts&"
-                            + "format=json&explaintext=&titles=" + title);
+                            + "format=json&explaintext=&titles=" + title +"&exintro=1");
             
             json = json.getJSONObject("query").getJSONObject("pages");
             JSONArray names = json.names();
