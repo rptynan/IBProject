@@ -41,7 +41,7 @@ public class Configuration {
     private final String[] SentimentAnalyserArgs;
     private final String[] KnowledgeGraphArgs;
     private static Database DB;
-    private static final Set<String> stopWords = new HashSet<String>();
+    private static final Set<String> stopWords = new HashSet<>();
     private static final Map<String,Integer> locationLookup = new HashMap<>();
     private static final Map<String,String> ConfigMap = new HashMap<>();
 
@@ -64,7 +64,6 @@ public class Configuration {
         getTrendsArgs(doc);
         buildTwitterLocationMap();
     }
-
     /**
      * Builds an object containing the default configuration values
      *

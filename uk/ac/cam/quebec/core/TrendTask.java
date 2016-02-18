@@ -3,11 +3,10 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package uk.ac.cam.quebec.core.test;
+package uk.ac.cam.quebec.core;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import uk.ac.cam.quebec.core.Task;
-import uk.ac.cam.quebec.core.TaskInterface;
 import uk.ac.cam.quebec.trends.Trend;
 import uk.ac.cam.quebec.twitterproc.TwitterProcessor;
 
@@ -37,6 +36,20 @@ public class TrendTask implements TaskInterface{
     public Collection<Task> process() {
        TwitterProcessor.process(trend);
        return null;
+       /*ArrayList<Task> ret = null;
+       if(TwitterProcessor.doProcess(trend))
+       {
+       ret = new ArrayList<>();
+       WikiTask t = new WikiTask(trend);
+       Task tsk = new Task(t,TaskType.Wiki);
+       ret.add(tsk);
+       TweetTask tweet = new TweetTask(trend);
+       tsk = new Task(tweet,TaskType.Tweet);
+       ret.add(tsk);
+       }
+       return ret;
+       
+       */
     }
     
 }

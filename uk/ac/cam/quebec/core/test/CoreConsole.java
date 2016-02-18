@@ -127,7 +127,7 @@ public class CoreConsole extends Thread {
         boolean b = m.matches();
         if (b) {
             String trendName = m.group("trendName");
-            String location = config.getLocation();
+            String location = config.getDefaultLocation();
             if (m.group("trendLocation") != null) {
                 location = m.group("trendLocation");
             }
@@ -173,15 +173,6 @@ public class CoreConsole extends Thread {
             System.out.println("Wiki wrapper test start");
             uk.ac.cam.quebec.wikiwrapper.test.Test.main(new String[0]);
             System.out.println("Wiki wrapper test end");
-        } else if (command.startsWith("add trend ")) {
-            String s = command.substring(10);
-            System.out.println("Adding trend " + s);
-            Trend T = new Trend(s, "World", 0);
-            if (coreTrends.putTrend(T)) {
-                System.out.println("Trend " + s + " added successfully");
-            } else {
-                System.out.println("Failed to add trend " + s);
-            }
         } else if (command.equalsIgnoreCase("repopulate trends")) {
             System.out.println("Repopulating trends");
             coreInter.repopulateTrends();
