@@ -10,7 +10,7 @@ $(document).ready(function(){
 		var tD = $("#tweetsDiv");
 		var twH = $("#tweetsHeader");
 		var twL = $("#tweetsList");
-		var dS = $("#dSelected");
+		var dM = $("#dropdownMenu1");
 		// initialise stuff
 		var dDdom;
 		var trendList = [];
@@ -137,8 +137,7 @@ $(document).ready(function(){
 		
 		// Allow locations to be selected
 		$('#dropDown li a').on('click', function(){
-			
-			dS.html($(this).html());
+			dM.html($(this).html() + "\n<span class=\"caret\"></span>");
 		});
 		
 		// Make it happen
@@ -147,6 +146,3 @@ $(document).ready(function(){
 		(pL.get(0)).onclick = updatePage;
 		
 	});
-		
-		
-	
