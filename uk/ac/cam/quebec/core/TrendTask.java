@@ -34,9 +34,12 @@ public class TrendTask implements TaskInterface{
 
     @Override
     public Collection<Task> process() {
-       TwitterProcessor.process(trend);
+   if(true)
+   {
+        TwitterProcessor.process(trend);
        return null;
-       /*ArrayList<Task> ret = null;
+   }
+       ArrayList<Task> ret = null;
        if(TwitterProcessor.doProcess(trend))
        {
        ret = new ArrayList<>();
@@ -48,8 +51,6 @@ public class TrendTask implements TaskInterface{
        ret.add(tsk);
        }
        return ret;
-       
-       */
     }
     
 }

@@ -8,6 +8,7 @@ package uk.ac.cam.quebec.core;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
+import uk.ac.cam.quebec.twitterwrapper.TwitException;
 
 /**
  *
@@ -29,7 +30,13 @@ public class TrendRefreshTask implements TaskInterface{
         
         ArrayList<Task> ret = new ArrayList<>();
         Task t = new Task(this,TaskType.Core);
+        try{
         parent.repopulateTrends();
+        }
+        catch(TwitException ex)
+        {
+            Throwable cause = ex.getCause();
+        }
         try {
             sleepstart = System.currentTimeMillis();
             sleeptime = TimeUnit.MINUTES.toMillis(delay);
