@@ -30,6 +30,8 @@ import winterwell.jtwitter.Status;
  */
 public class TwitterProcessor {
 
+    private static final int PERCENTAGE = 30;
+
     /**
      * Process a trend and in the end pass a list of concepts to the Wikipedia
      * Processor.
@@ -148,21 +150,27 @@ public class TwitterProcessor {
             }
         }
 
-        Pair<String, Integer>[] orderedWords = wordCounter.getOrderedWordsAndCount();
-        if (orderedWords != null) {
-            // Add at most 100 most common words among the tweets sorted by their frequencies.
-            for (int i = 0; i < 100 && i < orderedWords.length; i++) {
-                trend.addConcept(orderedWords[i]);
-            }
-        }
+	Pair<String, Integer>[] orderedWords = wordCounter.getOrderedWordsAndCount();
+	if (orderedWords != null) {
+	    // Add top 5 words + all those which pass the threshold.
+	    for (int i = 0; i < orderedWords.length; i++) {
+		if (i < 5
+		|| 100 * orderedWords[i].getValue() >= PERCENTAGE * orderedWords.length) {
+		    trend.addConcept(orderedWords[i]);
+		}
+	    }
+	}
 
-        Pair<String, Integer>[] orderedHashTags = hashTagCounter.getOrderedWordsAndCount();
-        if (orderedHashTags != null) {
-            // Add at most 100 most common hash tags among the tweets sorted by their frequencies.
-            for (int i = 0; i < 100 && i < orderedHashTags.length; i++) {
-                trend.addRelatedHashTag(orderedHashTags[i]);
-            }
-        }
+	Pair<String, Integer>[] orderedHashTags = hashTagCounter.getOrderedWordsAndCount();
+	if (orderedHashTags != null) {
+	    // Add top 5 hash tags + all those which pass the threshold.
+	    for (int i = 0; i < orderedHashTags.length; i++) {
+		if (i < 5
+		|| 100 * orderedHashTags[i].getValue() >= PERCENTAGE * orderedHashTags.length) {
+		    trend.addRelatedHashTag(orderedHashTags[i]);
+		}
+	    }
+	}
     }
 
     /**

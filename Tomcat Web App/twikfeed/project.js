@@ -23,6 +23,7 @@ $(document).ready(function(){
 		var pageIndex = -1;
 		var lTrend;
 		var lPage;
+		var location = "World";
 		eD.hide();
 		tD.hide();
 		
@@ -30,7 +31,7 @@ $(document).ready(function(){
 		
 		// Handle startup or a selection of a new location
 		var updateTrends = function(){
-			$.get("TwikfeedServlet?Type=Trends").done(function(data, textStatus) {
+			$.get("TwikfeedServlet?Type=Trends&location=" + location).done(function(data, textStatus) {
 			
 		
 			trendList = $.parseJSON(data);
@@ -56,7 +57,7 @@ $(document).ready(function(){
 				//Now make a get request to get the list of page name
 				trendIndex = cTrend.index();
 				
-				cTrend.html("<a href=\"\">"+trendList[trendIndex].name+"<span class=\"sr-only\">(current)</span></a>");
+				cTrend.html("<a href=\"#\">"+trendList[trendIndex].name+"<span class=\"sr-only\">(current)</span></a>");
 				cTrend.addClass("active");
 				// Call to load articles
 				$.get("TwikfeedServlet?Type=Articles&id="+trendList[trendIndex].id).done(function(data, textStatus) {
@@ -138,6 +139,9 @@ $(document).ready(function(){
 		// Allow locations to be selected
 		$('#dropDown li a').on('click', function(){
 			dM.html($(this).html() + "\n<span class=\"caret\"></span>");
+			location = $(this).html();
+			updateTrends();
+			
 		});
 		
 		// Make it happen

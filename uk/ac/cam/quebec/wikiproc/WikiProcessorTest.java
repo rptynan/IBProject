@@ -22,7 +22,7 @@ public class WikiProcessorTest {
         wikiProcessor.process(trend);
 
         System.out.println("\n>>>>> CONCEPTS: <<<<<\n");
-        for (Pair<String, Double> concept : wikiProcessor.getWikiConcepts()) {
+        for (Pair<String, Double> concept : wikiProcessor.getAugmentedConcepts()) {
             System.out.println(concept);
         }
 

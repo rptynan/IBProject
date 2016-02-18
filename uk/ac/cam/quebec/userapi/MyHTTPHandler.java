@@ -51,13 +51,13 @@ public class MyHTTPHandler  implements HttpHandler{
     {
         case TrendsRequest:
           
-            s = parent.getTrendsAsString("UK", "Popularity", 15);
+            s = parent.getTrendsAsString(m.group(1), "Popularity", 15);
             break;
         case ArticlesRequest:
             s = parent.getArticlesAsString(Integer.parseInt(m.group(1)),"Popularity",15);
             break;
         case TweetsRequest:
-            s = parent.getTweetsAsString(Integer.parseInt(m.group(1)),"Popularity",8);
+            s = parent.getTweetsAsString(Integer.parseInt(m.group(1)),"Popularity",15);
             break;
         default:
             s+= " The Request type was: "+type.toString();

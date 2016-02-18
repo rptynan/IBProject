@@ -57,6 +57,26 @@ public class WikiArticle implements Serializable {
         this.relevance += increase;
     }
 
+    private Double popularity;
+
+    public Double getPopularity() {
+        return popularity;
+    }
+
+    public void setPopularity(Double popularity) {
+        this.popularity = popularity;
+    }
+
+    private Double controversy;
+
+    public Double getControversy() {
+        return controversy;
+    }
+
+    public void setControversy(Double controversy) {
+        this.controversy = controversy;
+    }
+
     /**
      * Constructor for an article. For performance reasons only the extract is
      * gathered on initialisation.
@@ -73,7 +93,7 @@ public class WikiArticle implements Serializable {
             JSONObject json = WikiFetch
                     .getJSONfromAddress("https://en.wikipedia.org/w/api.php?"
                             + "action=query&prop=extracts&"
-                            + "format=json&explaintext=&titles=" + title);
+                            + "format=json&explaintext=&titles=" + title +"&exintro=1");
             
             json = json.getJSONObject("query").getJSONObject("pages");
             JSONArray names = json.names();
@@ -155,14 +175,14 @@ public class WikiArticle implements Serializable {
             }
             return ret;
         } else {
-            edits = new LinkedList<WikiEdit>();
+            //edits = new LinkedList<WikiEdit>();  // We only get as many as we need.
             try {
                 JSONObject json = WikiFetch
                         .getJSONfromAddress("https://en.wikipedia.org/w/api.php?"
                                 + "action=query&prop=revisions&format=json&rvprop=ids%"
                                 + "7Ctimestamp%7Ccomment&"
                                 + "rvlimit="
-                                + editCount
+                                + (editCount - edits.size())
                                 + "&titles="
                                 + title.replace(" ", "%20"));
                 json = json.getJSONObject("query").getJSONObject("pages");
