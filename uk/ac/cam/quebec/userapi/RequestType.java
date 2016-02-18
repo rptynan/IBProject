@@ -22,7 +22,7 @@ public enum RequestType {
     TestRequest2("stuff","(.)*"),
     DefaultRequest("", "(.)*"),
     InvalidRequest("inv", "(.)*"),
-    TrendsRequest("Trends","(.)*"),
+    TrendsRequest("Trends","location=([a-zA-Z]*)(.)*"),
     ArticlesRequest("Articles","id=(\\d+)(.)*"),
     TweetsRequest("Tweets","id=(\\d+)(.)*");
     private final Pattern requestPattern;

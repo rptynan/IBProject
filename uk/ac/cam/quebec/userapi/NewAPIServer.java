@@ -75,7 +75,7 @@ public class NewAPIServer extends APIServerAbstract {
 
     public String getTrendsAsString(String location, String sorting, int max) {
         try {
-            List<Trend> trendList = DB.getTrends();
+            List<Trend> trendList = DB.getTrends(location);
             // flag
             boolean itemAdded = false;
             String result = "[";
