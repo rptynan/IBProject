@@ -1,6 +1,7 @@
 package uk.ac.cam.quebec.trends;
 
 import java.io.Serializable;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -30,6 +31,9 @@ public class Trend implements Serializable, Comparable<Trend> {
     private List<Pair<String, Integer>> concepts;
     private List<Pair<String, Integer>> relatedHashTags;
 
+    // TODO: calculate the timestamp of the trend properly
+    private Date timestamp = new Date(System.currentTimeMillis());
+
     public String getName() { return name; }
     public String getLocation() { return location; }
     public int getId() { return id; }
@@ -40,6 +44,14 @@ public class Trend implements Serializable, Comparable<Trend> {
     public int getPopularity() { return popularity; }
     public List<Pair<String, Integer>> getConcepts() { return concepts; }
     public List<Pair<String, Integer>> getRelatedHashTags() { return relatedHashTags; }
+
+    public Date getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(Date timestamp) {
+        this.timestamp = timestamp;
+    }
 
     /**
      * Create a Trend object.

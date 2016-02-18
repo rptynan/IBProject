@@ -6,11 +6,13 @@ import uk.ac.cam.quebec.kgsearchwrapper.KGConcept;
 import uk.ac.cam.quebec.kgsearchwrapper.KGConceptGenerator;
 import uk.ac.cam.quebec.trends.Trend;
 import uk.ac.cam.quebec.wikiwrapper.WikiArticle;
+import uk.ac.cam.quebec.wikiwrapper.WikiEdit;
 import uk.ac.cam.quebec.wikiwrapper.WikiException;
 import uk.ac.cam.quebec.wikiwrapper.WikiFetch;
 
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -31,8 +33,9 @@ public class WikiProcessor {
     private static final int CONCEPTS_LIMIT = 10;
 
     private Trend trend;
+    private Date trendTime;
     private List<WikiArticle> articleList;
-    private List<Pair<String, Double>> wikiConcepts;
+    private List<Pair<String, Double>> augmentedConcepts;
     private List<Pair<String, Integer>> trendConcepts;
     private List<KGConcept> kgConcepts;
     private KGConceptGenerator kgConceptGenerator;
@@ -41,8 +44,8 @@ public class WikiProcessor {
         return articleList;
     }
 
-    public List<Pair<String, Double>> getWikiConcepts() {
-        return wikiConcepts;
+    public List<Pair<String, Double>> getAugmentedConcepts() {
+        return augmentedConcepts;
     }
 
     public List<KGConcept> getKgConcepts() {
@@ -62,9 +65,10 @@ public class WikiProcessor {
     public void process(Trend trend) {
         this.trend = trend;
 
-        buildConcepts();
+        augmentConcepts();
         fetchArticles();
-        removeDuplicateArticlesAndSort();
+        removeDuplicateArticles();
+        processArticles();
         storeArticles();
     }
 
@@ -72,7 +76,7 @@ public class WikiProcessor {
      * Builds a list of ordered concepts. The simplest way is just use the concepts in the Trend
      * object, but we can improve those using the Knowledge Graph API
      */
-    private void buildConcepts() {
+    private void augmentConcepts() {
         trendConcepts = trend.getConcepts();
 
         kgConceptGenerator = new KGConceptGenerator();
@@ -110,13 +114,13 @@ public class WikiProcessor {
             }
         });
 
-        wikiConcepts = new LinkedList<>();
+        augmentedConcepts = new LinkedList<>();
         for (KGConcept kgConcept : kgConcepts) {
-            wikiConcepts.add(new Pair<>(kgConcept.getName(), kgConcept.getScore()));
+            augmentedConcepts.add(new Pair<>(kgConcept.getName(), kgConcept.getScore()));
         }
     }
 
-    public void removeDuplicateArticlesAndSort() {
+    public void removeDuplicateArticles() {
         HashMap<Integer, Integer> position = new HashMap<>();
 
         List<WikiArticle> copy = articleList;
@@ -132,14 +136,6 @@ public class WikiProcessor {
                 position.put(id, articleList.size() - 1);
             }
         }
-
-        // sort articles by relevance
-        articleList.sort(new Comparator<WikiArticle>() {
-            @Override
-            public int compare(WikiArticle o1, WikiArticle o2) {
-                return Double.compare(o2.getRelevance(), o1.getRelevance());
-            }
-        });
     }
 
     /**
@@ -149,15 +145,15 @@ public class WikiProcessor {
         articleList = new LinkedList<>();
 
         double averageScore = 0;
-        for (Pair<String, Double> concept : wikiConcepts) {
+        for (Pair<String, Double> concept : augmentedConcepts) {
             averageScore += concept.getValue();
         }
-        if (!wikiConcepts.isEmpty()) {
-            averageScore /= wikiConcepts.size();
+        if (!augmentedConcepts.isEmpty()) {
+            averageScore /= augmentedConcepts.size();
         }
 
         List<WikiArticle> conceptArticles;
-        for (Pair<String, Double> concept : wikiConcepts) {
+        for (Pair<String, Double> concept : augmentedConcepts) {
             try {
                 conceptArticles = WikiFetch.search(concept.getKey(),
                         concept.getValue() >= averageScore ? 2 : 1, 0);
@@ -173,6 +169,53 @@ public class WikiProcessor {
             } catch (WikiException exception) {
                 exception.printStackTrace();
             }
+        }
+    }
+
+    /** Do some processing on the Articles
+     *
+     */
+    private void processArticles() {
+        for (WikiArticle article : articleList) {
+            int views = 0;
+            try {
+                views = article.getViews();
+            } catch (WikiException ex) {
+                ex.printStackTrace();
+            }
+            article.setPopularity(1.0 * views);
+
+
+            int count = article.getCachedEdits().size();
+            int afterTrend = 0;
+            boolean more = true;
+            while (more) {
+                more = false;
+                try {
+                    List<WikiEdit> edits = article.getEdits(count + 3);
+                    if (edits.size() < count + 3) {
+                        break;
+                    }
+
+                    count = edits.size();
+                    int newAfterTrend = 0;
+                    for (WikiEdit edit : edits) {
+                        if (edit.getTimeStamp().after(trend.getTimestamp())) {
+                            newAfterTrend++;
+                        }
+                    }
+
+                    if (newAfterTrend > afterTrend) {
+                        afterTrend = newAfterTrend;
+                        more = true;
+                    }
+
+                } catch (WikiException ex) {
+                    ex.printStackTrace();
+                }
+            }
+
+            article.setControversy(1.0 * afterTrend);
         }
     }
 

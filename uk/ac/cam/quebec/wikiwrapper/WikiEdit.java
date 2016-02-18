@@ -3,6 +3,7 @@ package uk.ac.cam.quebec.wikiwrapper;
 import info.bliki.wiki.model.WikiModel;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.Date;
 
@@ -16,7 +17,7 @@ import winterwell.json.JSONObject;
  * @author Stuart
  *
  */
-public class WikiEdit {
+public class WikiEdit implements Serializable {
 
     private String comment;
     private String diff = null;
