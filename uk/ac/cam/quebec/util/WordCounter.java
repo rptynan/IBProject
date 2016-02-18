@@ -21,6 +21,15 @@ import javafx.util.Pair;
  */
 public class WordCounter {
 
+    /**
+     * use this as a stopword to put between words so they are not counted as n-grams
+     * e.g. if we have {"DONALD", "TRUMP"} then we will count "DONALD TRUMP" as a bigram
+     * however if we put {"DONALD", IGNORED_WORD, "TRUMP"} the bigram will be ignored
+     *
+     * put this exact same instance as the comparisons will compare the instances, not the contents
+     */
+    public static final String IGNORED_WORD = ">IGNORE<";
+
     private int n;
 
     private HashMap<String, Integer> wordCount;
@@ -102,6 +111,9 @@ public class WordCounter {
         // Increment single word count
         updatedWordCount = true;
         for (String copy : words) {
+            if (copy == IGNORED_WORD) {
+                continue;
+            }
             String word = copy.toLowerCase();
 
             Integer prev = wordCount.get(word);
@@ -118,7 +130,11 @@ public class WordCounter {
 
             for (ListIterator<String> iterator = words.listIterator(i);
                  iterator.hasNext() && iterator.nextIndex() - i < n; ) {
-                subseq.add(iterator.next().toLowerCase());
+                String word = iterator.next();
+                if (word == IGNORED_WORD) {
+                    break;
+                }
+                subseq.add(word.toLowerCase());
 
                 int len = subseq.size();
                 if (len > 1) {
