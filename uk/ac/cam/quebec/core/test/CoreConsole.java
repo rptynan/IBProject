@@ -85,12 +85,27 @@ public class CoreConsole extends Thread {
             case InvalidCommand:
                 System.out.println("Invalid command");
                 break;
+            case RepopulateTrendCommand:
+                repopulateTrends(c,command);
+                break;
             default:
                 oldProcessCommand(command);
                 break;
         }
 
     }
+    private void repopulateTrends(CoreConsoleCommand c, String command) {
+        try{
+        System.out.println("Repopulating trends");
+        coreInter.repopulateTrends();
+        System.out.println("Repopulated trends");
+        }
+        catch(TwitException ex)
+        {
+            System.out.println("Error repopulating trends: "+ex);
+        }
+    }
+
     private void checkProjectStyle(CoreConsoleCommand c, String command)
     {   System.out.println("Starting style check");
         //String project root = config.getValue("ProjectRoot");
@@ -100,11 +115,8 @@ public class CoreConsole extends Thread {
     {   Set<String> keySet = CoreConsoleCommand.getLookupMap().keySet();
         System.out.println("Valid console commands are:");
         String s = "";
-        for(String key :keySet)
-        {
-            s+=" "+key+",";
-        }
-        System.out.println();
+        s = keySet.stream().map((key) -> " "+key+",").reduce(s, String::concat);
+        System.out.println(s);
     }
     private void checkStopWord(CoreConsoleCommand c, String command) {
         Matcher m = c.getFullPattern().matcher(command);
@@ -174,10 +186,6 @@ public class CoreConsole extends Thread {
             System.out.println("Wiki wrapper test start");
             uk.ac.cam.quebec.wikiwrapper.test.Test.main(new String[0]);
             System.out.println("Wiki wrapper test end");
-        } else if (command.equalsIgnoreCase("repopulate trends")) {
-            System.out.println("Repopulating trends");
-            coreInter.repopulateTrends();
-            System.out.println("Trends repopulated");
         } else if (command.equalsIgnoreCase("test database")) {
             System.out.println("Starting database test");
             DatabaseTest.test();
@@ -238,4 +246,5 @@ public class CoreConsole extends Thread {
             System.err.println(ex);
         }
     }
+
 }

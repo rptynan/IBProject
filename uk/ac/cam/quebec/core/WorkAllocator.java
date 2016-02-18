@@ -104,6 +104,7 @@ public class WorkAllocator {
             ret = new Task(t, TaskType.Trend);
             return ret;
         }
-        return ret;
+        //taskCount.release();//If we get to here without a task assigned then 
+        return ret;//we should release our permit so another thread can use it
     }
 }

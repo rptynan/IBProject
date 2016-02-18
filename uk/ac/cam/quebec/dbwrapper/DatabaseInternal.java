@@ -89,41 +89,43 @@ class DatabaseInternal extends Database {
 
         // Create database tables if they don't exist
         Statement stmt = null;
+        String s;
         try {
             stmt = connection.createStatement();
             // Drop the tables on startup, clears any data in db!
             if (dropTables) {
-                stmt.execute("DROP tables IF EXISTS trends, wikiarticles, tweets, "
+                stmt.execute(s = "DROP tables IF EXISTS trends, wikiarticles, tweets, "
                         + "trends_wikiarticles_junction");
             }
-
+            
             // trends
-            stmt.execute("CREATE TABLE IF NOT EXISTS trends ("
-                    + "name VARCHAR(60) NOT NULL,"
-                    + "location VARCHAR(60),"
+            stmt.execute(s = "CREATE TABLE IF NOT EXISTS trends ("
+                    + "name VARCHAR(60) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_general_ci' NOT NULL,"
+                    + "location VARCHAR(60) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_general_ci',"
                     + "updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,"
                     + "object MEDIUMBLOB NOT NULL,"
-                    + "trend_id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY)");
+                    + "trend_id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY) CHARACTER SET 'utf8mb4'");
+            
             // tweets
-            stmt.execute("CREATE TABLE IF NOT EXISTS tweets ("
-                    + "content VARCHAR(200) NOT NULL,"
-                    + "location VARCHAR(60),"
+            stmt.execute(s = "CREATE TABLE IF NOT EXISTS tweets ("
+                    + "content VARCHAR(200) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_general_ci' NOT NULL,"
+                    + "location VARCHAR(60) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_general_ci',"
                     + "updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,"
                     + "object MEDIUMBLOB NOT NULL,"
                     + "trend_id INT UNSIGNED NOT NULL,"
-                    + "tweet_id BIGINT UNSIGNED NOT NULL PRIMARY KEY)");
+                    + "tweet_id BIGINT UNSIGNED NOT NULL PRIMARY KEY)CHARACTER SET 'utf8mb4'");
             // wikiarticles
-            stmt.execute("CREATE TABLE IF NOT EXISTS wikiarticles ("
-                    + "title VARCHAR(300) NOT NULL,"
+            stmt.execute(s = "CREATE TABLE IF NOT EXISTS wikiarticles ("
+                    + "title VARCHAR(300) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_general_ci' NOT NULL,"
                     + "updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,"
                     + "relevance DOUBLE NOT NULL,"
                     + "object MEDIUMBLOB NOT NULL,"
-                    + "wikiarticle_id INT UNSIGNED NOT NULL PRIMARY KEY)");
+                    + "wikiarticle_id INT UNSIGNED NOT NULL PRIMARY KEY) CHARACTER SET 'utf8mb4'");
             // trends_wikiarticles_junction
-            stmt.execute("CREATE TABLE IF NOT EXISTS trends_wikiarticles_junction ("
+            stmt.execute(s = "CREATE TABLE IF NOT EXISTS trends_wikiarticles_junction ("
                     + "trend_id INT UNSIGNED NOT NULL,"
                     + "wikiarticle_id INT UNSIGNED NOT NULL,"
-                    + "PRIMARY KEY(trend_id, wikiarticle_id))");
+                    + "PRIMARY KEY(trend_id, wikiarticle_id)) CHARACTER SET 'utf8mb4'");
         } catch (SQLException exp) {
             exp.printStackTrace();
         } finally {

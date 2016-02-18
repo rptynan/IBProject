@@ -50,8 +50,7 @@ public class Worker extends Thread implements Comparable{
         return false;
     }
         try{
-        o.add(_task);
-        return true;
+        return o.add(_task);
     }
     catch (IllegalStateException ex)
     {   //this means the Queue is full
@@ -76,16 +75,10 @@ public class Worker extends Thread implements Comparable{
         try {
             Task t = o.take();
             Collection<Task> process = t.getTaskInterface().process();
-            if(process != null)
+            boolean addTask = parent.addTasks(process);
+            if(!addTask)
             {
-               for(Task t0: process)
-               {
-                   boolean addTask = parent.addTask(t);
-                   if(!addTask)
-                   {
-                       System.err.println("Error adding task from task");
-                   }
-               }
+                System.err.println("Error adding tasks from task: "+t.toString());
             }
         } catch (Exception ex) {
             System.err.println("Error processing task");

@@ -8,15 +8,16 @@ package uk.ac.cam.quebec.core;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
+import uk.ac.cam.quebec.twitterwrapper.TwitException;
 
 /**
  *
  * @author James
  */
-public class TrendRefreshTask implements TaskInterface{
+public class TrendRefreshTask extends GenericTask{
     private final int delay;
     private final ControlInterface parent;
-    private static final int priority = 1000;//lowest priority core task
+    private static final int priority = 1000;//lowest getPriority core task
     private long sleeptime =0 ;
     private long sleepstart = 0;
     public TrendRefreshTask(int _delay, ControlInterface _parent)
@@ -29,7 +30,15 @@ public class TrendRefreshTask implements TaskInterface{
         
         ArrayList<Task> ret = new ArrayList<>();
         Task t = new Task(this,TaskType.Core);
+        try{
         parent.repopulateTrends();
+        }
+        catch(TwitException ex)
+        {   System.err.println(ex);
+            Throwable cause = ex.getCause();
+            boolean b0 = cause !=null;
+            
+        }
         try {
             sleepstart = System.currentTimeMillis();
             sleeptime = TimeUnit.MINUTES.toMillis(delay);
@@ -47,14 +56,10 @@ public class TrendRefreshTask implements TaskInterface{
         
     }
     @Override
-    public int priority() {
-        return this.priority();
+    public int getPriority() {
+        return priority;
     }
-
     @Override
-    public int compareTo(TaskInterface o) {
-        return this.priority()-o.priority();
-    }
     public String getStatus()
     {
         if(sleepstart==0)

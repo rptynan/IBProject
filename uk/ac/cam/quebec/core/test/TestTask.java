@@ -27,13 +27,13 @@ public class TestTask implements TaskInterface{
     }
 
     @Override
-    public int priority() {
+    public int getPriority() {
         return 0;
     }
 
     @Override
     public int compareTo(TaskInterface o) {
-        return this.priority()-o.priority();
+        return this.getPriority()-o.getPriority();
     }
     
 }
