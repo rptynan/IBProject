@@ -24,7 +24,8 @@ public enum RequestType {
     InvalidRequest("inv", "(.)*"),
     TrendsRequest("Trends","location=([a-zA-Z]*)(.)*"),
     ArticlesRequest("Articles","id=(\\d+)(.)*"),
-    TweetsRequest("Tweets","id=(\\d+)(.)*");
+    TweetsRequest("Tweets","id=(\\d+)(.)*"),
+    CustomTrendRequest("Custom","trend=(.*)");
     private final Pattern requestPattern;
     private final Pattern fullPattern;
     private final String requestOption;

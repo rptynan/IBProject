@@ -59,6 +59,13 @@ public class MyHTTPHandler  implements HttpHandler{
         case TweetsRequest:
             s = parent.getTweetsAsString(Integer.parseInt(m.group(1)),"Popularity",15);
             break;
+        case CustomTrendRequest:
+            if(parent.addTrend(m.group(1))){
+                s = "Success";
+            }else{
+                s = "Failure";
+            }
+            break;
         default:
             s+= " The Request type was: "+type.toString();
     }
