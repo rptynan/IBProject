@@ -103,7 +103,7 @@ $(document).ready(function(){
 				}
 				pageIndex = cPage.index();
 	
-				cPage.html("<a href=\"\">" + pageList[pageIndex].title + "<span class=\"sr-only\">(current)</span></a>");
+				cPage.html("<a href=\"#\">" + pageList[pageIndex].title + "<span class=\"sr-only\">(current)</span></a>");
 				cPage.addClass("active");
 			
 				wF.get(0).src = pageList[pageIndex].url;
