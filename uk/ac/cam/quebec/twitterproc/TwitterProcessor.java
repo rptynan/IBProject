@@ -1,6 +1,9 @@
 package uk.ac.cam.quebec.twitterproc;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
@@ -12,7 +15,6 @@ import uk.ac.cam.quebec.trends.Trend;
 import uk.ac.cam.quebec.twitterwrapper.TwitException;
 import uk.ac.cam.quebec.twitterwrapper.TwitterLink;
 import uk.ac.cam.quebec.util.WordCounter;
-import uk.ac.cam.quebec.util.parsing.StopWords;
 import uk.ac.cam.quebec.util.parsing.UtilParsing;
 import uk.ac.cam.quebec.wikiproc.WikiProcessor;
 import winterwell.jtwitter.Status;
@@ -30,7 +32,10 @@ import winterwell.jtwitter.Status;
  */
 public class TwitterProcessor {
 
-    private static final int PERCENTAGE = 30;
+    private static final boolean DEBUG = false;
+
+    private static final int CONCEPT_THRESHOLD_PERCENTAGE = 30;
+    private static final int MERGE_BI_GRAMS_PERCENTAGE = 40;
 
     /**
      * Process a trend and in the end pass a list of concepts to the Wikipedia
@@ -47,8 +52,9 @@ public class TwitterProcessor {
 
     /**
      * Do the actual processing of the trend
+     *
      * @param trend The trend that should be processed.
-     * @return true if trend sucessfully processed
+     * @return true if trend successfully processed
      */
     public static boolean doProcess(Trend trend) {
         trend.setParsedName(UtilParsing.parseTrendName(trend.getName()));
@@ -121,19 +127,25 @@ public class TwitterProcessor {
             return;
         }
 
-        List<String> tweets = filter(tweetsBatch);
-        WordCounter wordCounter = new WordCounter();
-        WordCounter hashTagCounter = new WordCounter();
-        for (String tweet : tweets) {
-            String text = UtilParsing.removeLinks(tweet);
-            String[] words = text.replaceAll("[^a-zA-Z0-9@#-]", " ")
-                    .trim()
-                    .split("\\s+");
-            for (String word : words) {
-                if (word.startsWith("@")) {
-                    // Discard usernames and links.
-                    continue;
-                } else if (word.startsWith("#")) {
+        List<List<String>> tweetsSplitted = filter(removeDuplicates(tweetsBatch));
+        tweetsSplitted = hashTagConcepts(trend, tweetsSplitted);
+        wordConcepts(trend, tweetsSplitted);
+    }
+
+    /**
+     * Process the hash tags in the tweets (in search for related trends) and eventually remove
+     * them.
+     *
+     * @param trend
+     * @param tweets
+     */
+    private static List<List<String>> hashTagConcepts(Trend trend, List<List<String>> tweets) {
+	WordCounter hashTagCounter = new WordCounter();
+	List<List<String>> tweetsWithNoHashTags = new ArrayList<List<String>>();
+	for (List<String> tweet : tweets) {
+	    List<String> tweetWithNoHashTags = new ArrayList<String>();
+	    for (String word : tweet) {
+		if (word.startsWith("#")) {
                     // Certain hash tag.
                     if (!trend.getParsedName().toLowerCase().equals(
                             UtilParsing.parseTrendName(word).toLowerCase())) {
@@ -141,24 +153,11 @@ public class TwitterProcessor {
                         // relevant trend.
                         hashTagCounter.addWord(word);
                     }
-                } else {
-                    if (word.length() > 2 && !StopWords.isStopWord(word)) {
-                        // Discard short words (a.g. is, the, a, and, ...).
-                        wordCounter.addWord(word);
-                    }
-                }
-            }
-        }
-
-	Pair<String, Integer>[] orderedWords = wordCounter.getOrderedWordsAndCount();
-	if (orderedWords != null) {
-	    // Add top 5 words + all those which pass the threshold.
-	    for (int i = 0; i < orderedWords.length; i++) {
-		if (i < 5
-		|| 100 * orderedWords[i].getValue() >= PERCENTAGE * orderedWords.length) {
-		    trend.addConcept(orderedWords[i]);
+		} else {
+		    tweetWithNoHashTags.add(word);
 		}
 	    }
+	    tweetsWithNoHashTags.add(tweetWithNoHashTags);
 	}
 
 	Pair<String, Integer>[] orderedHashTags = hashTagCounter.getOrderedWordsAndCount();
@@ -166,9 +165,92 @@ public class TwitterProcessor {
 	    // Add top 5 hash tags + all those which pass the threshold.
 	    for (int i = 0; i < orderedHashTags.length; i++) {
 		if (i < 5
-		|| 100 * orderedHashTags[i].getValue() >= PERCENTAGE * orderedHashTags.length) {
+		|| 100 * orderedHashTags[i].getValue() >=
+			CONCEPT_THRESHOLD_PERCENTAGE * tweets.size()) {
 		    trend.addRelatedHashTag(orderedHashTags[i]);
 		}
+	    }
+	}
+
+	return tweetsWithNoHashTags;
+    }
+
+    /**
+     * Looks for concepts in the tweets combining the popular bi-grams in a single concept.
+     *
+     * @param trend
+     * @param tweets
+     */
+    private static void wordConcepts(Trend trend, List<List<String>> tweets) {
+	if (DEBUG) {
+	    System.out.println(" ~~~~ Tweets on which we run the concepts extractor ~~~~ ");
+	    for (List<String> tweet : tweets) {
+		for (String word : tweet) {
+		    System.out.print(word + " ");
+		}
+		System.out.println();
+	    }
+	}
+
+	WordCounter wordCounter = new WordCounter();
+	for (List<String> tweet : tweets) {
+	    wordCounter.addSentence(tweet);
+	}
+
+	Pair<String, Integer>[] orderedWords = wordCounter.getOrderedWordsAndCount();
+	Pair<List<String>, Integer>[] orderedBiGrams = wordCounter.getOrderedNGramsAndCount(2);
+	HashMap<String, Integer> wordCount = new HashMap<String, Integer>();
+	List<Pair<String, Integer>> concepts = new ArrayList<Pair<String, Integer>>();
+	HashSet<String> removeFromSingleWordConcepts = new HashSet<String>();
+
+	if (orderedBiGrams == null && orderedWords == null) {
+	    return;
+	}
+
+	if (orderedBiGrams != null) {
+	    for (int i = 0; i < orderedWords.length; i++) {
+		wordCount.put(orderedWords[i].getKey(), orderedWords[i].getValue());
+	    }
+	    for (int i = 0; i < orderedBiGrams.length; i++) {
+		String word1 = orderedBiGrams[i].getKey().get(0);
+		String word2 = orderedBiGrams[i].getKey().get(1);
+		if (100 * orderedBiGrams[i].getValue() <
+			(CONCEPT_THRESHOLD_PERCENTAGE / 2) * tweets.size()) {
+		    concepts.add(new Pair<String, Integer>(word1 + " " + word2,
+			    orderedBiGrams[i].getValue()));
+		}
+		if (100 * orderedBiGrams[i].getValue() >= MERGE_BI_GRAMS_PERCENTAGE *
+			Math.max(wordCount.get(word1), wordCount.get(word2))) {
+		    concepts.add(new Pair<String, Integer>(word1 + " " + word2,
+			    wordCount.get(word1) + wordCount.get(word2)));
+		    removeFromSingleWordConcepts.add(word1);
+		    removeFromSingleWordConcepts.add(word2);
+		} else {
+		    concepts.add(new Pair<String, Integer>(word1 + " " + word2,
+			    orderedBiGrams[i].getValue()));
+		}
+	    }
+	}
+
+	for (int i = 0; i < orderedWords.length; i++) {
+	    if (!removeFromSingleWordConcepts.contains(orderedWords[i].getKey())) {
+		concepts.add(orderedWords[i]);
+	    }
+	}
+
+	Collections.sort(concepts, new Comparator<Pair<String, Integer>>() {
+            @Override
+            public int compare(Pair<String, Integer> o1, Pair<String, Integer> o2) {
+                // sort them such that o2 comes before o1 if o2 > o1, otherwise sort
+                return o2.getValue().compareTo(o1.getValue());
+            }
+        });
+
+	for (int i = 0; i < concepts.size(); i++) {
+	    Pair<String, Integer> concept = concepts.get(i);
+	    if (i < 5 || 100 * concept.getValue() >=
+		    CONCEPT_THRESHOLD_PERCENTAGE * tweets.size()) {
+		trend.addConcept(concept);
 	    }
 	}
     }
@@ -178,10 +260,9 @@ public class TwitterProcessor {
      * want to remove the duplicates.
      *
      * @param tweets
-     * @return Filtered List of tweets (represented just as strings that must be
-     * unique).
+     * @return List of tweets (represented just as strings that must be unique).
      */
-    private static List<String> filter(List<Status> tweets) {
+    private static List<String> removeDuplicates(List<Status> tweets) {
         HashSet<String> cache = new HashSet<String>();
         for (Status tweet : tweets) {
             cache.add(tweet.getDisplayText());
@@ -189,4 +270,26 @@ public class TwitterProcessor {
         return new ArrayList<String>(cache);
     }
 
+    /**
+     * Remove stop words and Twitter usernames; split into words.
+     *
+     * @param tweets
+     * @return List of filtered tweets
+     */
+    private static List<List<String>> filter(List<String> tweets) {
+	List<List<String>> tweetsSplitted = new ArrayList<List<String>>();
+	for (String tweet : tweets) {
+	    String[] individualWords = UtilParsing.splitIntoWords(UtilParsing.removeLinks(tweet));
+	    List<String> finalSetOfWords = new ArrayList<String>();
+	    for (int i = 0; i < individualWords.length; i++) {
+		if (individualWords[i].length() > 2
+		    && !UtilParsing.isStopWord(individualWords[i])
+		    && !individualWords[i].startsWith("@")) {
+		    finalSetOfWords.add(individualWords[i]);
+		}
+	    }
+	    tweetsSplitted.add(finalSetOfWords);
+	}
+	return tweetsSplitted;
+    }
 }
