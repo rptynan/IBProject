@@ -36,7 +36,7 @@ public class TwikfeedServlet extends HttpServlet {
 	    String serverAddress = "";
 	    String type = request.getParameter("Type");
 	    if(type.equals("Trends")){
-	        serverAddress = "Trends?stuff";
+	        serverAddress = "Trends?location=" + request.getParameter("location");
 	    }
 	    
 	    if(type.equals("Articles")){
