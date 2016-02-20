@@ -12,19 +12,20 @@ import java.io.InputStreamReader;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+
 import uk.ac.cam.quebec.core.Configuration;
 import uk.ac.cam.quebec.core.ControlInterface;
 import uk.ac.cam.quebec.core.GroupProjectCore;
 import uk.ac.cam.quebec.dbwrapper.DatabaseTest;
-import uk.ac.cam.quebec.trends.Trend;
-import uk.ac.cam.quebec.trends.TrendsQueue;
-import uk.ac.cam.quebec.util.WordCounterTest;
-import java.util.regex.Matcher;
 import uk.ac.cam.quebec.havenapi.HavenException;
 import uk.ac.cam.quebec.havenapi.SentimentAnalyserTest;
 import uk.ac.cam.quebec.kgsearchwrapper.KGConceptGeneratorTest;
+import uk.ac.cam.quebec.trends.Trend;
+import uk.ac.cam.quebec.trends.TrendsQueue;
 import uk.ac.cam.quebec.twitterwrapper.TwitException;
-import uk.ac.cam.quebec.util.parsing.StopWords;
+import uk.ac.cam.quebec.util.WordCounterTest;
+import uk.ac.cam.quebec.util.parsing.UtilParsing;
 import uk.ac.cam.quebec.wikiwrapper.WikiException;
 
 /**
@@ -110,7 +111,7 @@ public class CoreConsole extends Thread {
         boolean b = m.matches();
         if (b) {
             String word = m.group("stopWord");
-            boolean b0 = StopWords.isStopWord(word);
+            boolean b0 = UtilParsing.isStopWord(word);
             if (b0) {
                 System.out.println(word + " is a stop word");
             } else {

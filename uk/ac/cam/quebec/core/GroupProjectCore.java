@@ -2,23 +2,20 @@ package uk.ac.cam.quebec.core;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import uk.ac.cam.quebec.userapi.APIServerAbstract;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.PriorityBlockingQueue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import uk.ac.cam.quebec.dbwrapper.Database;
+import uk.ac.cam.quebec.kgsearchwrapper.APIConstants;
 import uk.ac.cam.quebec.trends.Trend;
 import uk.ac.cam.quebec.trends.TrendsQueue;
 import uk.ac.cam.quebec.twitterproc.TwitterProcessor;
 import uk.ac.cam.quebec.twitterwrapper.TwitException;
 import uk.ac.cam.quebec.twitterwrapper.TwitterLink;
+import uk.ac.cam.quebec.userapi.APIServerAbstract;
 import uk.ac.cam.quebec.userapi.NewAPIServer;
 import uk.ac.cam.quebec.wikiproc.WikiProcessor;
-import uk.ac.cam.quebec.wikiwrapper.WikiArticle;
-import uk.ac.cam.quebec.kgsearchwrapper.APIConstants;
-import uk.ac.cam.quebec.util.parsing.StopWords;
 //import uk.ac.cam.quebec.havenapi.APIConstants;
 
 /**
@@ -36,7 +33,6 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
     private final TwitterLink twitterWrapper;//Always goood
     private final TwitterProcessor twitterProcessor;//to try and ensure
     private final WikiProcessor wikiProcessor;//that all our singleton classes
-    private final StopWords stopWords;//have been properly initialised
     private final Database DB;//to start with
     private final int ThreadPoolSize;//The thread pool that we want to allocate for each job
     private final Configuration config;
@@ -58,7 +54,6 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
         APIConstants.setCredentials(config.getKnowledgeGraphKey());
         uk.ac.cam.quebec.havenapi.APIConstants.setCredentials(config.getSentimentAnalyserKey());
         ThreadPoolSize = config.getThreadPoolSize();
-        stopWords = new StopWords();
         refreshTask = makeTrendRefreshTask();
     }
 
@@ -74,7 +69,6 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
         twitterProcessor = new TwitterProcessor();
         wikiProcessor = new WikiProcessor();
         defaultLocation = _location;
-        stopWords = new StopWords();
         refreshTask = makeTrendRefreshTask();
     }
 
