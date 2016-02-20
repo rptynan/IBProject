@@ -27,6 +27,20 @@ $(document).ready(function(){
 		eD.hide();
 		tD.hide();
 		
+		// Handle the input of custom trends
+		$("#form").on('submit', function (e) {
+			e.preventDefault();
+			// Can't send spaces through the request
+			var content = $("#input").val().replace(/\s+/g, '');
+		
+			$.get("TwikfeedServlet?Type=Custom&trend=" + content).done(function(data, textStatus) {
+				if (parseInt(data) == 1){
+					alert(content + " has been submitted as a custom trend. It will soon appear under the Custom location.");
+				}else{
+					alert("Sorry, your trend was not successfully submitted.");
+				}
+			}, "text");
+		});
 		
 		
 		// Handle startup or a selection of a new location
@@ -34,13 +48,13 @@ $(document).ready(function(){
 			$.get("TwikfeedServlet?Type=Trends&location=" + location).done(function(data, textStatus) {
 			
 		
-			trendList = $.parseJSON(data);
-		
-			tL.empty();
-			var i;
-			for(i=0; i < trendList.length; i++){
-				tL.append("<li><a href=\"#\">" + trendList[i].name + "</a></li>");
-			}
+				trendList = $.parseJSON(data);
+			
+				tL.empty();
+				var i;
+				for(i=0; i < trendList.length; i++){
+					tL.append("<li><a href=\"#\">" + trendList[i].name + "</a></li>");
+				}
 			}, "text");
 			
 		}
@@ -49,6 +63,7 @@ $(document).ready(function(){
 			
 			cTrend = $(event.target).parent();
 			if (cTrend[0].nodeName == "LI"){
+				pageIndex = -1;
 				if(trendIndex >= 0){
 					//reset old selected trend
 					lTrend.removeClass("active");
@@ -78,7 +93,7 @@ $(document).ready(function(){
 	
 		
 					tweetList = $.parseJSON(data);
-					twH.html(trendList[trendIndex].name + "Tweets");
+					twH.html(trendList[trendIndex].name + " Tweets");
 					twL.empty();
 					var i;
 					for(i=0; i < tweetList.length; i++){
@@ -140,9 +155,12 @@ $(document).ready(function(){
 		$('#dropDown li a').on('click', function(){
 			dM.html($(this).html() + "\n<span class=\"caret\"></span>");
 			location = $(this).html();
+			trendIndex = -1;
 			updateTrends();
 			
 		});
+		
+		
 		
 		// Make it happen
 		updateTrends();

@@ -61,9 +61,9 @@ public class MyHTTPHandler  implements HttpHandler{
             break;
         case CustomTrendRequest:
             if(parent.addTrend(m.group(1))){
-                s = "Success";
+                s = "1";
             }else{
-                s = "Failure";
+                s = "0";
             }
             break;
         default:
