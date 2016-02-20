@@ -121,7 +121,8 @@ public class TwitterProcessor {
      */
     @VisibleForTesting
     static void extractConcepts(Trend trend, List<Status> tweetsBatch) {
-        trend.addConcept(new Pair<String, Integer>(trend.getParsedName(), Integer.MAX_VALUE));
+        trend.addConcept(new Pair<String, Integer>(trend.getParsedName(),
+        	tweetsBatch == null ? 0 : tweetsBatch.size()));
 
         if (tweetsBatch == null) {
             return;
@@ -214,15 +215,11 @@ public class TwitterProcessor {
 	    for (int i = 0; i < orderedBiGrams.length; i++) {
 		String word1 = orderedBiGrams[i].getKey().get(0);
 		String word2 = orderedBiGrams[i].getKey().get(1);
-		if (100 * orderedBiGrams[i].getValue() <
-			(CONCEPT_THRESHOLD_PERCENTAGE / 2) * tweets.size()) {
-		    concepts.add(new Pair<String, Integer>(word1 + " " + word2,
-			    orderedBiGrams[i].getValue()));
-		}
 		if (100 * orderedBiGrams[i].getValue() >= MERGE_BI_GRAMS_PERCENTAGE *
 			Math.max(wordCount.get(word1), wordCount.get(word2))) {
 		    concepts.add(new Pair<String, Integer>(word1 + " " + word2,
-			    wordCount.get(word1) + wordCount.get(word2)));
+			    wordCount.get(word1) + wordCount.get(word2)
+			    - orderedBiGrams[i].getValue() / 2));
 		    removeFromSingleWordConcepts.add(word1);
 		    removeFromSingleWordConcepts.add(word2);
 		} else {
