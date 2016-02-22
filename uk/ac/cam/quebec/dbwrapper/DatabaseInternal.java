@@ -84,8 +84,6 @@ class DatabaseInternal extends Database {
             connection.setClientInfo("characterEncoding", "utf8mb4");
             connection.setClientInfo("connectionCollation", "utf8mb4_general_ci");
             connection.setClientInfo("characterSetResults", "utf8mb4");
-            Properties clientInfo = connection.getClientInfo();
-            
             // Might be able to lower this later
             connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
             connection.setAutoCommit(true);
@@ -257,32 +255,13 @@ class DatabaseInternal extends Database {
                 connection.setAutoCommit(true);
             }
         } catch (SQLException exp) {
-            String s = stmt.toString();
-            testing(stmt);
             throw new DatabaseException("SQL failed to insert all Tweets into the database", exp);
         } finally {
             try { if (stmt != null) stmt.close(); } catch (Exception e) {};
         }
         return;
     }
-    private void testing(PreparedStatement stmt)
-    {
-        try {
-            Properties clientInfo = connection.getClientInfo();
-            Connection connection1 = stmt.getConnection();
-            boolean b = connection.equals(connection1);
-            String query = "show variables like '%char%'";
-            stmt.execute(query);
-            java.sql.ResultSet rs = stmt.getResultSet();
-            while (rs.next())
-            {
-                String k = rs.getString(1);
-                String v = rs.getString(2);
-                System.out.println(k + " - " + v);
-            }   } catch (SQLException ex) {
-            Logger.getLogger(DatabaseInternal.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
+
     @Override
     public List<Status> getTweets(Trend trend) throws DatabaseException {
         return getTweets(trend.getId());
