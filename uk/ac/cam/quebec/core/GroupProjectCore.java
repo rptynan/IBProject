@@ -263,4 +263,14 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
     public long timeUntilRepopulate() {
         return refreshTask.remainingTime();
     }
+
+    @Override
+    public void forceRepopulate() {
+        refreshTask.forceRefresh();
+    }
+
+    @Override
+    public void clearAllTasks() {
+      workAllocator.clearAllTasks();
+    }
 }

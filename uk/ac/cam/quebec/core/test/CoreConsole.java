@@ -88,6 +88,15 @@ public class CoreConsole extends Thread {
             case RepopulateTrendCommand:
                 repopulateTrends(c,command);
                 break;
+            case ForceRefreshCommand:
+                System.out.println("Forcing core refresh");
+                coreInter.forceRepopulate();
+                System.out.println("Core refresh complete");
+                break;
+            case ClearWorkCommand:
+                System.out.println("Clearing all tasks");
+                coreInter.clearAllTasks();
+                break;
             default:
                 oldProcessCommand(command);
                 break;
@@ -134,18 +143,23 @@ public class CoreConsole extends Thread {
             System.out.println("Failed to parse stop word in: " + command);
         }
     }
-
+    
+    @SuppressWarnings("static-access")
     private void addTrend(CoreConsoleCommand c, String command) {
         Matcher m = c.getFullPattern().matcher(command);
         boolean b = m.matches();
         if (b) {
-            String trendName = m.group("trendName");
+            String trendName = m.group("trendName");           
             String location = config.getDefaultLocation();
+            int priority = 0;
             if (m.group("trendLocation") != null) {
                 location = m.group("trendLocation");
             }
+            if (m.group("trendPriority") != null) {
+                priority = Integer.parseInt(m.group("trendPriority"));
+            }
             System.out.println("Adding trend " + trendName + ", for location " + location);
-            Trend T = new Trend(trendName, location, 0);
+            Trend T = new Trend(trendName, location, priority);
             if (coreTrends.putTrend(T)) {
                 System.out.println("Trend " + trendName + " added successfully");
             } else {

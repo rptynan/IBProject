@@ -38,7 +38,7 @@ public class WorkAllocator {
     }
 
     public String getStatus() {
-        String s = "There are: " + TrendTaskQueue.size() + " trends, " + TweetQueue.size() + " tweets and " + WikiQueue.size() + " pages in the queue ("+taskCount.availablePermits()+" permits avaliable). There are currently " + ThreadQueue.size() + "/" + ThreadPool.size() + " idle threads.";
+        String s = "There are: " + TrendTaskQueue.size() + " trends, " + TweetQueue.size() + " tweets and " + WikiQueue.size() + " pages in the queue ("+waitingTasks()+" waiting tasks and "+taskCount.availablePermits()+" permits avaliable). There are currently " + ThreadQueue.size() + "/" + ThreadPool.size() + " idle threads.";
         return s;
     }
     public boolean putTrend(Trend t)
@@ -62,6 +62,10 @@ public class WorkAllocator {
     }
 
     public Task getTask(TaskType preferredType) throws InterruptedException {
+        if(taskCount.availablePermits()!=waitingTasks())
+        {
+            System.err.println("Mismatch between waiting tasks and permits");
+        }
         taskCount.acquire();
         Task ret = null;
         TaskInterface t = null;
@@ -106,5 +110,27 @@ public class WorkAllocator {
         }
         //taskCount.release();//If we get to here without a task assigned then 
         return ret;//we should release our permit so another thread can use it
+    }
+    private int waitingTasks()
+    {
+        int i = CoreQueue.size();
+        i+= TweetQueue.size();
+        i+= WikiQueue.size();
+        i+=TrendTaskQueue.size();
+        return i;
+    }
+    /**
+     * Note not thread safe, for testing only
+     */
+    void clearAllTasks() {
+        int i=taskCount.availablePermits();
+     if(i!=0)
+     {int j = taskCount.drainPermits();
+         int k = CoreQueue.size();
+         TrendTaskQueue.clear();
+         TweetQueue.clear();
+         WikiQueue.clear();
+         taskCount.release(k);//Don't want to clear the Core Queue tasks
+     }
     }
 }
