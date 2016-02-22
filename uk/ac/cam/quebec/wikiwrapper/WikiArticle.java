@@ -43,7 +43,7 @@ public class WikiArticle implements Serializable {
     /**
      * Processing stuff
      */
-    private Double relevance;
+    private Double relevance = new Double(0.0);
 
     public Double getRelevance() {
         return relevance;
@@ -57,7 +57,7 @@ public class WikiArticle implements Serializable {
         this.relevance += increase;
     }
 
-    private Double popularity;
+    private Double popularity = new Double(0.0);
 
     public Double getPopularity() {
         return popularity;
@@ -67,7 +67,7 @@ public class WikiArticle implements Serializable {
         this.popularity = popularity;
     }
 
-    private Double controversy;
+    private Double controversy = new Double(0.0);
 
     public Double getControversy() {
         return controversy;
@@ -75,6 +75,16 @@ public class WikiArticle implements Serializable {
 
     public void setControversy(Double controversy) {
         this.controversy = controversy;
+    }
+
+    private Double recency = new Double(0.0);
+
+    public Double getRecency() {
+        return recency;
+    }
+
+    public void setRecency(Double recency) {
+        this.recency = recency;
     }
 
     /**
