@@ -12,7 +12,6 @@ import uk.ac.cam.quebec.wikiwrapper.WikiFetch;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -20,10 +19,20 @@ import java.util.List;
 import javafx.util.Pair;
 
 /**
- * Class responsible for Wikipedia processing. For the minimum viable product,
- * it should have the basic functionality that given a Trend and a list of
- * relevant Concepts it should identify relevant Wikipedia articles and
- * return a list of them on demand.
+ * Class responsible for Wikipedia processing.
+ *
+ * So far it is called by the Twitter processor on process(Trend trend), also getting the trend
+ * there. It then gets the concepts identified by the Twitter processor, runs them through the
+ * Knowledge graph wrapper and augments them, creating the augmentedConcepts.
+ *
+ * Using the augmentedConcepts as search terms, it fetches WikiArticles from wikipedia, processes
+ * them and then stores them in the database.
+ *
+ * As for what processing is being done on the articles, first a relevance measure is calculated
+ * based on the score of the concepts (both from Twitter and KGSearch) used to find it on Wikipedia,
+ * then it also sets the popularity based on the number of views, the recency based on the timestamp
+ * of the latest edit and the controversy based on the number of edits that have happened after
+ * the timestamp of the Trend.
  *
  * @author Tudor
  *
@@ -33,7 +42,6 @@ public class WikiProcessor {
     private static final int CONCEPTS_LIMIT = 10;
 
     private Trend trend;
-    private Date trendTime;
     private List<WikiArticle> articleList;
     private List<Pair<String, Double>> augmentedConcepts;
     private List<Pair<String, Integer>> trendConcepts;
@@ -120,6 +128,9 @@ public class WikiProcessor {
         }
     }
 
+    /**
+     * Removes duplicate Articles.
+     */
     public void removeDuplicateArticles() {
         HashMap<Integer, Integer> position = new HashMap<>();
 
@@ -172,8 +183,8 @@ public class WikiProcessor {
         }
     }
 
-    /** Do some processing on the Articles
-     *
+    /**
+     * Do some processing on the Articles (relevance, recency, popularity, controversy)
      */
     private void processArticles() {
         for (WikiArticle article : articleList) {
@@ -216,6 +227,10 @@ public class WikiProcessor {
             }
 
             article.setControversy(1.0 * afterTrend);
+            List<WikiEdit> edits = article.getCachedEdits();
+            if (!edits.isEmpty()) {
+                article.setRecency(new Double(edits.get(0).getTimeStamp().getTime()));
+            }
         }
     }
 

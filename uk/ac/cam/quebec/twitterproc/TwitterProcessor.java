@@ -72,6 +72,7 @@ public class TwitterProcessor {
             }
 
             trend.setPopularity(calculatePopularity(tweets));
+			calculateTimestamp(trend, tweets);
             extractConcepts(trend, tweets);
             return true;
         } catch (TwitException e) {
@@ -117,7 +118,7 @@ public class TwitterProcessor {
      * Currently relies on simple word count.
      *
      * @param trend The trend we are processing.
-     * @param tweets The tweets related to this trend.
+     * @param tweetsBatch The tweets related to this trend.
      */
     @VisibleForTesting
     static void extractConcepts(Trend trend, List<Status> tweetsBatch) {
@@ -132,6 +133,27 @@ public class TwitterProcessor {
         tweetsSplitted = hashTagConcepts(trend, tweetsSplitted);
         wordConcepts(trend, tweetsSplitted);
     }
+
+	/**
+	 * <p>
+	 * Calculates a timestamp for the trend.
+	 *
+	 * <p>
+	 * Currently considers it as the earliest tweet for the trend
+	 *
+	 * @param trend The trend we are processing.
+	 * @param tweets The tweets related to this trend.
+	 */
+	private static void calculateTimestamp(Trend trend, List<Status> tweets) {
+		boolean set = false;
+		for (Status tweet : tweets) {
+			if (tweet.getCreatedAt() != null &&
+					(!set || tweet.getCreatedAt().before(trend.getTimestamp()))) {
+				trend.setTimestamp(tweet.getCreatedAt());
+				set = true;
+			}
+		}
+	}
 
     /**
      * Process the hash tags in the tweets (in search for related trends) and eventually remove
