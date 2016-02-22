@@ -21,6 +21,9 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Class which implements Database.
@@ -77,6 +80,12 @@ class DatabaseInternal extends Database {
 
         try {
             connection = DriverManager.getConnection(dbserver, username, password);
+            connection.setClientInfo("useUnicode", "true");
+            connection.setClientInfo("characterEncoding", "utf8mb4");
+            connection.setClientInfo("connectionCollation", "utf8mb4_general_ci");
+            connection.setClientInfo("characterSetResults", "utf8mb4");
+            Properties clientInfo = connection.getClientInfo();
+            
             // Might be able to lower this later
             connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
             connection.setAutoCommit(true);
@@ -137,6 +146,7 @@ class DatabaseInternal extends Database {
         return INSTANCE;
     }
 
+    @Override
     public void putTrend(Trend trend) throws DatabaseException {
         PreparedStatement stmt = null;
 
@@ -173,11 +183,13 @@ class DatabaseInternal extends Database {
         return;
     }
 
+    @Override
     public List<Trend> getTrends() throws DatabaseException {
         // Pass wildcard as location to get all trends
         return getTrends("%");
     }
 
+    @Override
     public List<Trend> getTrends(String location) throws DatabaseException {
         ArrayList<Trend> result = new ArrayList<Trend>();
         Statement stmt = null;
@@ -206,6 +218,7 @@ class DatabaseInternal extends Database {
         return result;
     }
 
+    @Override
     public void putTweets(List<Status> tweets, Trend trend) throws DatabaseException {
         // In case this trend hasn't been put in the db before
         if (trend.getId() == 0) {
@@ -244,17 +257,38 @@ class DatabaseInternal extends Database {
                 connection.setAutoCommit(true);
             }
         } catch (SQLException exp) {
+            String s = stmt.toString();
+            testing(stmt);
             throw new DatabaseException("SQL failed to insert all Tweets into the database", exp);
         } finally {
             try { if (stmt != null) stmt.close(); } catch (Exception e) {};
         }
         return;
     }
-
+    private void testing(PreparedStatement stmt)
+    {
+        try {
+            Properties clientInfo = connection.getClientInfo();
+            Connection connection1 = stmt.getConnection();
+            boolean b = connection.equals(connection1);
+            String query = "show variables like '%char%'";
+            stmt.execute(query);
+            java.sql.ResultSet rs = stmt.getResultSet();
+            while (rs.next())
+            {
+                String k = rs.getString(1);
+                String v = rs.getString(2);
+                System.out.println(k + " - " + v);
+            }   } catch (SQLException ex) {
+            Logger.getLogger(DatabaseInternal.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    @Override
     public List<Status> getTweets(Trend trend) throws DatabaseException {
         return getTweets(trend.getId());
     }
 
+    @Override
     public List<Status> getTweets(int trend_id) throws DatabaseException {
         ArrayList<Status> result = new ArrayList<Status>();
         Statement stmt = null;
@@ -283,6 +317,7 @@ class DatabaseInternal extends Database {
         return result;
     }
 
+    @Override
     public void putWikiArticles(List<WikiArticle> articles, Trend trend) throws DatabaseException {
         // In case this trend hasn't been put in the db before
         if (trend.getId() == 0) {
@@ -351,10 +386,12 @@ class DatabaseInternal extends Database {
         return;
     }
 
+    @Override
     public List<WikiArticle> getWikiArticles(Trend trend) throws DatabaseException {
         return getWikiArticles(trend.getId());
     }
 
+    @Override
     public List<WikiArticle> getWikiArticles(int trend_id) throws DatabaseException {
         ArrayList<WikiArticle> result = new ArrayList<WikiArticle>();
         Statement stmt = null;

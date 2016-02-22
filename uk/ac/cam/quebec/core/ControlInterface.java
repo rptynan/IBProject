@@ -18,4 +18,6 @@ public interface ControlInterface {
     public void initialiseUAPI();
     public void repopulateTrends() throws TwitException;
     public long timeUntilRepopulate();
+    public void forceRepopulate();
+    public void clearAllTasks();
 }

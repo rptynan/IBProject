@@ -25,13 +25,15 @@ public enum CoreConsoleCommand {
     WikiWrapTestCommand("test wikiwrap",""),
     SentimentAnalysisTestCommand("test sentiment",""),
     KnowledgeGraphTestCommand("test knowledge graph",""),
-    AddTrendCommand("add trend","(?<trendName>[^\\,]*)(, (?<trendLocation>\\w+))?"),
+    AddTrendCommand("add trend","(?<trendName>[^\\,]*)(, (?<trendLocation>\\w+)(, (?<trendPriority>\\d+))?)?"),
     RepopulateTrendCommand("repopulate trends",""),
     TestDatabaseCommand("test database",""),
     CheckStopWordCommand("check stop word","(?<stopWord>.+)"),
     TestWordCounterCommand("test word counter",""),
     HelpCommand("help","(?<Command>\\w+)?"),
     CheckStyleCommand("check style",""),
+    ClearWorkCommand("clear work",""),
+    ForceRefreshCommand("force refresh",""),
     InvalidCommand("","(.*)");
     private final Pattern requestPattern;
     private final Pattern fullPattern;

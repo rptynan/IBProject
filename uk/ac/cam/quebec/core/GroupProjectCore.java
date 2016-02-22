@@ -32,7 +32,7 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
     private final TwitterLink twitterWrapper;//Always goood
     private final TwitterProcessor twitterProcessor;//to try and ensure
     private final WikiProcessor wikiProcessor;//that all our singleton classes
-    private final Database DB;//to start with
+    private final Database DB;//are initialised to start with
     private final int ThreadPoolSize;//The thread pool that we want to allocate for each job
     private final Configuration config;
     private boolean running;
@@ -262,5 +262,15 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
     @Override
     public long timeUntilRepopulate() {
         return refreshTask.remainingTime();
+    }
+
+    @Override
+    public void forceRepopulate() {
+        refreshTask.forceRefresh();
+    }
+
+    @Override
+    public void clearAllTasks() {
+      workAllocator.clearAllTasks();
     }
 }
