@@ -70,12 +70,27 @@ public class DatabaseTest {
         }
         System.out.println("Check ID of trends inserted: " + t1.getId() + " " + t2.getId());
         System.out.println("Check processCount of trend " + t1.getId() + " is 1");
+        // Location test
+        System.out.println("Should only show trends from UK:");
         for (Trend t : trendList2) {
             System.out.println(t.getName() + " " + t.getLocation()
                     + " " + t.getPriority() + " " + t.getProcessCount()
                     + " " + t.getId());
         }
-        System.out.println("Should only show trends from UK");
+        // Duplicate test
+        Trend t3 = new Trend("TestTrend2", "UK", 9);
+        try {
+            db1.putTrend(t3);
+            trendList1 = db2.getTrends();
+        } catch (DatabaseException exp) {
+            exp.printStackTrace();
+        }
+        System.out.println("Check there are no duplicates:");
+        for (Trend t : trendList1) {
+            System.out.println(t.getName() + " " + t.getLocation()
+                    + " " + t.getPriority() + " " + t.getProcessCount()
+                    + " " + t.getId());
+        }
 
         // putTweets(), getTweets()
         System.out.println("\n==> Testing Tweets");

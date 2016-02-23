@@ -70,8 +70,6 @@
               <button type="button" class="btn btn-default">Controversy</button>
             </div>
           </div>
-		  <!-- Refresh Button-->
-		  <button type="button" id = "trendRefresh" class="btn btn-default">Refresh</button>
           <!-- Trends list -->
           <ul id="trendList" class="nav nav-sidebar">
             <!-- List injected like this:
@@ -79,6 +77,10 @@
             <li><a href="">Trend2</a></li>
             -->
           </ul>
+          <!-- Refresh Button-->
+          <button type="button" id = "articleRefresh" class="btn btn-default">
+            <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+          </button>
         </div>
 
         <!-- Middle iframe -->
@@ -99,19 +101,22 @@
 
         <!-- Right Nav -->
         <div class="col-xs-2 col-xs-offset-10 sidebar">
-          <h3 id = "trendHeading">No Trend Selected</h3>
-          <h4>Related Wikipedia Articles</h4>
+          <h3>
+            <div id = "trendHeading">No Trend Selected</div>
+            <small>Related Wikipedia Articles</small>
+          </h3>
           <!-- Sort by buttons -->
           Sort by
           <div class="nav nav-sidebar">
-            <div class="btn-group btn-group-sm" role="group" aria-label="...">
-              <button type="button" class="btn btn-default">Recency</button>
-              <button type="button" class="btn btn-default">Popularity</button>
-              <button type="button" class="btn btn-default">Controversy</button>
+            <div class="btn-group btn-group-justified" role="group" aria-label="...">
+              <a href="#" class="btn btn-default" role="button">Relevance</a>
+              <a href="#" class="btn btn-default" role="button">Popularity</a>
+            </div>
+            <div class="btn-group btn-group-justified" role="group" aria-label="...">
+              <a href="#" class="btn btn-default" role="button">Controversy</a>
+              <a href="#" class="btn btn-default" role="button">Recency</a>
             </div>
           </div>
-		  <!-- Refresh Button-->
-		  <button type="button" id = "articleRefresh" class="btn btn-default">Refresh</button>
           <!-- Relate wiki page list -->
           <ul class="nav nav-sidebar" id = "pageList">
             <!-- List injected like this:
@@ -119,6 +124,10 @@
             <li><a href="">Page2</a></li>
             -->
           </ul>
+          <!-- Refresh Button-->
+          <button type="button" id = "articleRefresh" class="btn btn-default">
+            <span class="glyphicon glyphicon-refresh" aria-hidden="true"></span>
+          </button>
         </div>
 
       </div>

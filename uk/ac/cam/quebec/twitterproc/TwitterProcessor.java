@@ -11,6 +11,9 @@ import javafx.util.Pair;
 import uk.ac.cam.quebec.common.VisibleForTesting;
 import uk.ac.cam.quebec.dbwrapper.Database;
 import uk.ac.cam.quebec.dbwrapper.DatabaseException;
+import uk.ac.cam.quebec.havenapi.HavenException;
+import uk.ac.cam.quebec.havenapi.SentimentAnalyser;
+import uk.ac.cam.quebec.havenapi.SentimentAnalysis;
 import uk.ac.cam.quebec.trends.Trend;
 import uk.ac.cam.quebec.twitterwrapper.TwitException;
 import uk.ac.cam.quebec.twitterwrapper.TwitterLink;
@@ -71,8 +74,8 @@ public class TwitterProcessor {
                 e.printStackTrace();
             }
 
-            trend.setPopularity(calculatePopularity(tweets));
-			calculateTimestamp(trend, tweets);
+            calculatePopularity(trend, tweets);
+            calculateTimestamp(trend, tweets);
             extractConcepts(trend, tweets);
             return true;
         } catch (TwitException e) {
@@ -93,7 +96,7 @@ public class TwitterProcessor {
      * @return Integer evaluation of the popularity of the trend based on these
      * tweets.
      */
-    private static int calculatePopularity(List<Status> tweets) {
+    private static void calculatePopularity(Trend trend, List<Status> tweets) {
         int popularity = 0;
         if (tweets != null) {
             for (Status tweet : tweets) {
@@ -107,7 +110,55 @@ public class TwitterProcessor {
                 }
             }
         }
-        return popularity;
+        trend.setPopularity(popularity);
+    }
+
+    /**
+     * <p>
+     * Calculates a timestamp for the trend.
+     *
+     * <p>
+     * Currently considers it as the earliest tweet for the trend
+     *
+     * @param trend The trend we are processing.
+     * @param tweets The tweets related to this trend.
+     */
+    private static void calculateTimestamp(Trend trend, List<Status> tweets) {
+	boolean set = false;
+	for (Status tweet : tweets) {
+	    if (tweet.getCreatedAt() != null &&
+		    (!set || tweet.getCreatedAt().before(trend.getTimestamp()))) {
+		trend.setTimestamp(tweet.getCreatedAt());
+		set = true;
+	    }
+	}
+    }
+
+    /**
+     * Calculates controversy of a trend on the basis of the sentiment analyses of the tweets.
+     *
+     * @param trend
+     * @param tweets
+     */
+    private static void calculateControversy(Trend trend, List<List<String>> tweets) {
+	double mx = -1e6;
+	double mn =  1e6;
+	boolean set = false;
+	for (List<String> tweet : tweets) {
+	    String text = String.join(" ", tweet);
+	    try {
+		SentimentAnalysis sa = SentimentAnalyser.getAnalysis(text);
+		mx = Double.max(mx, sa.getAggregate().getScore());
+		mn = Double.min(mn, sa.getAggregate().getScore());
+		set = true;
+	    } catch (HavenException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	    }
+	}
+	if (set) {
+	    trend.setControversy(mx - mn);
+	}
     }
 
     /**
@@ -123,7 +174,7 @@ public class TwitterProcessor {
     @VisibleForTesting
     static void extractConcepts(Trend trend, List<Status> tweetsBatch) {
         trend.addConcept(new Pair<String, Integer>(trend.getParsedName(),
-        	tweetsBatch == null ? 0 : tweetsBatch.size()));
+        	tweetsBatch == null ? 1 : 1 + 2 * tweetsBatch.size()));
 
         if (tweetsBatch == null) {
             return;
@@ -131,32 +182,9 @@ public class TwitterProcessor {
 
         List<List<String>> tweetsSplitted = filter(removeDuplicates(tweetsBatch));
         tweetsSplitted = hashTagConcepts(trend, tweetsSplitted);
+        calculateControversy(trend, tweetsSplitted);
         wordConcepts(trend, tweetsSplitted);
     }
-
-	/**
-	 * <p>
-	 * Calculates a timestamp for the trend.
-	 *
-	 * <p>
-	 * Currently considers it as the earliest tweet for the trend
-	 *
-	 * @param trend The trend we are processing.
-	 * @param tweets The tweets related to this trend.
-	 */
-	private static void calculateTimestamp(Trend trend, List<Status> tweets) {
-		boolean set = false;
-		for (Status tweet : tweets) {
-			if (tweet.getCreatedAt() != null &&
-					(!set || tweet.getCreatedAt().before(trend.getTimestamp()))) {
-				trend.setTimestamp(tweet.getCreatedAt());
-				set = true;
-			}
-		}
-		if (trend.getTimestamp() != null) {
-			trend.getTimestamp().setTime(trend.getTimestamp().getTime() - 24 * 3600 * 1000);
-		}
-	}
 
     /**
      * Process the hash tags in the tweets (in search for related trends) and eventually remove

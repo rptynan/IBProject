@@ -43,7 +43,7 @@ public class TwikfeedServlet extends HttpServlet {
         }
 
         if (type.equals("Articles")) {
-            serverAddress = "Articles?id=" + request.getParameter("id");
+            serverAddress = "Articles?id=" + request.getParameter("id") + "&sorting=" + request.getParameter("sorting");
 
         }
         if (type.equals("Tweets")) {
