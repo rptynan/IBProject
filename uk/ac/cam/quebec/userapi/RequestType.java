@@ -23,7 +23,8 @@ public enum RequestType {
     DefaultRequest("", "(.)*"),
     InvalidRequest("inv", "(.)*"),
     TrendsRequest("Trends","location=([a-zA-Z]*)(.)*"),
-    ArticlesRequest("Articles","id=(\\d+)(.)*"),
+    // Sorting 1 = relevance, 2 = popularity, 3 = recency, 4 = controversy
+    ArticlesRequest("Articles","id=(\\d+)&sorting=(\\d+)(.)*"),
     TweetsRequest("Tweets","id=(\\d+)(.)*"),
     CustomTrendRequest("Custom","trend=(.*)");
     private final Pattern requestPattern;
