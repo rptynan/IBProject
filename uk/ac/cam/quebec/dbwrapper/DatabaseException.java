@@ -12,7 +12,7 @@ public class DatabaseException extends Exception {
     /**
      * Contructor.
      *
-     * @param exception the exception which caused this to be thrown
+     * @param message the exception which caused this to be thrown
      */
     public DatabaseException(String message) {
         super(message);
