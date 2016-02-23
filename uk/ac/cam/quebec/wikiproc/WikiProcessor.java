@@ -31,8 +31,8 @@ import javafx.util.Pair;
  * As for what processing is being done on the articles, first a relevance measure is calculated
  * based on the score of the concepts (both from Twitter and KGSearch) used to find it on Wikipedia,
  * then it also sets the popularity based on the number of views, the recency based on the timestamp
- * of the latest edit and the controversy based on the number of edits that have happened after
- * the timestamp of the Trend.
+ * of the latest edit and the controversy based on the number of edits that have happened in the
+ * 24 hours before the timestamp of the Trend.
  *
  * @author Tudor
  *
@@ -40,6 +40,8 @@ import javafx.util.Pair;
 public class WikiProcessor {
 
     private static final int CONCEPTS_LIMIT = 10;
+    private static final int WIKI_EDITS_AT_ONCE = 10;
+    private static final int WIKI_EDITS_LIMIT = 30;
 
     private Trend trend;
     private List<WikiArticle> articleList;
@@ -197,14 +199,14 @@ public class WikiProcessor {
             article.setPopularity(1.0 * views);
 
 
-            int count = article.getCachedEdits().size();
+            int count = 0;
             int afterTrend = 0;
             boolean more = true;
-            while (more) {
+            while (more && count < WIKI_EDITS_LIMIT) {
                 more = false;
                 try {
-                    List<WikiEdit> edits = article.getEdits(count + 3);
-                    if (edits.size() < count + 3) {
+                    List<WikiEdit> edits = article.getEdits(count + WIKI_EDITS_AT_ONCE);
+                    if (edits.size() < count + WIKI_EDITS_AT_ONCE) {
                         break;
                     }
 
@@ -218,7 +220,9 @@ public class WikiProcessor {
 
                     if (newAfterTrend > afterTrend) {
                         afterTrend = newAfterTrend;
-                        more = true;
+                        if (newAfterTrend - afterTrend >= WIKI_EDITS_AT_ONCE) {
+                            more = true;
+                        }
                     }
 
                 } catch (WikiException ex) {
@@ -229,7 +233,7 @@ public class WikiProcessor {
             article.setControversy(1.0 * afterTrend);
             List<WikiEdit> edits = article.getCachedEdits();
             if (!edits.isEmpty()) {
-                article.setRecency(new Double(edits.get(0).getTimeStamp().getTime()));
+                article.setRecency(1.0 * edits.get(0).getTimeStamp().getTime());
             }
         }
     }
