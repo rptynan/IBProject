@@ -25,4 +25,9 @@ public class Task {
     {
         return taskInterface;
     }
+   @Override
+    public String toString()
+    {
+        return type.name() +" : "+taskInterface.toString();
+    }
 }

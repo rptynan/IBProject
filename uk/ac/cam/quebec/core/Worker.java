@@ -83,7 +83,7 @@ public class Worker extends Thread implements Comparable{
                 System.err.println("Error adding tasks from task: "+currentTask.toString());
             }
         } catch (Exception ex) {
-            System.err.println("Error processing task");
+            System.err.println("Error processing task: "+currentTask.toString());
             Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
         }
         currentTask = null;

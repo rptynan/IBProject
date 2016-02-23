@@ -20,12 +20,13 @@ public class TrendRefreshTask extends GenericTask {
     private final ControlInterface parent;
     private Thread thisThread = null;
     private static final int priority = 1000;//lowest getPriority core task
-    private long sleeptime = 0;
+    private final long sleeptime;
     private long sleepstart = 0;
 
     public TrendRefreshTask(int _delay, ControlInterface _parent) {
         delay = _delay;
         parent = _parent;
+        sleeptime = TimeUnit.MINUTES.toMillis(delay);
     }
 
     @Override
@@ -40,13 +41,13 @@ public class TrendRefreshTask extends GenericTask {
             System.err.println(ex);
             Throwable cause = ex.getCause();
             boolean b0 = cause != null;
-
+            if (b0) {
+                System.err.println(cause);
+            }
         }
         try {
             sleepstart = System.currentTimeMillis();
-            sleeptime = TimeUnit.MINUTES.toMillis(delay);
             Thread.sleep(sleeptime);
-
         } catch (InterruptedException ex) {
 
         }
@@ -64,6 +65,7 @@ public class TrendRefreshTask extends GenericTask {
             thisThread.interrupt();
         }
     }
+
     @Override
     public int getPriority() {
         return priority;
