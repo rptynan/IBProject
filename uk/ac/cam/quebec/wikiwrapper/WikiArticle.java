@@ -5,11 +5,14 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
 import winterwell.json.JSONArray;
+import winterwell.json.JSONException;
 import winterwell.json.JSONObject;
 
 /**
@@ -33,6 +36,7 @@ public class WikiArticle implements Serializable {
     public String getExtract() {
         return extract;
     }
+
     public int getId() {
         return id;
     }
@@ -103,16 +107,16 @@ public class WikiArticle implements Serializable {
             JSONObject json = WikiFetch
                     .getJSONfromAddress("https://en.wikipedia.org/w/api.php?"
                             + "action=query&prop=extracts&"
-                            + "format=json&explaintext=&titles=" + title +"&exintro=1");
-            
+                            + "format=json&explaintext=&titles=" + title
+                            + "&exintro=1");
+
             json = json.getJSONObject("query").getJSONObject("pages");
             JSONArray names = json.names();
             extract = json.getJSONObject(names.getString(0)).getString(
                     "extract");
-            id = json.getJSONObject(names.getString(0)).getInt(
-                    "pageid");
+            id = json.getJSONObject(names.getString(0)).getInt("pageid");
             // For testing System.out.println("Article: " + this.title);
- 
+
         } catch (IOException e) {
             throw new WikiException("Connection to Wikipedia failed.");
         }
@@ -121,32 +125,32 @@ public class WikiArticle implements Serializable {
 
     /**
      * Method to get usage data for a page. Is gathered on first call so there
-     * is likely to be a performance hit then. The data is monthly not daily so
+     * is likely to be a performance hit then. The data is daily so
      * it may not be that useful and perhaps better to rely on search.
      * 
      * @throws WikiException
      *             Throws exception if connection fails
-     * @return The number of views of the page in the past 30 days.
+     * @return The number of views of the page in the past day.
      */
     public int getViews() throws WikiException {
         if (views >= 0)
             return views;
         else {
             try {
-
+                Date today = new Date();
+                Date yesterday = new Date(today.getTime()-86400000L);
+                SimpleDateFormat dt = new SimpleDateFormat("yyyyMMdd"); 
                 JSONObject json = WikiFetch
-                        .getJSONfromAddress("http://stats.grok.se/json/en/latest30/"
-                                + title.replace(" ", "%20"));
-                json = json.getJSONObject("daily_views");
-                Iterator keys = json.keys();
-                views = 0;
-                while (keys.hasNext()) {
-                    views += json.getInt((String) keys.next());
-                }
-                return views;
+                        .getJSONfromAddress("https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia.org/all-access/all-agents/"
+                                + title.replace(" ", "%20")+ "/daily/"+ dt.format(yesterday)+"/"+dt.format(today));
+                return json.getJSONArray("items").getJSONObject(0).getInt("views");
+               
 
             } catch (IOException e) {
-                throw new WikiException("Connection to stats.grok.se failed.");
+                throw new WikiException("Connection to view api failed.");
+            }
+            catch (JSONException e){
+                throw new WikiException("Invalid Article.");
             }
         }
     }
@@ -185,7 +189,8 @@ public class WikiArticle implements Serializable {
             }
             return ret;
         } else {
-            //edits = new LinkedList<WikiEdit>();  // We only get as many as we need.
+            // edits = new LinkedList<WikiEdit>(); // We only get as many as we
+            // need.
             try {
                 JSONObject json = WikiFetch
                         .getJSONfromAddress("https://en.wikipedia.org/w/api.php?"
@@ -211,6 +216,7 @@ public class WikiArticle implements Serializable {
             } catch (IOException e) {
                 throw new WikiException("Connection to Wikipedia failed.");
             }
+            
         }
 
     }
