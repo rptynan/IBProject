@@ -90,33 +90,32 @@ class DatabaseInternal extends Database {
 
         // Create database tables if they don't exist
         Statement stmt = null;
-        String s;
         try {
             stmt = connection.createStatement();
             // Drop the tables on startup, clears any data in db!
             if (dropTables) {
-                stmt.execute(s = "DROP tables IF EXISTS trends, wikiarticles, tweets, "
+                stmt.execute("DROP tables IF EXISTS trends, wikiarticles, tweets, "
                         + "trends_wikiarticles_junction");
             }
-            
+
             // trends
-            stmt.execute(s = "CREATE TABLE IF NOT EXISTS trends ("
+            stmt.execute("CREATE TABLE IF NOT EXISTS trends ("
                     + "name VARCHAR(60) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_general_ci' NOT NULL,"
                     + "location VARCHAR(60) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_general_ci',"
                     + "updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,"
                     + "object MEDIUMBLOB NOT NULL,"
                     + "trend_id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY) CHARACTER SET 'utf8mb4'");
-            
+
             // tweets
-            stmt.execute(s = "CREATE TABLE IF NOT EXISTS tweets ("
+            stmt.execute("CREATE TABLE IF NOT EXISTS tweets ("
                     + "content VARCHAR(200) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_general_ci' NOT NULL,"
                     + "location VARCHAR(60) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_general_ci',"
                     + "updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,"
                     + "object MEDIUMBLOB NOT NULL,"
                     + "trend_id INT UNSIGNED NOT NULL,"
-                    + "tweet_id BIGINT UNSIGNED NOT NULL PRIMARY KEY)CHARACTER SET 'utf8mb4'");
+                    + "tweet_id BIGINT UNSIGNED NOT NULL PRIMARY KEY) CHARACTER SET 'utf8mb4'");
             // wikiarticles
-            stmt.execute(s = "CREATE TABLE IF NOT EXISTS wikiarticles ("
+            stmt.execute("CREATE TABLE IF NOT EXISTS wikiarticles ("
                     + "title VARCHAR(300) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_general_ci' NOT NULL,"
                     + "updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,"
                     + "relevance DOUBLE NOT NULL,"
@@ -126,7 +125,7 @@ class DatabaseInternal extends Database {
                     + "object MEDIUMBLOB NOT NULL,"
                     + "wikiarticle_id INT UNSIGNED NOT NULL PRIMARY KEY) CHARACTER SET 'utf8mb4'");
             // trends_wikiarticles_junction
-            stmt.execute(s = "CREATE TABLE IF NOT EXISTS trends_wikiarticles_junction ("
+            stmt.execute("CREATE TABLE IF NOT EXISTS trends_wikiarticles_junction ("
                     + "trend_id INT UNSIGNED NOT NULL,"
                     + "wikiarticle_id INT UNSIGNED NOT NULL,"
                     + "PRIMARY KEY(trend_id, wikiarticle_id)) CHARACTER SET 'utf8mb4'");
@@ -159,15 +158,31 @@ class DatabaseInternal extends Database {
             synchronized (conMutex) {
                 // If ID hasn't been set before, we need to set it
                 if (trend.getId() == 0) {
-                    Statement ss = connection.createStatement();
-                    ResultSet rs = ss.executeQuery("SELECT MAX(trend_id) FROM trends");
-                    rs.first();
-                    trend.setId(rs.getInt(1) + 1, accessId);
+                    // Check if this trend has been in before
+                    PreparedStatement s = connection.prepareStatement("SELECT trend_id FROM trends WHERE name=? AND location=?");
+                    s.setString(1, trend.getName());
+                    s.setString(2, trend.getLocation());
+                    ResultSet rs = s.executeQuery();
+                    if (rs.first()) {
+                        trend.setId(rs.getInt(1), accessId);
+                    }
                     rs.close();
-                    ss.close();
+                    s.close();
+
+                    // If not, assign it next id available
+                    if (trend.getId() == 0) {
+                        Statement ss = connection.createStatement();
+                        rs = ss.executeQuery("SELECT MAX(trend_id) FROM trends");
+                        rs.first();
+                        trend.setId(rs.getInt(1) + 1, accessId);
+                        rs.close();
+                        ss.close();
+                    }
+
                     stmt.setObject(3, trend);
                     stmt.setInt(4, trend.getId());
                 }
+
                 stmt.executeUpdate();
             }
         } catch (SQLException exp) {
