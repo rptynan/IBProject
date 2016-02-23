@@ -174,7 +174,7 @@ public class TwitterProcessor {
     @VisibleForTesting
     static void extractConcepts(Trend trend, List<Status> tweetsBatch) {
         trend.addConcept(new Pair<String, Integer>(trend.getParsedName(),
-        	tweetsBatch == null ? 0 : tweetsBatch.size()));
+        	tweetsBatch == null ? 1 : 1 + 2 * tweetsBatch.size()));
 
         if (tweetsBatch == null) {
             return;
