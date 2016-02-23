@@ -24,6 +24,8 @@ $(document).ready(function(){
 	var lTrend;
 	var lPage;
 	var location = "World";
+	var pageSorting = 1;
+	var trendObject = null;
 	eD.hide();
 	tD.hide();
 	
@@ -61,7 +63,7 @@ $(document).ready(function(){
 	
 	var updatePagesInner = function(){
 		// Call to load articles
-		$.get("TwikfeedServlet?Type=Articles&id="+trendList[trendIndex].id).done(function(data, textStatus) {
+		$.get("TwikfeedServlet?Type=Articles&id="+trendObject.id + "&sorting=" + pageSorting).done(function(data, textStatus) {
 
 
 			pageList = $.parseJSON(data);
@@ -74,12 +76,15 @@ $(document).ready(function(){
 				pL.append("<li><a href=\"#\">" + pageList[i].title + "</a></li>");
 			}
 		}, "text");
+	}
+	
+	var updateTweets = function(){
 		// Call to load tweets
-		$.get("TwikfeedServlet?Type=Tweets&id="+trendList[trendIndex].id).done(function(data, textStatus) {
+		$.get("TwikfeedServlet?Type=Tweets&id="+trendObject.id).done(function(data, textStatus) {
 
 
 			tweetList = $.parseJSON(data);
-			twH.html(trendList[trendIndex].name + " Tweets");
+			twH.html(trendObject.name + " Tweets");
 			twL.empty();
 			var i;
 			for(i=0; i < tweetList.length; i++){
@@ -106,11 +111,12 @@ $(document).ready(function(){
 			}
 			//Now make a get request to get the list of page name
 			trendIndex = cTrend.index();
-			
+			trendObject = trendList[trendIndex];
 			cTrend.html("<a href=\"#\">"+trendList[trendIndex].name+"<span class=\"sr-only\">(current)</span></a>");
 			cTrend.addClass("active");
 			// Inner function makes the requests
 			updatePagesInner();
+			updateTweets();
 			lTrend = cTrend;
 		}
 	}
@@ -172,10 +178,29 @@ $(document).ready(function(){
 		updateTrends();
 	});
 	$("#articleRefresh").click(function(){
-		updatePagesInner();
+		if (trendObject !== null){
+			updatePagesInner();
+			updateTweets();
+		}
 	});
 	
-	
+	// Select the sorting method for the articles
+	$("#pageRelevance").click(function(){
+		pageSorting = 1;
+		if (trendObject !== null) updatePagesInner();
+	});
+	$("#pagePopularity").click(function(){
+		pageSorting = 2;
+		if (trendObject !== null) updatePagesInner();
+	});
+	$("#pageRecency").click(function(){
+		pageSorting = 3;
+		if (trendObject !== null) updatePagesInner();
+	});
+	$("#pageControversy").click(function(){
+		pageSorting = 4;
+		if (trendObject !== null) updatePagesInner();
+	});
 	
 	
 	// Make it happen
