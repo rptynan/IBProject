@@ -3,9 +3,9 @@ package uk.ac.cam.quebec.core;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.PriorityBlockingQueue;
-
 import uk.ac.cam.quebec.dbwrapper.Database;
 import uk.ac.cam.quebec.kgsearchwrapper.APIConstants;
 import uk.ac.cam.quebec.trends.Trend;
@@ -16,7 +16,6 @@ import uk.ac.cam.quebec.twitterwrapper.TwitterLink;
 import uk.ac.cam.quebec.userapi.APIServerAbstract;
 import uk.ac.cam.quebec.userapi.NewAPIServer;
 import uk.ac.cam.quebec.wikiproc.WikiProcessor;
-//import uk.ac.cam.quebec.havenapi.APIConstants;
 
 /**
  * A brief implementation of a first pass at some core logic
@@ -33,13 +32,14 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
     private final TwitterLink twitterWrapper;//Always goood
     private final TwitterProcessor twitterProcessor;//to try and ensure
     private final WikiProcessor wikiProcessor;//that all our singleton classes
-    private final Database DB;//to start with
+    private final Database DB;//are initialised to start with
     private final int ThreadPoolSize;//The thread pool that we want to allocate for each job
     private final Configuration config;
     private boolean running;
     private final String defaultLocation;
     private final TrendRefreshTask refreshTask;
 
+    @SuppressWarnings("static-access")
     public GroupProjectCore(Configuration _config) throws IOException, TwitException {
         config = _config;
         DB = config.getDatabase();
@@ -57,9 +57,10 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
         refreshTask = makeTrendRefreshTask();
     }
 
+    @Deprecated
     public GroupProjectCore(String[] TwitterLoginArgs, Database _DB, String _location) throws IOException, TwitException {
         int UAPIPort = 90;
-        config = new Configuration(TwitterLoginArgs,new String[1], new String[1]);
+        config = new Configuration(TwitterLoginArgs, new String[1], new String[1]);
         DB = _DB;
         UAPI = new NewAPIServer(DB, UAPIPort, this);
         UAPII = UAPI;
@@ -92,6 +93,7 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
         }
     }
 
+    @SuppressWarnings("static-access")
     private void getTrends() throws TwitException {
         String[] locations = config.getLocations();
         for (String location : locations) {
@@ -116,7 +118,7 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
     private void mainLoop() {
         try {
             Worker w;
-            Task task = new Task(refreshTask,TaskType.Core);
+            Task task = new Task(refreshTask, TaskType.Core);
             workAllocator.putTask(task);
             while (running) {
                 w = ThreadQueue.take();
@@ -125,13 +127,16 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
                 if (!w.isAlive()) {
                     w.start();
                 }
+                if (!process) {
+                    System.err.println("There was an error processing the task");
+                }
             }
         } catch (InterruptedException ex) {
             System.out.println("Core loop interupted, core should be closing");
         }
     }
-
-    private TrendRefreshTask makeTrendRefreshTask() {
+    @SuppressWarnings("static-access")
+    private TrendRefreshTask makeTrendRefreshTask() {        
         int delay = config.getTrendRefreshTime();
         TrendRefreshTask tmp = new TrendRefreshTask(delay, this);
         return tmp;
@@ -191,7 +196,8 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
         s += workAllocator.getStatus() + System.lineSeparator();
         s += UAPII.getStatus() + System.lineSeparator();
         s += refreshTask.getStatus();
-        return s;}
+        return s;
+    }
 
     @Override
     public void beginClose() {
@@ -205,18 +211,26 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
     }
 
     @Override
-    public void repopulateTrends() {
-        try {
-            getTrends();
-        } catch (TwitException ex) {
-            System.err.println("Error repopulating trends");
-            System.err.println(ex);
-        }
+    public void repopulateTrends() throws TwitException {
+        getTrends();
     }
 
     @Override
     public boolean addTask(Task t) {
         return workAllocator.putTask(t);
+    }
+
+    @Override
+    public boolean addTasks(Collection<Task> t) {
+        boolean b0 = true;
+        if (t == null) {
+            return b0;
+        }
+
+        for (Task task : t) {
+            b0 = b0 && workAllocator.putTask(task);
+        }
+        return b0;
     }
 
     @Override
@@ -231,9 +245,7 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
             config = new Configuration(args[0]);
         } catch (FileNotFoundException ex) {
             System.err.println("Failed to load config file from " + args[0] + " using fallback values");
-            String[] SentimentAnalyserArgs = {""};
-            String[] KnowledgeGraphArgs = {""};
-            config = new Configuration(args, SentimentAnalyserArgs, KnowledgeGraphArgs);
+            config = new Configuration(args);
         }
         GroupProjectCore core = new GroupProjectCore(config);
         core.setDaemon(true);
@@ -242,6 +254,21 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
 
     @Override
     public long timeUntilRepopulate() {
-        return refreshTask.remainingTime();      
+        return refreshTask.remainingTime();
+    }
+
+    @Override
+    public void forceRepopulate() {
+        refreshTask.forceRefresh();
+    }
+
+    @Override
+    public void clearAllTasks() {
+      workAllocator.clearAllTasks();
+    }
+
+    @Override
+    public String listRunningTasks() {
+     return workAllocator.getRunningTasks();
     }
 }

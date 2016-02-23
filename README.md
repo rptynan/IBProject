@@ -79,6 +79,22 @@ Run CoreConsole with 1 argument - the path to a completed config.xml file
 
 A default config.xml file can be found in this directory
 
-These are depreciated entry points, they should not be used
+There are some depreciated entry points, they should not be used:
+
 Run GroupProjectCore with 5 agruements - the 4 Twitter login keys and the username IBProjectQuebec.
 Run CoreConsole with 5 agruements - the 4 Twitter login keys and the username IBProjectQuebec.
+
+##Using the Core Console
+
+The core console is started using the procedure outlined above. The console will
+load and initialise the configuration file and all the other static classes.
+
+The console will allow you to give a number of commands to the server, allowing
+you to experiment with various features and run certain tests. Some of the 
+useful commands are outlined below.
+
+1. Start - this will start the Core
+2. Status - this will tell you the status of the various services running
+3. Exit - this will close down the Core
+4. Add trend: <trend name>, <trend location> - this will add a trend to the queue with the specified location
+5. Repopulate trends - this will add cause the core to trigger the trend repopulation task early

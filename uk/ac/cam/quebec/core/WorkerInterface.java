@@ -5,6 +5,8 @@
  */
 package uk.ac.cam.quebec.core;
 
+import java.util.Collection;
+
 /**
  *
  * @author James
@@ -12,7 +14,7 @@ package uk.ac.cam.quebec.core;
 public interface WorkerInterface {
 
     public boolean addTask(Task t);
-
+    public boolean addTasks(Collection<Task> t);
     public void reallocateWorker(Worker aThis);
     
 }
