@@ -214,7 +214,23 @@ public class CoreConsole extends Thread {
 
     @SuppressWarnings("static-access")
     private void oldProcessCommand(String command) throws WikiException {
-        if (command.equalsIgnoreCase("test word counter")) {
+        if (command.equalsIgnoreCase("test twitter")) {
+            System.out.println("Twitter test start");
+            uk.ac.cam.quebec.twitterwrapper.test.Test.main(config.getDefaultTwitterArgs());
+            System.out.println("Twitter test end");
+        } else if (command.equalsIgnoreCase("test wikiproc")) {
+            System.out.println("Wiki processing test start");
+            uk.ac.cam.quebec.wikiproc.WikiProcessorTest.main(new String[0]);
+            System.out.println("Wiki processing test end");
+        } else if (command.equalsIgnoreCase("test wikiwrap")) {
+            System.out.println("Wiki wrapper test start");
+            uk.ac.cam.quebec.wikiwrapper.test.Test.main(new String[0]);
+            System.out.println("Wiki wrapper test end");
+        } else if (command.equalsIgnoreCase("test database")) {
+            System.out.println("Starting database test");
+            DatabaseTest.test();
+            System.out.println("Database test finish");
+        } else if (command.equalsIgnoreCase("test word counter")) {
             System.out.println("Starting word count test");
             WordCounterTest.test1();
             System.out.println("Word count test finish");
