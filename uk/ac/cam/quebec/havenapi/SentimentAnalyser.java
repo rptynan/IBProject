@@ -27,6 +27,9 @@ public class SentimentAnalyser {
      * @return a SentimentAnalysis object for the text query, if it was successful, or null if not
      */
     public static SentimentAnalysis getAnalysis(String textQuery) throws HavenException {
+        if (textQuery == null || textQuery.isEmpty()) {
+            throw new HavenException("The text passed for analysis is empty");
+        }
         try {
             String urlString = URL_BASE + URLEncoder.encode(textQuery, "UTF-8");
 
