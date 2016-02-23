@@ -19,10 +19,12 @@ import uk.ac.cam.quebec.trends.Trend;
  * @author James
  */
 public class Worker extends Thread implements Comparable{
-    private BlockingQueue<Task> o;//Todo: replace with semaphores
+    private final BlockingQueue<Task> o;//Todo: replace with semaphores
     private final TaskType type;
     private boolean running;
     private final WorkerInterface parent;
+    private Task currentTask = null;
+    
     public Worker (TaskType _type,GroupProjectCore _parent)
     {
         o = new ArrayBlockingQueue<>(1);
@@ -50,8 +52,7 @@ public class Worker extends Thread implements Comparable{
         return false;
     }
         try{
-        o.add(_task);
-        return true;
+        return o.add(_task);
     }
     catch (IllegalStateException ex)
     {   //this means the Queue is full
@@ -74,28 +75,28 @@ public class Worker extends Thread implements Comparable{
         while (running)
         {
         try {
-            Task t = o.take();
-            Collection<Task> process = t.getTaskInterface().process();
-            if(process != null)
+            currentTask = o.take();
+            Collection<Task> process = currentTask.getTaskInterface().process();
+            boolean addTask = parent.addTasks(process);
+            if(!addTask)
             {
-               for(Task t0: process)
-               {
-                   boolean addTask = parent.addTask(t);
-                   if(!addTask)
-                   {
-                       System.err.println("Error adding task from task");
-                   }
-               }
+                System.err.println("Error adding tasks from task: "+currentTask.toString());
             }
         } catch (Exception ex) {
             System.err.println("Error processing task");
             Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
         }
+        currentTask = null;
         parent.reallocateWorker(this);
         }
     }
     @Override
     public int compareTo(Object o) {
        return 0;
+    }
+    @Override
+    public String toString()
+    {
+        return this.getName()+" : "+currentTask.toString();
     }
 }

@@ -85,12 +85,36 @@ public class CoreConsole extends Thread {
             case InvalidCommand:
                 System.out.println("Invalid command");
                 break;
+            case RepopulateTrendCommand:
+                repopulateTrends(c,command);
+                break;
+            case ForceRefreshCommand:
+                System.out.println("Forcing core refresh");
+                coreInter.forceRepopulate();
+                System.out.println("Core refresh complete");
+                break;
+            case ClearWorkCommand:
+                System.out.println("Clearing all tasks");
+                coreInter.clearAllTasks();
+                break;
             default:
                 oldProcessCommand(command);
                 break;
         }
 
     }
+    private void repopulateTrends(CoreConsoleCommand c, String command) {
+        try{
+        System.out.println("Repopulating trends");
+        coreInter.repopulateTrends();
+        System.out.println("Repopulated trends");
+        }
+        catch(TwitException ex)
+        {
+            System.out.println("Error repopulating trends: "+ex);
+        }
+    }
+
     private void checkProjectStyle(CoreConsoleCommand c, String command)
     {   System.out.println("Starting style check");
         //String project root = config.getValue("ProjectRoot");
@@ -100,11 +124,8 @@ public class CoreConsole extends Thread {
     {   Set<String> keySet = CoreConsoleCommand.getLookupMap().keySet();
         System.out.println("Valid console commands are:");
         String s = "";
-        for(String key :keySet)
-        {
-            s+=" "+key+",";
-        }
-        System.out.println();
+        s = keySet.stream().map((key) -> " "+key+",").reduce(s, String::concat);
+        System.out.println(s);
     }
     private void checkStopWord(CoreConsoleCommand c, String command) {
         Matcher m = c.getFullPattern().matcher(command);
@@ -122,18 +143,23 @@ public class CoreConsole extends Thread {
             System.out.println("Failed to parse stop word in: " + command);
         }
     }
-
+    
+    @SuppressWarnings("static-access")
     private void addTrend(CoreConsoleCommand c, String command) {
         Matcher m = c.getFullPattern().matcher(command);
         boolean b = m.matches();
         if (b) {
-            String trendName = m.group("trendName");
+            String trendName = m.group("trendName");           
             String location = config.getDefaultLocation();
+            int priority = 0;
             if (m.group("trendLocation") != null) {
                 location = m.group("trendLocation");
             }
+            if (m.group("trendPriority") != null) {
+                priority = Integer.parseInt(m.group("trendPriority"));
+            }
             System.out.println("Adding trend " + trendName + ", for location " + location);
-            Trend T = new Trend(trendName, location, 0);
+            Trend T = new Trend(trendName, location, priority);
             if (coreTrends.putTrend(T)) {
                 System.out.println("Trend " + trendName + " added successfully");
             } else {
@@ -161,10 +187,11 @@ public class CoreConsole extends Thread {
         running = false;
     }
 
+    @SuppressWarnings("static-access")
     private void oldProcessCommand(String command) throws WikiException {
         if (command.equalsIgnoreCase("test twitter")) {
             System.out.println("Twitter test start");
-            uk.ac.cam.quebec.twitterwrapper.test.Test.main(config.getTwitterArgs());
+            uk.ac.cam.quebec.twitterwrapper.test.Test.main(config.getDefaultTwitterArgs());
             System.out.println("Twitter test end");
         } else if (command.equalsIgnoreCase("test wikiproc")) {
             System.out.println("Wiki processing test start");
@@ -174,10 +201,6 @@ public class CoreConsole extends Thread {
             System.out.println("Wiki wrapper test start");
             uk.ac.cam.quebec.wikiwrapper.test.Test.main(new String[0]);
             System.out.println("Wiki wrapper test end");
-        } else if (command.equalsIgnoreCase("repopulate trends")) {
-            System.out.println("Repopulating trends");
-            coreInter.repopulateTrends();
-            System.out.println("Trends repopulated");
         } else if (command.equalsIgnoreCase("test database")) {
             System.out.println("Starting database test");
             DatabaseTest.test();
@@ -200,8 +223,8 @@ public class CoreConsole extends Thread {
             while ((running) && ((s = r.readLine()).length() > 0)) {
                 try {
                     processCommand(s);
-                } catch (Exception ex) {
-                    System.err.println(ex);
+                } catch (Exception ex) {//I know this is ugly but it is for 
+                    System.err.println(ex);//degugging only
                 }
             }
         } catch (IOException ex) {
@@ -223,9 +246,7 @@ public class CoreConsole extends Thread {
                 config = new Configuration(args[0]);
             } catch (FileNotFoundException ex) {
                 System.err.println("Config file not found, falling back on defaults");
-                String[] SentimentAnalyserArgs = {""};
-                String[] KnowledgeGraphArgs = {""};
-                config = new Configuration(args, SentimentAnalyserArgs, KnowledgeGraphArgs);
+                config = new Configuration(args);
             }
             GroupProjectCore core = new GroupProjectCore(config);
             core.setDaemon(true);
@@ -238,4 +259,5 @@ public class CoreConsole extends Thread {
             System.err.println(ex);
         }
     }
+
 }
