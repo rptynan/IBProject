@@ -39,6 +39,33 @@ public class UtilParsing {
     }
 
     /**
+     * Removes usernames (starting with '@') and hashtags (starting with '#') from a tweet.
+     *
+     * @param text
+     * @return The tweet without usernames and hashtags
+     */
+    public static String removeUsersAndHashTags(String text) {
+	StringBuilder sb = new StringBuilder();
+	boolean removeMode = false;
+	for (int i = 0; i < text.length(); i++) {
+	    if (text.charAt(i) == '@' || text.charAt(i) == '#') {
+		removeMode = true;
+		continue;
+	    }
+
+	    if (removeMode) {
+		removeMode = (Character.isAlphabetic(text.codePointAt(i))
+			   || Character.isDigit(text.codePointAt(i)));
+	    }
+
+	    if (!removeMode) {
+		sb.append(text.charAt(i));
+	    }
+	}
+	return sb.toString().trim().replaceAll(" +", " ");
+    }
+
+    /**
      * <p> Parse the name of the trend.
      *
      * <p> This includes removal of special symbols such as '@' and '#' and trying to put spaces

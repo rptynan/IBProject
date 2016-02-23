@@ -76,6 +76,7 @@ public class TwitterProcessor {
 
             calculatePopularity(trend, tweets);
             calculateTimestamp(trend, tweets);
+            calculateControversy(trend, tweets);
             extractConcepts(trend, tweets);
             return true;
         } catch (TwitException e) {
@@ -140,22 +141,33 @@ public class TwitterProcessor {
      * @param trend
      * @param tweets
      */
-    private static void calculateControversy(Trend trend, List<List<String>> tweets) {
+    private static void calculateControversy(Trend trend, List<Status> tweets) {
+	List<String> uniqueTweets = removeDuplicates(tweets);
+	for (int i = 0; i < uniqueTweets.size(); i++) {
+	    uniqueTweets.set(i, UtilParsing.removeLinks(uniqueTweets.get(i)));
+	}
+
 	double mx = -1e6;
 	double mn =  1e6;
 	boolean set = false;
-	for (List<String> tweet : tweets) {
-	    String text = String.join(" ", tweet);
-	    try {
-		SentimentAnalysis sa = SentimentAnalyser.getAnalysis(text);
-		mx = Double.max(mx, sa.getAggregate().getScore());
-		mn = Double.min(mn, sa.getAggregate().getScore());
-		set = true;
-	    } catch (HavenException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
+	for (String tweet : uniqueTweets) {
+	    String text = UtilParsing.removeUsersAndHashTags(tweet);
+	    if (text != null && !text.isEmpty()) {
+		SentimentAnalysis sa;
+		try {
+		    sa = SentimentAnalyser.getAnalysis(text);
+		    if (sa != null) {
+			mx = Double.max(mx, sa.getAggregate().getScore());
+			mn = Double.min(mn, sa.getAggregate().getScore());
+			set = true;
+		    }
+		} catch (HavenException e) {
+		    // TODO Auto-generated catch block
+		    e.printStackTrace();
+		}
 	    }
 	}
+
 	if (set) {
 	    trend.setControversy(mx - mn);
 	}
@@ -182,7 +194,6 @@ public class TwitterProcessor {
 
         List<List<String>> tweetsSplitted = filter(removeDuplicates(tweetsBatch));
         tweetsSplitted = hashTagConcepts(trend, tweetsSplitted);
-        calculateControversy(trend, tweetsSplitted);
         wordConcepts(trend, tweetsSplitted);
     }
 

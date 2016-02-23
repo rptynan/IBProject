@@ -32,4 +32,15 @@ public class UtilParsingTest {
 		"Link in the end");
     }
 
+    @Test
+    public void removeUsersAndHashTagsTest() {
+	assertEquals(UtilParsing.removeUsersAndHashTags("This Is @a test #case end."),
+		"This Is test end.");
+	assertEquals(UtilParsing.removeUsersAndHashTags("#empty"), "");
+	assertEquals(UtilParsing.removeUsersAndHashTags("#This Is @a test #case end."),
+		"Is test end.");
+	assertEquals(UtilParsing.removeUsersAndHashTags("Hash tag in the #end124"),
+		"Hash tag in the");
+    }
+
 }
