@@ -14,42 +14,40 @@ import uk.ac.cam.quebec.twitterproc.TwitterProcessor;
  *
  * @author James
  */
-public class TrendTask implements TaskInterface{
+public class TrendTask extends GenericTask {
+
     private final Trend trend;
-    public TrendTask(Trend _trend)
-    {
+
+    public TrendTask(Trend _trend) {
         trend = _trend;
     }
 
-
     @Override
-    public int priority() {
-      return trend.getPriority();
-    }
-
-    @Override
-    public int compareTo(TaskInterface o) {
-        return this.priority()-o.priority();
+    public int getPriority() {
+        return trend.getPriority();
     }
 
     @Override
     public Collection<Task> process() {
-       TwitterProcessor.process(trend);
-       return null;
-       /*ArrayList<Task> ret = null;
-       if(TwitterProcessor.doProcess(trend))
-       {
-       ret = new ArrayList<>();
-       WikiTask t = new WikiTask(trend);
-       Task tsk = new Task(t,TaskType.Wiki);
-       ret.add(tsk);
-       TweetTask tweet = new TweetTask(trend);
-       tsk = new Task(tweet,TaskType.Tweet);
-       ret.add(tsk);
-       }
-       return ret;
-       
-       */
+        if (!true) {
+            TwitterProcessor.process(trend);
+            return null;
+        }
+        ArrayList<Task> ret = null;
+        if (TwitterProcessor.doProcess(trend)) {
+            ret = new ArrayList<>();
+            WikiTask t = new WikiTask(trend);
+            Task tsk = new Task(t, TaskType.Wiki);
+            ret.add(tsk);
+            TweetTask tweet = new TweetTask(trend);
+            tsk = new Task(tweet, TaskType.Tweet);
+            ret.add(tsk);
+        }
+        return ret;
     }
-    
+
+    @Override
+    public String getStatus() {
+        return "Trend processing task for trend: " + trend.getParsedName();
+    }
 }
