@@ -27,12 +27,11 @@ public class Trend implements Serializable, Comparable<Trend> {
     private int processCount;
 
     private String parsedName;
-    private int popularity;
+    private double popularity;
+    private Date timestamp;
+    private double recency;
     private List<Pair<String, Integer>> concepts;
     private List<Pair<String, Integer>> relatedHashTags;
-
-    // TODO: calculate the timestamp of the trend properly
-    private Date timestamp = new Date(System.currentTimeMillis());
 
     public String getName() { return name; }
     public String getLocation() { return location; }
@@ -41,17 +40,11 @@ public class Trend implements Serializable, Comparable<Trend> {
     public int getProcessCount() { return processCount; }
 
     public String getParsedName() { return parsedName; }
-    public int getPopularity() { return popularity; }
+    public double getPopularity() { return popularity; }
+    public Date getTimestamp() { return timestamp; }
+    public double getRecency() { return recency; }
     public List<Pair<String, Integer>> getConcepts() { return concepts; }
     public List<Pair<String, Integer>> getRelatedHashTags() { return relatedHashTags; }
-
-    public Date getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(Date timestamp) {
-        this.timestamp = timestamp;
-    }
 
     /**
      * Create a Trend object.
@@ -74,6 +67,8 @@ public class Trend implements Serializable, Comparable<Trend> {
         processCount = 0;
         parsedName = null;
         popularity = 0;
+        timestamp = new Date(System.currentTimeMillis());
+        recency = (double) timestamp.getTime();
         concepts = new LinkedList<>();
         relatedHashTags = new LinkedList<>();
     }
@@ -83,7 +78,12 @@ public class Trend implements Serializable, Comparable<Trend> {
     }
 
     public void setPopularity(int popularity) {
-        this.popularity = popularity;
+        this.popularity = (double) popularity;
+    }
+
+    public void setTimestamp(Date timestamp) {
+        this.timestamp = timestamp;
+        this.recency = (double) timestamp.getTime();
     }
 
     public void addConcept(Pair<String, Integer> concept) {

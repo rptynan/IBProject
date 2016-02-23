@@ -16,6 +16,7 @@ public class UtilParsingTest {
 	assertEquals(UtilParsing.parseTrendName("Federer"), "Federer");
 	assertEquals(UtilParsing.parseTrendName("#BaeIn3Words"), "Bae In 3 Words");
 	assertEquals(UtilParsing.parseTrendName("@JPMorgan"), "JP Morgan");
+	assertEquals(UtilParsing.parseTrendName("#NFU16"), "NFU 16");
     }
 
     @Test
