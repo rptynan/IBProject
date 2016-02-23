@@ -141,7 +141,8 @@ public class TwitterProcessor {
      * @param trend
      * @param tweets
      */
-    private static void calculateControversy(Trend trend, List<Status> tweets) {
+    @VisibleForTesting
+    static void calculateControversy(Trend trend, List<Status> tweets) {
 	List<String> uniqueTweets = removeDuplicates(tweets);
 	for (int i = 0; i < uniqueTweets.size(); i++) {
 	    uniqueTweets.set(i, UtilParsing.removeLinks(uniqueTweets.get(i)));
@@ -152,11 +153,18 @@ public class TwitterProcessor {
 	boolean set = false;
 	for (String tweet : uniqueTweets) {
 	    String text = UtilParsing.removeUsersAndHashTags(tweet);
+	    if (DEBUG) {
+		System.out.println(text);
+	    }
 	    if (text != null && !text.isEmpty()) {
 		SentimentAnalysis sa;
 		try {
 		    sa = SentimentAnalyser.getAnalysis(text);
 		    if (sa != null) {
+			if (DEBUG) {
+			    System.out.println(sa.getAggregate().getScore());
+			}
+
 			mx = Double.max(mx, sa.getAggregate().getScore());
 			mn = Double.min(mn, sa.getAggregate().getScore());
 			set = true;
