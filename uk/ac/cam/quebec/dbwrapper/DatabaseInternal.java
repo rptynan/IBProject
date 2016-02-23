@@ -117,6 +117,9 @@ class DatabaseInternal extends Database {
                     + "title VARCHAR(300) NOT NULL,"
                     + "updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,"
                     + "relevance DOUBLE NOT NULL,"
+                    + "popularity DOUBLE NOT NULL,"
+                    + "controversy DOUBLE NOT NULL,"
+                    + "recency DOUBLE NOT NULL,"
                     + "object MEDIUMBLOB NOT NULL,"
                     + "wikiarticle_id INT UNSIGNED NOT NULL PRIMARY KEY)");
             // trends_wikiarticles_junction
@@ -281,6 +284,18 @@ class DatabaseInternal extends Database {
         return result;
     }
 
+    /*
+     * WikiArticle put method
+    */
+    private static final String WIKI_ARTICLE_INSERT = "INSERT INTO wikiarticles "
+        + "(title, relevance, popularity, controversy, recency, object, wikiarticle_id) "
+        + "  VALUES (?, ?, ?, ?, ?, ?, ?) "
+        + "ON DUPLICATE KEY UPDATE "
+        + "  title = VALUES(title), relevance = VALUES(relevance), "
+        + "  popularity = VALUES(popularity), controversy = VALUES(controversy), "
+        + "  recency = VALUES(recency), object = VALUES(object), "
+        + "  wikiarticle_id = VALUES(wikiarticle_id)";
+
     public void putWikiArticles(List<WikiArticle> articles, Trend trend) throws DatabaseException {
         // In case this trend hasn't been put in the db before
         if (trend.getId() == 0) {
@@ -295,18 +310,17 @@ class DatabaseInternal extends Database {
                 connection.setAutoCommit(false);
 
                 // Insert articles
-                stmt = connection.prepareStatement("INSERT INTO wikiarticles "
-                        + "(title, relevance, object, wikiarticle_id) VALUES (?, ?, ?, ?) "
-                        + "ON DUPLICATE KEY UPDATE "
-                        + "title = VALUES(title), relevance = VALUES(relevance), "
-                        + "object = VALUES(object), wikiarticle_id = VALUES(wikiarticle_id)");
+                stmt = connection.prepareStatement(WIKI_ARTICLE_INSERT);
 
                 int num = 0;
                 for (WikiArticle wk : articles) {
                     stmt.setString(1, wk.getTitle());
                     stmt.setDouble(2, wk.getRelevance());
-                    stmt.setObject(3, wk);
-                    stmt.setInt(4, wk.getId());
+                    stmt.setDouble(3, wk.getPopularity());
+                    stmt.setDouble(4, wk.getControversy());
+                    stmt.setDouble(5, wk.getRecency());
+                    stmt.setObject(6, wk);
+                    stmt.setInt(7, wk.getId());
                     stmt.addBatch();
                     num++;
                     // Some DB drivers don't like big batches
@@ -350,14 +364,20 @@ class DatabaseInternal extends Database {
     }
 
     /*
-     * WikiArticles
+     * WikiArticle get methods
     */
-    private static final String WIKI_ARTICLE_QUERY = "SELECT object "
+    private static final String WIKI_ARTICLE_SELECT = "SELECT object "
         + "FROM wikiarticles INNER JOIN trends_wikiarticles_junction "
         + "ON wikiarticles.wikiarticle_id = trends_wikiarticles_junction.wikiarticle_id "
         + "WHERE trend_id = ";
     private static final String WIKI_ARTICLE_SORT_RELEVANCE =
         " ORDER BY wikiarticles.relevance DESC";
+    private static final String WIKI_ARTICLE_SORT_POPULARITY =
+        " ORDER BY wikiarticles.popularity DESC";
+    private static final String WIKI_ARTICLE_SORT_CONTROVERSY =
+        " ORDER BY wikiarticles.controversy DESC";
+    private static final String WIKI_ARTICLE_SORT_RECENCY =
+        " ORDER BY wikiarticles.recency DESC";
 
     //Private method
     private List<WikiArticle> getWikiArticlesByQuery(String query) throws DatabaseException {
@@ -391,7 +411,7 @@ class DatabaseInternal extends Database {
 
     // Public-facing methods
     public List<WikiArticle> getWikiArticles(int trend_id) throws DatabaseException {
-        return getWikiArticlesByQuery(WIKI_ARTICLE_QUERY + trend_id
+        return getWikiArticlesByQuery(WIKI_ARTICLE_SELECT + trend_id
                 + WIKI_ARTICLE_SORT_RELEVANCE);
     }
 
@@ -399,5 +419,30 @@ class DatabaseInternal extends Database {
         return getWikiArticles(trend.getId());
     }
 
+    public List<WikiArticle> getWikiArticlesByPopularity(int trend_id) throws DatabaseException {
+        return getWikiArticlesByQuery(WIKI_ARTICLE_SELECT + trend_id
+                + WIKI_ARTICLE_SORT_POPULARITY);
+    }
 
+    public List<WikiArticle> getWikiArticlesByPopularity(Trend trend) throws DatabaseException {
+        return getWikiArticlesByPopularity(trend.getId());
+    }
+
+    public List<WikiArticle> getWikiArticlesByControversy(int trend_id) throws DatabaseException {
+        return getWikiArticlesByQuery(WIKI_ARTICLE_SELECT + trend_id
+                + WIKI_ARTICLE_SORT_CONTROVERSY);
+    }
+
+    public List<WikiArticle> getWikiArticlesByControversy(Trend trend) throws DatabaseException {
+        return getWikiArticlesByControversy(trend.getId());
+    }
+
+    public List<WikiArticle> getWikiArticlesByRecency(int trend_id) throws DatabaseException {
+        return getWikiArticlesByQuery(WIKI_ARTICLE_SELECT + trend_id
+                + WIKI_ARTICLE_SORT_RECENCY);
+    }
+
+    public List<WikiArticle> getWikiArticlesByRecency(Trend trend) throws DatabaseException {
+        return getWikiArticlesByRecency(trend.getId());
+    }
 }

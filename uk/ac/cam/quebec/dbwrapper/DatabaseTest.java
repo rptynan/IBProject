@@ -105,15 +105,28 @@ public class DatabaseTest {
         ArrayList<WikiArticle> wikis2 = new ArrayList<WikiArticle>(2);
         List<WikiArticle> wikiList1 = null;
         List<WikiArticle> wikiList2 = null;
+        List<WikiArticle> wikiList3 = null;
         try {
             wikis1.add(0, new WikiArticle("Standard ML"));
-            wikis1.get(0).setRelevance(new Double(10));
+            wikis1.get(0).setRelevance(new Double(3));
+            wikis1.get(0).setPopularity(new Double(3));
+            wikis1.get(0).setControversy(new Double(3));
+            wikis1.get(0).setRecency(new Double(3));
             wikis1.add(1, new WikiArticle("Lawrence Paulson"));
-            wikis1.get(1).setRelevance(new Double(8));
+            wikis1.get(1).setRelevance(new Double(4));
+            wikis1.get(1).setPopularity(new Double(4));
+            wikis1.get(1).setControversy(new Double(4));
+            wikis1.get(1).setRecency(new Double(4));
             wikis2.add(0, new WikiArticle("Conway's Game of Life"));
-            wikis2.get(0).setRelevance(new Double(43));
+            wikis2.get(0).setRelevance(new Double(1));
+            wikis2.get(0).setPopularity(new Double(1));
+            wikis2.get(0).setControversy(new Double(1));
+            wikis2.get(0).setRecency(new Double(1));
             wikis2.add(1, new WikiArticle("John Horton Conway"));
-            wikis2.get(1).setRelevance(new Double(1));
+            wikis2.get(1).setRelevance(new Double(2));
+            wikis2.get(1).setPopularity(new Double(2));
+            wikis2.get(1).setControversy(new Double(2));
+            wikis2.get(1).setRecency(new Double(2));
         } catch (WikiException exp) {
             exp.printStackTrace();
         }
@@ -128,14 +141,37 @@ public class DatabaseTest {
         }
         System.out.println("Articles for Trend " + t1.getId());
         for (WikiArticle wk : wikiList1) {
-            System.out.println(wk.getTitle() + " " + wk.getId() + " " + wk.getRelevance());
+            System.out.println(wk.getTitle() + " " + wk.getId());
         }
         System.out.println("Articles for Trend " + t2.getId());
         for (WikiArticle wk : wikiList2) {
-            System.out.println(wk.getTitle() + " " + wk.getId() + " " + wk.getRelevance());
+            System.out.println(wk.getTitle() + " " + wk.getId());
         }
         System.out.println("Trend " + t1.getId() + " should have ML articles");
         System.out.println("Trend " + t2.getId() + " should have ML and GOL articles");
-        System.out.println("Trends should be in descending order of relevance");
+        System.out.println("Trends should be in descending order of relevance (number):");
+        for (WikiArticle wk : wikiList2) {
+            System.out.println(wk.getTitle() + " " + wk.getRelevance());
+        }
+        // Sorting tests
+        try {
+            wikiList1 = db2.getWikiArticlesByPopularity(t2);
+            wikiList2 = db2.getWikiArticlesByControversy(t2);
+            wikiList3 = db2.getWikiArticlesByRecency(t2);
+        } catch (DatabaseException exp) {
+            exp.printStackTrace();
+        }
+        System.out.println("Trends should be in descending order of popularity (number):");
+        for (WikiArticle wk : wikiList1) {
+            System.out.println(wk.getTitle() + " " + wk.getPopularity());
+        }
+        System.out.println("Trends should be in descending order of controversy (number):");
+        for (WikiArticle wk : wikiList2) {
+            System.out.println(wk.getTitle() + " " + wk.getControversy());
+        }
+        System.out.println("Trends should be in descending order of recency (number):");
+        for (WikiArticle wk : wikiList3) {
+            System.out.println(wk.getTitle() + " " + wk.getRecency());
+        }
     }
 }

@@ -128,7 +128,7 @@ public abstract class Database {
 
     /**
      * Gets a list of wikipedia articles associated with the Trend specified by
-     * the Trend object.
+     * the Trend object, ordered by descending relevance.
      *
      * @param trend     the trend the articles are stored under
      *
@@ -138,7 +138,7 @@ public abstract class Database {
 
     /**
      * Gets a list of wikipedia articles associated with the Trend specified by
-     * the trend_id.
+     * the trend_id, ordered by descending relevance.
      *
      * @param trend_id  the trend_id that the articles are stored under
      *
@@ -146,4 +146,69 @@ public abstract class Database {
      */
     public abstract List<WikiArticle> getWikiArticles(int trend_id) throws DatabaseException;
 
+    /**
+     * Gets a list of wikipedia articles associated with the Trend specified by
+     * the Trend object, ordered by descending popularity.
+     *
+     * @param trend     the trend the articles are stored under
+     *
+     * @return a list of the WikiArticles
+     */
+    public abstract List<WikiArticle> getWikiArticlesByPopularity(Trend trend)
+        throws DatabaseException;
+
+    /**
+     * Gets a list of wikipedia articles associated with the Trend specified by
+     * the trend_id, ordered by descending popularity.
+     *
+     * @param trend_id  the trend_id that the articles are stored under
+     *
+     * @return a list of the WikiArticles
+     */
+    public abstract List<WikiArticle> getWikiArticlesByPopularity(int trend_id)
+        throws DatabaseException;
+
+    /**
+     * Gets a list of wikipedia articles associated with the Trend specified by
+     * the Trend object, ordered by descending controversy.
+     *
+     * @param trend     the trend the articles are stored under
+     *
+     * @return a list of the WikiArticles
+     */
+    public abstract List<WikiArticle> getWikiArticlesByControversy(Trend trend)
+        throws DatabaseException;
+
+    /**
+     * Gets a list of wikipedia articles associated with the Trend specified by
+     * the trend_id, ordered by descending controversy.
+     *
+     * @param trend_id  the trend_id that the articles are stored under
+     *
+     * @return a list of the WikiArticles
+     */
+    public abstract List<WikiArticle> getWikiArticlesByControversy(int trend_id)
+        throws DatabaseException;
+
+    /**
+     * Gets a list of wikipedia articles associated with the Trend specified by
+     * the Trend object, ordered by descending recency.
+     *
+     * @param trend     the trend the articles are stored under
+     *
+     * @return a list of the WikiArticles
+     */
+    public abstract List<WikiArticle> getWikiArticlesByRecency(Trend trend)
+        throws DatabaseException;
+
+    /**
+     * Gets a list of wikipedia articles associated with the Trend specified by
+     * the trend_id, ordered by descending recency.
+     *
+     * @param trend_id  the trend_id that the articles are stored under
+     *
+     * @return a list of the WikiArticles
+     */
+    public abstract List<WikiArticle> getWikiArticlesByRecency(int trend_id)
+        throws DatabaseException;
 }
