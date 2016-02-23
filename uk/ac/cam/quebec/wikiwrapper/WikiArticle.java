@@ -118,7 +118,7 @@ public class WikiArticle implements Serializable {
             // For testing System.out.println("Article: " + this.title);
 
         } catch (IOException e) {
-            throw new WikiException("Connection to Wikipedia failed.");
+            throw new WikiException("Connection to Wikipedia failed.",e);
         }
 
     }
@@ -147,10 +147,10 @@ public class WikiArticle implements Serializable {
                
 
             } catch (IOException e) {
-                throw new WikiException("Connection to view api failed.");
+                throw new WikiException("Connection to view api failed.",e);
             }
             catch (JSONException e){
-                throw new WikiException("Invalid Article.");
+                throw new WikiException("Invalid Article.",e);
             }
         }
     }
@@ -213,7 +213,7 @@ public class WikiArticle implements Serializable {
                 return edits;
 
             } catch (IOException e) {
-                throw new WikiException("Connection to Wikipedia failed.");
+                throw new WikiException("Connection to Wikipedia failed.",e);
             }
             
         }

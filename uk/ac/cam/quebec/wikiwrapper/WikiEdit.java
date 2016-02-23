@@ -82,7 +82,7 @@ public class WikiEdit implements Serializable {
                 diff = diff.replace("href=\"/",
                         "href=\"https://en.wikipedia.org/wiki/");
             } catch (IOException e) {
-                throw new WikiException("Connection to Wikipedia failed.");
+                throw new WikiException("Connection to Wikipedia failed.",e);
             }
         }
         return diff;
@@ -114,7 +114,7 @@ public class WikiEdit implements Serializable {
                 content = content.replace("href=\"/",
                         "href=\"https://en.wikipedia.org/wiki/");
             } catch (IOException e) {
-                throw new WikiException("Connection to Wikipedia failed.");
+                throw new WikiException("Connection to Wikipedia failed.",e);
             }
         }
         return content;

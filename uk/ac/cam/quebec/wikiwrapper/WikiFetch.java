@@ -100,7 +100,7 @@ public class WikiFetch {
             }
             return ret;
         } catch (IOException e) {
-            throw new WikiException("Connection to Wikipedia failed.");
+            throw new WikiException("Connection to Wikipedia failed.",e);
         }
 
     }
