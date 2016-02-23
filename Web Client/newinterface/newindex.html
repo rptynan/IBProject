@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>TwikFeed</title>
+
+    <!-- Bootstrap CSS from CDN -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css" integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r" crossorigin="anonymous">
+
+    <!-- Our custom CSS -->
+    <link rel="stylesheet" href="main.css">
+  </head>
+
+  <body>
+
+     <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container-fluid">
+        <!-- Left title -->
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#">TwikFeed</a>
+        </div>
+        <div id="navbar">
+          <!-- Centre options -->
+          <ul class="nav navbar-nav">
+            <li><a href="#">Wikipedia Article</a></li>
+            <li><a href="#">Wikipedia Edits</a></li>
+            <li><a href="#">Related Tweets</a></li>
+          </ul>
+          <!-- Right search bar -->
+          <form class="navbar-form navbar-right">
+            <input type="text" class="form-control" placeholder="Search for custom trend...">
+          </form>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container-fluid">
+      <div class="row">
+
+        <!-- Left Nav -->
+        <div class="col-xs-2 sidebar">
+          <!-- Location dropdown -->
+          Trend location
+          <div class="nav nav-sidebar">
+            <div class="dropdown">
+              <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+                Insert default
+                <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+                <li><a href="#">World</a></li>
+                <li><a href="#">UK</a></li>
+                <li><a href="#">USA</a></li>
+                <li><a href="#">Ireland</a></li>
+              </ul>
+            </div>
+          </div>
+          <!-- Sort by buttons -->
+          Sort by
+          <div class="nav nav-sidebar">
+            <div class="btn-group btn-group-sm" role="group" aria-label="...">
+              <button type="button" class="btn btn-default">Recency</button>
+              <button type="button" class="btn btn-default">Popularity</button>
+              <button type="button" class="btn btn-default">Controversy</button>
+            </div>
+          </div>
+          <!-- Trends list -->
+          <ul id = "trendList" class="nav nav-sidebar">
+		  <!--
+            <li class="active"><a href="#">Trend1<span class="sr-only">(current)</span></a></li>
+            <li><a href="">Trend2</a></li>
+            <li><a href="">Trend3</a></li>
+            <li><a href="">Trend4</a></li>
+			-->
+          </ul>
+        </div>
+
+        <!-- Middle iframe -->
+        <div class="col-xs-8 col-xs-offset-2 main">
+          <iframe id="wikiFrame" src="https://en.wikipedia.org/wiki/Computer_Laboratory,_University_of_Cambridge"></iframe>
+        </div>
+		<div class="wrapper" align="center" id ="editsDiv">
+			<h4>No article selected to supply edits for.</h4>
+		</div>
+		<div class="wrapper" align="center" id ="tweetsDiv">
+			<h4 id = "tweetsHeader">No trend selected to supply tweets for.</h4
+		<ul id="tweetsList">
+		</ul>
+		</div>
+
+        <!-- Right Nav -->
+        <div class="col-xs-2 col-xs-offset-10 sidebar">
+          <h3 id = "trendHeading">No Trend Selected</h3>
+          <h4>Related Wikipedia Articles</h4>
+          <!-- Sort by buttons -->
+          Sort by
+          <div class="nav nav-sidebar">
+            <div class="btn-group btn-group-sm" role="group" aria-label="...">
+              <button type="button" class="btn btn-default">Recency</button>
+              <button type="button" class="btn btn-default">Popularity</button>
+              <button type="button" class="btn btn-default">Controversy</button>
+            </div>
+          </div>
+          <!-- Relate wiki page list -->
+          <ul class="nav nav-sidebar">
+            <li class="active"><a href="#">Page1<span class="sr-only">(current)</span></a></li>
+            <li><a href="">Page2</a></li>
+            <li><a href="">Page3</a></li>
+            <li><a href="">Page4</a></li>
+          </ul>
+        </div>
+
+      </div>
+    </div>
+
+
+    <!-- JS placed at end to load page faster -->
+	
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <!-- Bootstrap JS -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+	<script type = "text/javascript" src = "newproject.js" ></script>
+  </body>
+</html>
