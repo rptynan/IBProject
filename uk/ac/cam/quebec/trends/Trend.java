@@ -30,6 +30,7 @@ public class Trend implements Serializable, Comparable<Trend> {
     private double popularity;
     private Date timestamp;
     private double recency;
+    private double controversy;
     private List<Pair<String, Integer>> concepts;
     private List<Pair<String, Integer>> relatedHashTags;
 
@@ -43,6 +44,7 @@ public class Trend implements Serializable, Comparable<Trend> {
     public double getPopularity() { return popularity; }
     public Date getTimestamp() { return timestamp; }
     public double getRecency() { return recency; }
+    public double getControversy() { return controversy; }
     public List<Pair<String, Integer>> getConcepts() { return concepts; }
     public List<Pair<String, Integer>> getRelatedHashTags() { return relatedHashTags; }
 
@@ -66,9 +68,10 @@ public class Trend implements Serializable, Comparable<Trend> {
         this.priority = priority;
         processCount = 0;
         parsedName = null;
-        popularity = 0;
+        popularity = 0.0;
         timestamp = new Date(System.currentTimeMillis());
         recency = (double) timestamp.getTime();
+        controversy = 0.0;
         concepts = new LinkedList<>();
         relatedHashTags = new LinkedList<>();
     }
@@ -84,6 +87,10 @@ public class Trend implements Serializable, Comparable<Trend> {
     public void setTimestamp(Date timestamp) {
         this.timestamp = timestamp;
         this.recency = (double) timestamp.getTime();
+    }
+
+    public void setControversy(double controversy) {
+	this.controversy = controversy;
     }
 
     public void addConcept(Pair<String, Integer> concept) {
