@@ -349,11 +349,18 @@ class DatabaseInternal extends Database {
         return;
     }
 
-    public List<WikiArticle> getWikiArticles(Trend trend) throws DatabaseException {
-        return getWikiArticles(trend.getId());
-    }
+    /*
+     * WikiArticles
+    */
+    private static final String WIKI_ARTICLE_QUERY = "SELECT object "
+        + "FROM wikiarticles INNER JOIN trends_wikiarticles_junction "
+        + "ON wikiarticles.wikiarticle_id = trends_wikiarticles_junction.wikiarticle_id "
+        + "WHERE trend_id = ";
+    private static final String WIKI_ARTICLE_SORT_RELEVANCE =
+        " ORDER BY wikiarticles.relevance DESC";
 
-    public List<WikiArticle> getWikiArticles(int trend_id) throws DatabaseException {
+    //Private method
+    private List<WikiArticle> getWikiArticlesByQuery(String query) throws DatabaseException {
         ArrayList<WikiArticle> result = new ArrayList<WikiArticle>();
         Statement stmt = null;
         ResultSet rs = null;
@@ -361,13 +368,9 @@ class DatabaseInternal extends Database {
         try {
             // Creates forward & read only ResultSet by default
             stmt = connection.createStatement();
+
             synchronized (conMutex) {
-                rs = stmt.executeQuery("SELECT object "
-                        + "FROM wikiarticles INNER JOIN trends_wikiarticles_junction "
-                        + "ON wikiarticles.wikiarticle_id = "
-                        + "trends_wikiarticles_junction.wikiarticle_id "
-                        + "WHERE trend_id = " + trend_id
-                        + " ORDER BY wikiarticles.relevance DESC");
+                rs = stmt.executeQuery(query);
             }
 
             while (rs.next()) {
@@ -382,7 +385,19 @@ class DatabaseInternal extends Database {
             try { if (rs != null) rs.close(); } catch (Exception e) {};
             try { if (stmt != null) stmt.close(); } catch (Exception e) {};
         }
+
         return result;
     }
+
+    // Public-facing methods
+    public List<WikiArticle> getWikiArticles(int trend_id) throws DatabaseException {
+        return getWikiArticlesByQuery(WIKI_ARTICLE_QUERY + trend_id
+                + WIKI_ARTICLE_SORT_RELEVANCE);
+    }
+
+    public List<WikiArticle> getWikiArticles(Trend trend) throws DatabaseException {
+        return getWikiArticles(trend.getId());
+    }
+
 
 }
