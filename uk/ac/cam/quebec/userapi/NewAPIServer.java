@@ -9,6 +9,7 @@ import com.sun.net.httpserver.HttpServer;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.util.LinkedList;
 import java.util.List;
 
 import uk.ac.cam.quebec.dbwrapper.Database;
@@ -49,9 +50,26 @@ public class NewAPIServer extends APIServerAbstract {
         return null;
     }
 
-    public String getArticlesAsString(int id, String sorting, int max) {
+    public String getArticlesAsString(int id, int sorting, int max) {
         try {
-            List<WikiArticle> articleList = DB.getWikiArticles(id);
+            List<WikiArticle> articleList;
+            switch(sorting){
+            case 1:
+                articleList = DB.getWikiArticles(id);
+                break;
+            case 2:
+                articleList = DB.getWikiArticlesByRecency(id);
+                break;   
+            case 3:
+                articleList = DB.getWikiArticlesByPopularity(id);
+                break;   
+            case 4:
+                articleList = DB.getWikiArticlesByControversy(id);
+                break;
+            default:
+                articleList = new LinkedList<WikiArticle>();
+            }
+        
             // flag
             boolean itemAdded = false;
             String result = "[";

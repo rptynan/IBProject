@@ -4,14 +4,12 @@ import uk.ac.cam.quebec.trends.Trend;
 import uk.ac.cam.quebec.wikiwrapper.WikiArticle;
 
 import winterwell.jtwitter.Status;
-import winterwell.jtwitter.User;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
-import java.lang.String;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -19,7 +17,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -77,6 +74,10 @@ class DatabaseInternal extends Database {
 
         try {
             connection = DriverManager.getConnection(dbserver, username, password);
+            connection.setClientInfo("useUnicode", "true");
+            connection.setClientInfo("characterEncoding", "utf8mb4");
+            connection.setClientInfo("connectionCollation", "utf8mb4_general_ci");
+            connection.setClientInfo("characterSetResults", "utf8mb4");
             // Might be able to lower this later
             connection.setTransactionIsolation(Connection.TRANSACTION_SERIALIZABLE);
             connection.setAutoCommit(true);
@@ -89,44 +90,46 @@ class DatabaseInternal extends Database {
 
         // Create database tables if they don't exist
         Statement stmt = null;
+        String s;
         try {
             stmt = connection.createStatement();
             // Drop the tables on startup, clears any data in db!
             if (dropTables) {
-                stmt.execute("DROP tables IF EXISTS trends, wikiarticles, tweets, "
+                stmt.execute(s = "DROP tables IF EXISTS trends, wikiarticles, tweets, "
                         + "trends_wikiarticles_junction");
             }
-
+            
             // trends
-            stmt.execute("CREATE TABLE IF NOT EXISTS trends ("
-                    + "name VARCHAR(60) NOT NULL,"
-                    + "location VARCHAR(60),"
+            stmt.execute(s = "CREATE TABLE IF NOT EXISTS trends ("
+                    + "name VARCHAR(60) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_general_ci' NOT NULL,"
+                    + "location VARCHAR(60) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_general_ci',"
                     + "updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,"
                     + "object MEDIUMBLOB NOT NULL,"
-                    + "trend_id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY)");
+                    + "trend_id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY) CHARACTER SET 'utf8mb4'");
+            
             // tweets
-            stmt.execute("CREATE TABLE IF NOT EXISTS tweets ("
-                    + "content VARCHAR(200) NOT NULL,"
-                    + "location VARCHAR(60),"
+            stmt.execute(s = "CREATE TABLE IF NOT EXISTS tweets ("
+                    + "content VARCHAR(200) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_general_ci' NOT NULL,"
+                    + "location VARCHAR(60) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_general_ci',"
                     + "updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,"
                     + "object MEDIUMBLOB NOT NULL,"
                     + "trend_id INT UNSIGNED NOT NULL,"
-                    + "tweet_id BIGINT UNSIGNED NOT NULL PRIMARY KEY)");
+                    + "tweet_id BIGINT UNSIGNED NOT NULL PRIMARY KEY)CHARACTER SET 'utf8mb4'");
             // wikiarticles
-            stmt.execute("CREATE TABLE IF NOT EXISTS wikiarticles ("
-                    + "title VARCHAR(300) NOT NULL,"
+            stmt.execute(s = "CREATE TABLE IF NOT EXISTS wikiarticles ("
+                    + "title VARCHAR(300) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_general_ci' NOT NULL,"
                     + "updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,"
                     + "relevance DOUBLE NOT NULL,"
                     + "popularity DOUBLE NOT NULL,"
                     + "controversy DOUBLE NOT NULL,"
                     + "recency DOUBLE NOT NULL,"
                     + "object MEDIUMBLOB NOT NULL,"
-                    + "wikiarticle_id INT UNSIGNED NOT NULL PRIMARY KEY)");
+                    + "wikiarticle_id INT UNSIGNED NOT NULL PRIMARY KEY) CHARACTER SET 'utf8mb4'");
             // trends_wikiarticles_junction
-            stmt.execute("CREATE TABLE IF NOT EXISTS trends_wikiarticles_junction ("
+            stmt.execute(s = "CREATE TABLE IF NOT EXISTS trends_wikiarticles_junction ("
                     + "trend_id INT UNSIGNED NOT NULL,"
                     + "wikiarticle_id INT UNSIGNED NOT NULL,"
-                    + "PRIMARY KEY(trend_id, wikiarticle_id))");
+                    + "PRIMARY KEY(trend_id, wikiarticle_id)) CHARACTER SET 'utf8mb4'");
         } catch (SQLException exp) {
             exp.printStackTrace();
         } finally {
@@ -138,6 +141,7 @@ class DatabaseInternal extends Database {
         return INSTANCE;
     }
 
+    @Override
     public void putTrend(Trend trend) throws DatabaseException {
         PreparedStatement stmt = null;
 
@@ -174,13 +178,15 @@ class DatabaseInternal extends Database {
         return;
     }
 
+    @Override
     public List<Trend> getTrends() throws DatabaseException {
         // Pass wildcard as location to get all trends
         return getTrends("%");
     }
 
+    @Override
     public List<Trend> getTrends(String location) throws DatabaseException {
-        ArrayList<Trend> result = new ArrayList<Trend>();
+        ArrayList<Trend> result = new ArrayList<>();
         Statement stmt = null;
         ResultSet rs = null;
 
@@ -207,6 +213,7 @@ class DatabaseInternal extends Database {
         return result;
     }
 
+    @Override
     public void putTweets(List<Status> tweets, Trend trend) throws DatabaseException {
         // In case this trend hasn't been put in the db before
         if (trend.getId() == 0) {
@@ -252,10 +259,12 @@ class DatabaseInternal extends Database {
         return;
     }
 
+    @Override
     public List<Status> getTweets(Trend trend) throws DatabaseException {
         return getTweets(trend.getId());
     }
 
+    @Override
     public List<Status> getTweets(int trend_id) throws DatabaseException {
         ArrayList<Status> result = new ArrayList<Status>();
         Statement stmt = null;
@@ -296,6 +305,7 @@ class DatabaseInternal extends Database {
         + "  recency = VALUES(recency), object = VALUES(object), "
         + "  wikiarticle_id = VALUES(wikiarticle_id)";
 
+    @Override
     public void putWikiArticles(List<WikiArticle> articles, Trend trend) throws DatabaseException {
         // In case this trend hasn't been put in the db before
         if (trend.getId() == 0) {
@@ -381,7 +391,7 @@ class DatabaseInternal extends Database {
 
     //Private method
     private List<WikiArticle> getWikiArticlesByQuery(String query) throws DatabaseException {
-        ArrayList<WikiArticle> result = new ArrayList<WikiArticle>();
+        ArrayList<WikiArticle> result = new ArrayList<>();
         Statement stmt = null;
         ResultSet rs = null;
 
@@ -410,38 +420,46 @@ class DatabaseInternal extends Database {
     }
 
     // Public-facing methods
+    @Override
     public List<WikiArticle> getWikiArticles(int trend_id) throws DatabaseException {
         return getWikiArticlesByQuery(WIKI_ARTICLE_SELECT + trend_id
                 + WIKI_ARTICLE_SORT_RELEVANCE);
     }
 
+    @Override
     public List<WikiArticle> getWikiArticles(Trend trend) throws DatabaseException {
         return getWikiArticles(trend.getId());
     }
 
+    @Override
     public List<WikiArticle> getWikiArticlesByPopularity(int trend_id) throws DatabaseException {
         return getWikiArticlesByQuery(WIKI_ARTICLE_SELECT + trend_id
                 + WIKI_ARTICLE_SORT_POPULARITY);
     }
 
+    @Override
     public List<WikiArticle> getWikiArticlesByPopularity(Trend trend) throws DatabaseException {
         return getWikiArticlesByPopularity(trend.getId());
     }
 
+    @Override
     public List<WikiArticle> getWikiArticlesByControversy(int trend_id) throws DatabaseException {
         return getWikiArticlesByQuery(WIKI_ARTICLE_SELECT + trend_id
                 + WIKI_ARTICLE_SORT_CONTROVERSY);
     }
 
+    @Override
     public List<WikiArticle> getWikiArticlesByControversy(Trend trend) throws DatabaseException {
         return getWikiArticlesByControversy(trend.getId());
     }
 
+    @Override
     public List<WikiArticle> getWikiArticlesByRecency(int trend_id) throws DatabaseException {
         return getWikiArticlesByQuery(WIKI_ARTICLE_SELECT + trend_id
                 + WIKI_ARTICLE_SORT_RECENCY);
     }
 
+    @Override
     public List<WikiArticle> getWikiArticlesByRecency(Trend trend) throws DatabaseException {
         return getWikiArticlesByRecency(trend.getId());
     }

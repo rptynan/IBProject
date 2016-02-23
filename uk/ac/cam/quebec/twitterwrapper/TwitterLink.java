@@ -85,7 +85,7 @@ public class TwitterLink {
                     accessToken, accessTokenSecret);
             TwitterLink.username = username;
         } catch (TwitterException e) {
-            throw new TwitException("Login Failed.");
+            throw new TwitException("Login Failed.",e);
         }
 
     }
@@ -106,7 +106,7 @@ public class TwitterLink {
             } else
                 throw new TwitException("No static login performed.");
         } catch (TwitterException e) {
-            throw new TwitException("Connection to Twitter failed.");
+            throw new TwitException("Connection to Twitter failed.",e);
         }
     }
 
@@ -125,7 +125,7 @@ public class TwitterLink {
             // For testing System.out.println(x);
             return x;
         } catch (TwitterException e) {
-            throw new TwitException("Connection to Twitter failed.");
+            throw new TwitException("Connection to Twitter failed.",e);
         }
     }
 
@@ -145,7 +145,7 @@ public class TwitterLink {
         try {
             return twitter.search(phrase);
         } catch (TwitterException e) {
-            throw new TwitException("Connection to Twitter failed.");
+            throw new TwitException("Connection to Twitter failed.",e);
         }
     }
 
@@ -170,7 +170,7 @@ public class TwitterLink {
         try {
             user = twitterUsers.getUser(user.screenName);
         } catch (TwitterException e) {
-            throw new TwitException("Connection to Twitter failed.");
+            throw new TwitException("Connection to Twitter failed.",e);
         }
 
     }

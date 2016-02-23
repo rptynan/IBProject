@@ -189,15 +189,14 @@ public class WikiArticle implements Serializable {
             }
             return ret;
         } else {
-            // edits = new LinkedList<WikiEdit>(); // We only get as many as we
-            // need.
+            edits = new LinkedList<WikiEdit>();
             try {
                 JSONObject json = WikiFetch
                         .getJSONfromAddress("https://en.wikipedia.org/w/api.php?"
                                 + "action=query&prop=revisions&format=json&rvprop=ids%"
                                 + "7Ctimestamp%7Ccomment&"
                                 + "rvlimit="
-                                + (editCount - edits.size())
+                                + editCount
                                 + "&titles="
                                 + title.replace(" ", "%20"));
                 json = json.getJSONObject("query").getJSONObject("pages");
