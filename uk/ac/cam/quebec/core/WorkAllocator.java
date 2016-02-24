@@ -28,14 +28,16 @@ public class WorkAllocator {
     private final List<Thread> ThreadPool;
     private int startedTasks = 0;
     private final Semaphore taskCount = new Semaphore(0);
+    private final WorkerInterface parent;
 
-    WorkAllocator(PriorityBlockingQueue<Worker> _ThreadQueue, List<Thread> _ThreadPool) {
+    WorkAllocator(PriorityBlockingQueue<Worker> _ThreadQueue, List<Thread> _ThreadPool,WorkerInterface _parent) {
         WikiQueue = new MyPriorityBlockingQueue<>(taskCount);
         ThreadQueue = _ThreadQueue;
         ThreadPool = _ThreadPool;
         TweetQueue = new MyPriorityBlockingQueue<>(taskCount);
         CoreQueue = new MyPriorityBlockingQueue<>(taskCount);
         TrendTaskQueue = new MyPriorityBlockingQueue<>(taskCount);
+        parent = _parent;
     }
 
     public String getStatus() {
@@ -122,7 +124,8 @@ public class WorkAllocator {
         }
         taskCount.release();//If we get to here without a task assigned then 
         startedTasks--;//we should release our permit so another thread can use it
-        return ret;
+        return getTask(preferredType);//and recurse if we don't want to return null
+        //return ret;
     }
 
     private int waitingTasks() {
@@ -147,10 +150,26 @@ public class WorkAllocator {
             taskCount.release(k);//Don't want to clear the Core Queue tasks
         }
     }
-
-    public String getRunningTasks() {
+    private Collection<Thread> getRunningTasks()
+    {Collection<Thread> disjunction = CollectionUtils.disjunction(ThreadPool, ThreadQueue);
+        return disjunction;
+    }
+    public void cleanRunningTasks()
+    {
+        Collection<Thread> disjunction = getRunningTasks();
+        Worker w;
+        for(Thread t: disjunction)
+        {
+            w = (Worker)t;
+            if(!w.hasTask())
+            {   System.err.println("Force reallocating worker: "+w);
+                parent.reallocateWorker(w);
+            }
+        }
+    }
+    public String getRunningTasksStatus() {
         String s = "";
-        Collection<Thread> disjunction = CollectionUtils.disjunction(ThreadPool, ThreadQueue);
+        Collection<Thread> disjunction = getRunningTasks();
         s = disjunction.stream().map((t) -> t.toString() + System.lineSeparator()).reduce(s, String::concat);
         return s + "There are currently " + disjunction.size() + " tasks running";
     }

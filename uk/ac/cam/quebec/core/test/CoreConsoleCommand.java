@@ -19,6 +19,7 @@ public enum CoreConsoleCommand {
     
     StartCommand("start", ""),
     ExitCommand("exit",""),
+    CloseCommand("close",ExitCommand),
     StatusCommand("status", ""),
     TwitterTestCommand("test twitter", ""),
     WikiProcTestCommand("test wikiproc",""),
@@ -35,16 +36,26 @@ public enum CoreConsoleCommand {
     ClearWorkCommand("clear work",""),
     ForceRefreshCommand("force refresh",""),
     ListRunningWorkCommand("list running work",""),
+    ShowRunningWorkCommand("show running work",ListRunningWorkCommand),
+    CleanRunningWorkCommand("clean running work",""),
     InvalidCommand("","(.*)");
     private final Pattern requestPattern;
     private final Pattern fullPattern;
     private final String requestOption;
+    private final CoreConsoleCommand isAlias;
     private Matcher match = null;
-
+    private CoreConsoleCommand(String option, CoreConsoleCommand alias)
+    {
+        requestOption = option;
+        requestPattern = alias.getPattern();
+        fullPattern = Pattern.compile("("+option + ")(: " + requestPattern.pattern()+")?", Pattern.CASE_INSENSITIVE);
+        isAlias = alias;
+    }
     private CoreConsoleCommand(String option, String pattern) {
         requestOption = option;
         requestPattern = Pattern.compile(pattern);
         fullPattern = Pattern.compile("("+option + ")(: " + pattern+")?", Pattern.CASE_INSENSITIVE);
+        isAlias = null;
     }
     private void setMatch(Matcher m)
     {
@@ -53,6 +64,10 @@ public enum CoreConsoleCommand {
     public Matcher getMatch()
     {
         return match;
+    }
+    private CoreConsoleCommand getAlias()
+    {
+        return isAlias;
     }
     /**
      * The returns the pattern that should be used to parse the options

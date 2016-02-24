@@ -20,5 +20,6 @@ public interface ControlInterface {
     public long timeUntilRepopulate();
     public void forceRepopulate();
     public void clearAllTasks();
-    public String listRunningTasks();
+    public void cleanRunningTasks();
+    public String listRunningTasksStatus();
 }

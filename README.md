@@ -82,6 +82,7 @@ A default config.xml file can be found in this directory
 There are some depreciated entry points, they should not be used:
 
 Run GroupProjectCore with 5 agruements - the 4 Twitter login keys and the username IBProjectQuebec.
+
 Run CoreConsole with 5 agruements - the 4 Twitter login keys and the username IBProjectQuebec.
 
 ##Using the Core Console
@@ -96,5 +97,5 @@ useful commands are outlined below.
 1. Start - this will start the Core
 2. Status - this will tell you the status of the various services running
 3. Exit - this will close down the Core
-4. Add trend: <trend name>, <trend location> - this will add a trend to the queue with the specified location
-5. Repopulate trends - this will add cause the core to trigger the trend repopulation task early
+4. Add trend: "trend name", "trend location", "trend priority" - this will add a trend to the queue with the specified location and priority
+5. Repopulate trends - this will add cause the core to request new trends from twitter for all its set locations

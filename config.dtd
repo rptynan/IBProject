@@ -65,10 +65,13 @@
 <!ELEMENT KnowledgeGraph (API_KEY)*>
 
 <!--- Put your DTDDoc comment here. -->
-<!ELEMENT UserAPI (UserAPI_Port)*>
+<!ELEMENT UserAPI (UserAPI_Port|UserAPI_Address)*>
 
 <!--- Put your DTDDoc comment here. -->
 <!ELEMENT UserAPI_Port (#PCDATA)>
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT UserAPI_Address (#PCDATA)>
 
 <!--- Put your DTDDoc comment here. -->
 <!ELEMENT StopWords (Path)*>

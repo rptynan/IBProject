@@ -29,10 +29,6 @@ public class TrendTask extends GenericTask {
 
     @Override
     public Collection<Task> process() {
-        if (!true) {
-            TwitterProcessor.process(trend);
-            return null;
-        }
         ArrayList<Task> ret = null;
         if (TwitterProcessor.doProcess(trend)) {
             ret = new ArrayList<>();

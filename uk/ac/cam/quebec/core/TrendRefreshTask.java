@@ -37,6 +37,7 @@ public class TrendRefreshTask extends GenericTask {
         thisThread = Thread.currentThread();
         try {
             parent.repopulateTrends();
+            //parent.cleanRunningTasks();Might as well do some cleanup
         } catch (TwitException ex) {
             System.err.println(ex);
             Throwable cause = ex.getCause();

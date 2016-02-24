@@ -42,6 +42,7 @@ public class Configuration {
     private static final Map<String, Integer> locationLookup = new HashMap<>();
     private static final Map<String, String> ConfigMap = new HashMap<>();
     private static boolean valid = false;
+
     /**
      * Builds an object containing the various configuration variables
      *
@@ -64,28 +65,31 @@ public class Configuration {
     }
 
     /**
-     *  Builds an object containing the default configuration values
+     * Builds an object containing the default configuration values
+     *
      * @deprecated
      */
     @Deprecated
-    public Configuration()
-    {
+    public Configuration() {
         this(new String[5]);
     }
 
     /**
-     * Builds an object containing the default configuration values and twitter keys
+     * Builds an object containing the default configuration values and twitter
+     * keys
+     *
      * @param _twitterArgs a String[5] containing the twitter credentials
      * @deprecated
      */
     @Deprecated
-    public Configuration(String[] _twitterArgs)
-    {
-        this(_twitterArgs,new String[1],new String [1]);
+    public Configuration(String[] _twitterArgs) {
+        this(_twitterArgs, new String[1], new String[1]);
     }
+
     /**
-     * Builds an object containing the default configuration values and secret keys
-     * 
+     * Builds an object containing the default configuration values and secret
+     * keys
+     *
      * @param _twitterArgs a String[5] containing the twitter credentials
      * @param _SentimentAnalyserArgs a String[1] containing the api key
      * @param _KnowledgeGraphArgs a String[1] containing the api key
@@ -130,10 +134,12 @@ public class Configuration {
     public static Database getDatabase() {
         return DB;
     }
+
     @Deprecated
     public static String[] getTwitterArgs() {
-    return getDefaultTwitterArgs();
+        return getDefaultTwitterArgs();
     }
+
     public static String[] getDefaultTwitterArgs() {
         String[] ret = new String[5];
         ret[0] = getValue("TwitterOAuthKey");
@@ -143,21 +149,21 @@ public class Configuration {
         ret[4] = getValue("TwitterAccountName");
         return ret;
     }
+
     public static String[] getTwitterArgs(int i) {
-        if(i<=0)
-        {
+        if (i <= 0) {
             return getDefaultTwitterArgs();
         }
-        int j = i-1;
+        int j = i - 1;
         String[] ret = new String[5];
-        ret[0] = getValue("TwitterOAuthKey"+j);
-        ret[1] = getValue("TwitterOAuthSecret"+j);
-        ret[2] = getValue("TwitterAccessToken"+j);
-        ret[3] = getValue("TwitterAccessSecret"+j);
-        ret[4] = getValue("TwitterAccountName"+j);
+        ret[0] = getValue("TwitterOAuthKey" + j);
+        ret[1] = getValue("TwitterOAuthSecret" + j);
+        ret[2] = getValue("TwitterAccessToken" + j);
+        ret[3] = getValue("TwitterAccessSecret" + j);
+        ret[4] = getValue("TwitterAccountName" + j);
         return ret;
     }
-    
+
     public static String[] getLocations() {
         int locationNumbers = Integer.parseInt(getValue("locationNumbers"));
         String[] ret = new String[locationNumbers];
@@ -187,6 +193,10 @@ public class Configuration {
         return Integer.parseInt(s);
     }
 
+    public static String getUAPI_Address() {
+        return getValue("UserApiAddress");
+    }
+
     public static String getSentimentAnalyserKey() {
         return getValue("SentimentAnalyserKey");
     }
@@ -208,6 +218,10 @@ public class Configuration {
         String s = ConfigMap.get("TrendsPerLocation");
         return Integer.parseInt(s);
 
+    }
+
+    public static int getDefaultPriority() {
+        return 4;
     }
 
     public static int getTrendRefreshTime() {
@@ -412,7 +426,7 @@ public class Configuration {
      * @return A String[1] containing the arguments
      */
     private static String[] getUAPIArgs(Document doc) {
-        String[] ret = new String[1];
+        String[] ret = new String[2];
         String s;
         NodeList parents = doc.getElementsByTagName("UserAPI");
         Element parent = (Element) parents.item(0);
@@ -420,6 +434,15 @@ public class Configuration {
         s = Item.item(0).getTextContent();
         ConfigMap.put("UserAPIPort", s);
         ret[0] = s;
+        try {
+            Item = parent.getElementsByTagName("UserAPI_Address");
+            s = Item.item(0).getTextContent();
+        } catch (NullPointerException ex)//Incase someone has not updated their config file
+        {
+            s = "localhost";
+        }
+        ConfigMap.put("UserApiAddress", s);
+        ret[1] = s;
         return ret;
     }
 
@@ -500,27 +523,27 @@ public class Configuration {
         locationLookup.put("London", 44418);
 
     }
-    public static void main(String[] args)
-    {   Configuration config;
-        if(args.length==1)
-        {
-        try {
-            System.out.println("Trying to load config file from location: "+args[0]);
-            config = new Configuration(args[0]);
-        } catch (FileNotFoundException ex) {
-            System.out.println("Unable to find configuration file");
-        }
-        }
-        else if(args.length==7)
-        {
-            //config new Configuration(args);
-        }
-        else
-        {
+
+    public static void main(String[] args) {
+        Configuration config;
+        if (args.length == 1) {
+            try {
+                System.out.println("Trying to load config file from location: " + args[0]);
+                config = new Configuration(args[0]);
+            } catch (FileNotFoundException ex) {
+                System.out.println("Unable to find configuration file");
+            }
+        } else if (args.length == 7) {
+            String[] S0 = new String[1];
+            S0[0]=args[5];
+            String[] S1 = new String[1];
+            S1[0]= args[6];
+            config = new Configuration(args,S0,S1);
+        } else {
             System.out.println("Falling back on blank config");
-        config = new Configuration();
-        
+            config = new Configuration();
+
         }
-        System.out.println("Is configuration class valid?" +Configuration.isValid());
+        System.out.println("Is configuration class valid?" + Configuration.isValid());
     }
 }

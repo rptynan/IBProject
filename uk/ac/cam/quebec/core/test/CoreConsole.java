@@ -99,7 +99,7 @@ public class CoreConsole extends Thread {
                 coreInter.clearAllTasks();
                 break;
             case ListRunningWorkCommand:
-                System.out.println(coreInter.listRunningTasks());
+                System.out.println(coreInter.listRunningTasksStatus());
                 break;
             case TwitterTestCommand:
                 System.out.println("Twitter test start");
@@ -120,6 +120,10 @@ public class CoreConsole extends Thread {
                 System.out.println("Starting database test");
                 DatabaseTest.test();
                 System.out.println("Database test finish");
+                break;
+            case CleanRunningWorkCommand:
+                System.out.println("Cleaning running tasks");
+                coreInter.cleanRunningTasks();
                 break;
             default:
                 oldProcessCommand(command);

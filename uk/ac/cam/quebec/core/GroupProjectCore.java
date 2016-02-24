@@ -23,10 +23,10 @@ import uk.ac.cam.quebec.wikiproc.WikiProcessor;
  * @author James
  */
 public class GroupProjectCore extends Thread implements TrendsQueue, ControlInterface, WorkerInterface {
-
+    
     private final List<Thread> ThreadPool = new ArrayList<>();
     private final PriorityBlockingQueue<Worker> ThreadQueue = new PriorityBlockingQueue<>();
-    private final WorkAllocator workAllocator = new WorkAllocator(ThreadQueue, ThreadPool);
+    private final WorkAllocator workAllocator = new WorkAllocator(ThreadQueue, ThreadPool,this);
     private final NewAPIServer UAPI;//User API, here for testing only
     private final APIServerAbstract UAPII;//User API Interface
     private final TwitterLink twitterWrapper;//Always goood
@@ -45,7 +45,7 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
         DB = config.getDatabase();
         UAPI = new NewAPIServer(DB, config.getUAPI_Port(), this);
         UAPII = UAPI;
-        String[] TwitterLoginArgs = config.getTwitterArgs();
+        String[] TwitterLoginArgs = config.getDefaultTwitterArgs();
         TwitterLink.login(TwitterLoginArgs[0], TwitterLoginArgs[1], TwitterLoginArgs[2], TwitterLoginArgs[3], TwitterLoginArgs[4]);
         twitterWrapper = new TwitterLink();
         twitterProcessor = new TwitterProcessor();
@@ -104,7 +104,7 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
                 if (trendLimit == 0) {
                     break;
                 }
-                trend = new Trend(s, location, 4);
+                trend = new Trend(s, location, config.getDefaultPriority());
                 workAllocator.putTrend(trend);
                 trendLimit--;
             }
@@ -268,7 +268,12 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
     }
 
     @Override
-    public String listRunningTasks() {
-     return workAllocator.getRunningTasks();
+    public String listRunningTasksStatus() {
+     return workAllocator.getRunningTasksStatus();
+    }
+
+    @Override
+    public void cleanRunningTasks() {
+        workAllocator.cleanRunningTasks();
     }
 }

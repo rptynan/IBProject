@@ -28,6 +28,7 @@ and open the template in the editor.
     </KnowledgeGraph>
     <UserAPI>
         <UserAPI_Port>90</UserAPI_Port>
+        <UserAPI_Address>localhost</UserAPI_Address>
     </UserAPI>
     <StopWords>
         <Path>words.txt</Path>

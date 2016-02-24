@@ -35,6 +35,11 @@ public class Worker extends Thread implements Comparable{
     {
         return type;
     }
+    public boolean hasTask()
+    {
+        return null!=currentTask;
+    }
+    @Deprecated
     public boolean process (Trend _o)
     {
        TrendTask t = new TrendTask(_o);
@@ -82,7 +87,11 @@ public class Worker extends Thread implements Comparable{
             {
                 System.err.println("Error adding tasks from task: "+currentTask.toString());
             }
-        } catch (Exception ex) {
+        }/*catch (HavenException ex)
+        {
+            
+        }  */      
+        catch (Exception ex) {
             System.err.println("Error processing task: "+currentTask.toString());
             Logger.getLogger(Worker.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -96,7 +105,13 @@ public class Worker extends Thread implements Comparable{
     }
     @Override
     public String toString()
+    {   if(currentTask!=null)
     {
         return this.getName()+" : "+currentTask.toString();
+    }
+    else
+    {
+        return this.getName()+" : no task currently assigned";
+    }
     }
 }
