@@ -221,7 +221,7 @@ public class Configuration {
     }
 
     public static int getDefaultPriority() {
-         String s = ConfigMap.get("DefaultPriority");
+        String s = ConfigMap.get("DefaultPriority");
         return Integer.parseInt(s);
     }
 
@@ -276,17 +276,14 @@ public class Configuration {
         try {//just incase someone doesn't have the latest config.xml
             Item = parent.getElementsByTagName("ThreadPoolSize");
             s = Item.item(0).getTextContent();
-
         } catch (NullPointerException ex) {
             s = "10";
         }
         ConfigMap.put("ThreadPoolSize", s);
         ret[1] = s;
-
         try {//just incase someone doesn't have the latest config.xml
             Item = parent.getElementsByTagName("ProjectRoot");
             s = Item.item(0).getTextContent();
-
         } catch (NullPointerException ex) {
             s = ".\\";
         }
@@ -295,13 +292,11 @@ public class Configuration {
         try {//just incase someone doesn't have the latest config.xml
             Item = parent.getElementsByTagName("DefaultPriority");
             s = Item.item(0).getTextContent();
-
         } catch (NullPointerException ex) {
             s = "5";
         }
         ConfigMap.put("DefaultPriority", s);
         ret[3] = s;
-        
         return ret;
     }
 
@@ -545,10 +540,10 @@ public class Configuration {
             }
         } else if (args.length == 7) {
             String[] S0 = new String[1];
-            S0[0]=args[5];
+            S0[0] = args[5];
             String[] S1 = new String[1];
-            S1[0]= args[6];
-            config = new Configuration(args,S0,S1);
+            S1[0] = args[6];
+            config = new Configuration(args, S0, S1);
         } else {
             System.out.println("Falling back on blank config");
             config = new Configuration();
