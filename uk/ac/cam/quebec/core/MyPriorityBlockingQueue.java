@@ -22,7 +22,12 @@ public class MyPriorityBlockingQueue<T> extends PriorityBlockingQueue<T>{
     }
     @Override
     public boolean add(T item)
-    {   contentsCount.release();
-        return super.add(item);
+    {   
+        boolean b = super.add(item);
+        if(b)
+        {
+        contentsCount.release();
+        }
+        return b;
     }
 }

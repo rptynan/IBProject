@@ -180,7 +180,7 @@ public class CoreConsole extends Thread {
         if (b) {
             String trendName = m.group("trendName");
             String location = config.getDefaultLocation();
-            int priority = 0;
+            int priority = config.getDefaultPriority();
             if (m.group("trendLocation") != null) {
                 location = m.group("trendLocation");
             }

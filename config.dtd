@@ -86,7 +86,7 @@
 <!ELEMENT TrendRefreshTime (#PCDATA)>
 
 <!--- Put your DTDDoc comment here. -->
-<!ELEMENT Misc (Location|ThreadPoolSize|ProjectRoot)*>
+<!ELEMENT Misc (Location|ThreadPoolSize|ProjectRoot|DefaultPriority)*>
 
 <!--- Put your DTDDoc comment here. -->
 <!ELEMENT Location (#PCDATA)>
@@ -96,3 +96,6 @@
 
 <!--- Put your DTDDoc comment here. -->
 <!ELEMENT ProjectRoot (#PCDATA)>
+
+<!--- Put your DTDDoc comment here. -->
+<!ELEMENT DefaultPriority (#PCDATA)>

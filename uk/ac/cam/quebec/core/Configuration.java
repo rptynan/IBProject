@@ -221,7 +221,8 @@ public class Configuration {
     }
 
     public static int getDefaultPriority() {
-        return 4;
+         String s = ConfigMap.get("DefaultPriority");
+        return Integer.parseInt(s);
     }
 
     public static int getTrendRefreshTime() {
@@ -258,7 +259,7 @@ public class Configuration {
      */
     private static String[] getMisc(Document doc) {
         String s;
-        String[] ret = new String[3];
+        String[] ret = new String[4];
         NodeList parents = doc.getElementsByTagName("Misc");
         Element parent = (Element) parents.item(0);
         NodeList Item = parent.getElementsByTagName("Location");
@@ -291,7 +292,16 @@ public class Configuration {
         }
         ConfigMap.put("ProjectRoot", s);
         ret[2] = s;
+        try {//just incase someone doesn't have the latest config.xml
+            Item = parent.getElementsByTagName("DefaultPriority");
+            s = Item.item(0).getTextContent();
 
+        } catch (NullPointerException ex) {
+            s = "5";
+        }
+        ConfigMap.put("DefaultPriority", s);
+        ret[3] = s;
+        
         return ret;
     }
 

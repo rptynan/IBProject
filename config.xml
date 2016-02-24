@@ -46,5 +46,6 @@ and open the template in the editor.
         <Location>World</Location>
         <ThreadPoolSize>10</ThreadPoolSize>
         <ProjectRoot>.\</ProjectRoot>
+        <DefaultPriority>5</DefaultPriority>
     </Misc>
 </Configuration>

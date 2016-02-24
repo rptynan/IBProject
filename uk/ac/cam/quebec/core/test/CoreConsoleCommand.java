@@ -98,13 +98,22 @@ public enum CoreConsoleCommand {
      */
     public static final Pattern parsePattern = Pattern.compile("([^\\:]+)(: (.*))?", Pattern.CASE_INSENSITIVE);
     private static final Map<String, CoreConsoleCommand> lookupMap = new HashMap<>();
-
+    private static final Pattern blankPattern = Pattern.compile("");
     /**
      * Builds the contests of the lookup map at compile time
      */
     static {//This must be positioned after the lookupMap declaration
         for (CoreConsoleCommand t : CoreConsoleCommand.values()) {
+            CoreConsoleCommand alias = t.getAlias();
+             boolean b = ((alias!=null)&&(t.getPattern().pattern().equals("")));
+             if(b)
+             {
+                 lookupMap.put(t.getOption(), alias);
+             }
+             else
+             {
             lookupMap.put(t.getOption(), t);
+             }
         }
     }
     /**
