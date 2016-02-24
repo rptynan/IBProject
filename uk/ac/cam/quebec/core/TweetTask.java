@@ -15,7 +15,7 @@ import uk.ac.cam.quebec.trends.Trend;
 public class TweetTask extends GenericTask{
     private final Trend trend;
     public TweetTask(Trend t)
-    {
+    {   super(TaskType.Tweet);
         trend = t;
     }
    @Override

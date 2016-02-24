@@ -19,6 +19,7 @@ public class TrendTask extends GenericTask {
     private final Trend trend;
 
     public TrendTask(Trend _trend) {
+        super(TaskType.Trend);
         trend = _trend;
     }
 
@@ -33,10 +34,10 @@ public class TrendTask extends GenericTask {
         if (TwitterProcessor.doProcess(trend)) {
             ret = new ArrayList<>();
             WikiTask t = new WikiTask(trend);
-            Task tsk = new Task(t, TaskType.Wiki);
+            Task tsk = new Task(t);
             ret.add(tsk);
             TweetTask tweet = new TweetTask(trend);
-            tsk = new Task(tweet, TaskType.Tweet);
+            tsk = new Task(tweet);
             ret.add(tsk);
         }
         return ret;
