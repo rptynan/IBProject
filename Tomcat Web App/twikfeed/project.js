@@ -34,6 +34,7 @@ $(document).ready(function(){
 		e.preventDefault();
 		// Can't send spaces through the request
 		var content = $("#input").val().replace(/\s+/g, '');
+		content = content.replace("#","");
 	
 		$.get("TwikfeedServlet?Type=Custom&trend=" + content).done(function(data, textStatus) {
 			if (parseInt(data) == 1){
