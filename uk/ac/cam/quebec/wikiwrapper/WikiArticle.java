@@ -138,7 +138,7 @@ public class WikiArticle implements Serializable {
         else {
             try {
                 Date today = new Date();
-                Date yesterday = new Date(today.getTime()-86400000L);
+                Date yesterday = new Date(today.getTime()-172800000L);
                 SimpleDateFormat dt = new SimpleDateFormat("yyyyMMdd"); 
                 JSONObject json = WikiFetch
                         .getJSONfromAddress("https://wikimedia.org/api/rest_v1/metrics/pageviews/per-article/en.wikipedia.org/all-access/all-agents/"
