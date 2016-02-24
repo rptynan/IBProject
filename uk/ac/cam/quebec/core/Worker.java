@@ -43,7 +43,7 @@ public class Worker extends Thread implements Comparable{
     public boolean process (Trend _o)
     {
        TrendTask t = new TrendTask(_o);
-       Task task = new Task(t,TaskType.Trend);
+       Task task = new Task(t);
        return process(task);
     }
     /**
@@ -68,9 +68,10 @@ public class Worker extends Thread implements Comparable{
             throw ex;//debugging hook
         }
     }
+    @Deprecated
     public boolean processObject(Object _o)
     {TestTask tst = new TestTask(_o);
-    Task task = new Task(tst,TaskType.Core);
+    Task task = new Task(tst);
        return process(task);
        
     }

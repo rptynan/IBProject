@@ -5,21 +5,22 @@
  */
 package uk.ac.cam.quebec.core;
 
+import java.util.Collection;
+
 /**
- *
+ * This acts as a wrapper for the task interfaces
  * @author James
  */
-public class Task {
-   private final TaskType type;
+public class Task implements TaskInterface{
+
     private final TaskInterface taskInterface;
-    public Task (TaskInterface _taskInterface,TaskType _type)
+    public Task (TaskInterface _taskInterface)
     {
-        type = _type;
         taskInterface = _taskInterface;
     }
-    public TaskType getTaskType()
+    public TaskType getType()
     {
-        return type;
+        return taskInterface.getType();
     }
     public TaskInterface getTaskInterface()
     {
@@ -28,6 +29,19 @@ public class Task {
    @Override
     public String toString()
     {
-        return type.name() +" : "+taskInterface.toString();
+        return taskInterface.getType().name() +" : "+taskInterface.toString();
     }
+    public Collection<Task> process()
+    {
+        return taskInterface.process();
+    }
+    public int getPriority()
+    {
+        return taskInterface.getPriority();
+    }
+    @Override
+    public int compareTo(TaskInterface o) {
+        return taskInterface.compareTo(o);
+    }
+    
 }

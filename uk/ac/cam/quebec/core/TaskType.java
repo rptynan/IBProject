@@ -6,7 +6,7 @@
 package uk.ac.cam.quebec.core;
 
 /**
- * Enumeration used to allocate jobs to threads
+ * Enumeration which specifies the group that the task belongs to
  * @author James
  */
 public enum TaskType {
