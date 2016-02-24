@@ -118,7 +118,7 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
     private void mainLoop() {
         try {
             Worker w;
-            Task task = new Task(refreshTask);
+            Task task = new Task(refreshTask, TaskType.Core);
             workAllocator.putTask(task);
             while (running) {
                 w = ThreadQueue.take();

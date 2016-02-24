@@ -12,11 +12,7 @@ import java.util.Collection;
  * @author James
  */
 public abstract class GenericTask implements TaskInterface{
-    private final TaskType type;
-    protected GenericTask(TaskType _type)
-    {
-        type = _type;
-    }
+    
     @Override
     public abstract Collection<Task> process();
     
@@ -32,9 +28,5 @@ public abstract class GenericTask implements TaskInterface{
     public String toString()
     {
         return getStatus();
-    }
-    @Override
-    public TaskType getType() {
-       return type;
     }
 }

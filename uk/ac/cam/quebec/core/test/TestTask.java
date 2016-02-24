@@ -8,7 +8,6 @@ package uk.ac.cam.quebec.core.test;
 import java.util.Collection;
 import uk.ac.cam.quebec.core.Task;
 import uk.ac.cam.quebec.core.TaskInterface;
-import uk.ac.cam.quebec.core.TaskType;
 
 /**
  *
@@ -35,11 +34,6 @@ public class TestTask implements TaskInterface{
     @Override
     public int compareTo(TaskInterface o) {
         return this.getPriority()-o.getPriority();
-    }
-
-    @Override
-    public TaskType getType() {
-       return TaskType.Core;
     }
     
 }

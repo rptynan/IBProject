@@ -17,7 +17,7 @@ import uk.ac.cam.quebec.wikiproc.WikiProcessor;
 public class WikiTask extends GenericTask{
         private final Trend trend;
     public WikiTask(Trend _trend)
-    {   super(TaskType.Wiki);
+    {
         trend = _trend;
     }
     @Override

@@ -99,27 +99,27 @@ public class WorkAllocator {
                 break;
         }
         if (t != null) {
-            ret = new Task(t);
+            ret = new Task(t, preferredType);
             return ret;
         }
         if (!CoreQueue.isEmpty()) {
             t = CoreQueue.poll();
-            ret = new Task(t);
+            ret = new Task(t, TaskType.Core);
             return ret;
         }
         if (!TrendTaskQueue.isEmpty()) {
             t = TrendTaskQueue.poll();
-            ret = new Task(t);
+            ret = new Task(t, TaskType.Trend);
             return ret;
         }
         if (!TweetQueue.isEmpty()) {
             t = TweetQueue.poll();
-            ret = new Task(t);
+            ret = new Task(t, TaskType.Tweet);
             return ret;
         }
         if (!WikiQueue.isEmpty()) {
             t = WikiQueue.poll();
-            ret = new Task(t);
+            ret = new Task(t, TaskType.Trend);
             return ret;
         }
         taskCount.release();//If we get to here without a task assigned then 

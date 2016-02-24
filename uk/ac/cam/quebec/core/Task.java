@@ -10,15 +10,16 @@ package uk.ac.cam.quebec.core;
  * @author James
  */
 public class Task {
-
+   private final TaskType type;
     private final TaskInterface taskInterface;
-    public Task (TaskInterface _taskInterface)
+    public Task (TaskInterface _taskInterface,TaskType _type)
     {
+        type = _type;
         taskInterface = _taskInterface;
     }
     public TaskType getTaskType()
     {
-        return taskInterface.getType();
+        return type;
     }
     public TaskInterface getTaskInterface()
     {
@@ -27,6 +28,6 @@ public class Task {
    @Override
     public String toString()
     {
-        return taskInterface.getType().name() +" : "+taskInterface.toString();
+        return type.name() +" : "+taskInterface.toString();
     }
 }

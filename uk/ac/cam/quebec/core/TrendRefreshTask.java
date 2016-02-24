@@ -24,7 +24,6 @@ public class TrendRefreshTask extends GenericTask {
     private long sleepstart = 0;
 
     public TrendRefreshTask(int _delay, ControlInterface _parent) {
-        super(TaskType.Core);
         delay = _delay;
         parent = _parent;
         sleeptime = TimeUnit.MINUTES.toMillis(delay);
@@ -34,7 +33,7 @@ public class TrendRefreshTask extends GenericTask {
     public Collection<Task> process() {
 
         ArrayList<Task> ret = new ArrayList<>();
-        Task t = new Task(this);
+        Task t = new Task(this, TaskType.Core);
         thisThread = Thread.currentThread();
         try {
             parent.repopulateTrends();
@@ -84,7 +83,5 @@ public class TrendRefreshTask extends GenericTask {
             return s;
         }
     }
-
-    
 
 }

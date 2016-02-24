@@ -20,9 +20,4 @@ public interface TaskInterface extends Comparable<TaskInterface>{
     This method should return the task's getPriority
     */
     public int getPriority();
-    /*
-    This method should return which module the task is associated with
-    */
-    public TaskType getType();
-    
 }
