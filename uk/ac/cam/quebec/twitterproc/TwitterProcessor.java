@@ -11,9 +11,6 @@ import javafx.util.Pair;
 import uk.ac.cam.quebec.common.VisibleForTesting;
 import uk.ac.cam.quebec.dbwrapper.Database;
 import uk.ac.cam.quebec.dbwrapper.DatabaseException;
-import uk.ac.cam.quebec.havenapi.HavenException;
-import uk.ac.cam.quebec.havenapi.SentimentAnalyser;
-import uk.ac.cam.quebec.havenapi.SentimentAnalysis;
 import uk.ac.cam.quebec.trends.Trend;
 import uk.ac.cam.quebec.twitterwrapper.TwitException;
 import uk.ac.cam.quebec.twitterwrapper.TwitterLink;
@@ -76,7 +73,6 @@ public class TwitterProcessor {
 
             calculatePopularity(trend, tweets);
             calculateTimestamp(trend, tweets);
-            calculateControversy(trend, tweets);
             extractConcepts(trend, tweets);
             return true;
         } catch (TwitException e) {
@@ -132,52 +128,6 @@ public class TwitterProcessor {
 		trend.setTimestamp(tweet.getCreatedAt());
 		set = true;
 	    }
-	}
-    }
-
-    /**
-     * Calculates controversy of a trend on the basis of the sentiment analyses of the tweets.
-     *
-     * @param trend
-     * @param tweets
-     */
-    @VisibleForTesting
-    static void calculateControversy(Trend trend, List<Status> tweets) {
-	List<String> uniqueTweets = removeDuplicates(tweets);
-	for (int i = 0; i < uniqueTweets.size(); i++) {
-	    uniqueTweets.set(i, UtilParsing.removeLinks(uniqueTweets.get(i)));
-	}
-
-	double mx = -1e6;
-	double mn =  1e6;
-	boolean set = false;
-	for (String tweet : uniqueTweets) {
-	    String text = UtilParsing.removeUsersAndHashTags(tweet);
-	    if (DEBUG) {
-		System.out.println(text);
-	    }
-	    if (text != null && !text.isEmpty()) {
-		SentimentAnalysis sa;
-		try {
-		    sa = SentimentAnalyser.getAnalysis(text);
-		    if (sa != null) {
-			if (DEBUG) {
-			    System.out.println(sa.getAggregate().getScore());
-			}
-
-			mx = Double.max(mx, sa.getAggregate().getScore());
-			mn = Double.min(mn, sa.getAggregate().getScore());
-			set = true;
-		    }
-		} catch (HavenException e) {
-		    // TODO Auto-generated catch block
-		    e.printStackTrace();
-		}
-	    }
-	}
-
-	if (set) {
-	    trend.setControversy(mx - mn);
 	}
     }
 
