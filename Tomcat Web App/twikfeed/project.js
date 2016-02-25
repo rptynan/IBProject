@@ -28,6 +28,7 @@ $(document).ready(function(){
 	var lPage;
 	var location = "World";
 	var pageSorting = 1;
+	var trendSorting = 1;
 	var trendObject = null;
 	eD.hide();
 	tD.hide();
@@ -51,7 +52,7 @@ $(document).ready(function(){
 	
 	// Handle startup or a selection of a new location
 	var updateTrends = function(){
-		$.get("TwikfeedServlet?Type=Trends&location=" + location).done(function(data, textStatus) {
+		$.get("TwikfeedServlet?Type=Trends&location=" + location + "&sorting=" + trendSorting).done(function(data, textStatus) {
 		
 	
 			trendList = $.parseJSON(data);
@@ -218,6 +219,14 @@ $(document).ready(function(){
 	$("#pageControversy").click(function(){
 		pageSorting = 4;
 		if (trendObject !== null) updatePagesInner();
+	});
+	$("#trendPopularity").click(function(){
+		trendSorting = 1;
+		updateTrends();
+	});
+	$("#trendRecency").click(function(){
+		trendSorting = 2;
+		updateTrends();
 	});
 	
 	
