@@ -395,6 +395,8 @@ class DatabaseInternal extends Database {
         + "FROM wikiarticles INNER JOIN trends_wikiarticles_junction "
         + "ON wikiarticles.wikiarticle_id = trends_wikiarticles_junction.wikiarticle_id "
         + "WHERE trend_id = ";
+    private static final String WIKI_ARTICLE_SELECT_ID = "SELECT object "
+            + "FROM wikiarticles WHERE wikiarticle_id = ";
     private static final String WIKI_ARTICLE_SORT_RELEVANCE =
         " ORDER BY wikiarticles.relevance DESC";
     private static final String WIKI_ARTICLE_SORT_POPULARITY =
@@ -477,5 +479,10 @@ class DatabaseInternal extends Database {
     @Override
     public List<WikiArticle> getWikiArticlesByRecency(Trend trend) throws DatabaseException {
         return getWikiArticlesByRecency(trend.getId());
+    }
+
+    @Override
+    public WikiArticle getWikiArticle(int articleID) throws DatabaseException {
+        return getWikiArticlesByQuery(WIKI_ARTICLE_SELECT_ID + articleID).get(0);
     }
 }
