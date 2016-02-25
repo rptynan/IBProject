@@ -10,12 +10,15 @@ $(document).ready(function(){
 	var tD = $("#tweetsDiv");
 	var twH = $("#tweetsHeader");
 	var twL = $("#tweetsList");
+	var eH = $("#editsHeader");
+	var eL = $("#editsList");
 	var dM = $("#dropdownMenu1");
 	// initialise stuff
 	var dDdom;
 	var trendList = [];
 	var pageList = [];
 	var tweetList = [];
+	var editList = [];
 	var cTrend;
 	var cPage;
 	var cState = "Wikipedia";
@@ -97,7 +100,6 @@ $(document).ready(function(){
 	}
 	
 	
-	
 	// Handle the selection of a trend
 	var updatePages = function(event){
 		
@@ -139,6 +141,21 @@ $(document).ready(function(){
 			// Change the URL of the iframe
 			wF.get(0).src = pageList[pageIndex].url;
 			lPage = cPage;
+			// Now make call to update the edits
+			$.get("TwikfeedServlet?Type=Edits&id="+pageList[pageIndex].id).done(function(data, textStatus) {
+
+
+				editList = $.parseJSON(data);
+				eH.html(pageList[pageIndex].title + " Edit Comments");
+				eL.empty();
+				var i;
+				for(i=0; i < editList.length; i++){
+					eL.append("<li>" + editList[i].comment + "<br>" + editList[i].time + "</li>");
+				}
+				
+				
+			}, "text");
+			
 		}
 	}
 	// Handle changes between the views
