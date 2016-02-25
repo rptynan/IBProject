@@ -74,6 +74,12 @@ public class TwitterProcessor {
             calculatePopularity(trend, tweets);
             calculateTimestamp(trend, tweets);
             extractConcepts(trend, tweets);
+            try {
+		db.putTrend(trend);
+	    } catch (DatabaseException e) {
+		// TODO Auto-generated catch block
+		e.printStackTrace();
+	    }
             return true;
         } catch (TwitException e) {
             // TODO Auto-generated catch block
