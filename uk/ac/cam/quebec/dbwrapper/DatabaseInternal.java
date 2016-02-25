@@ -103,13 +103,15 @@ class DatabaseInternal extends Database {
                     + "name VARCHAR(60) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_general_ci' NOT NULL,"
                     + "location VARCHAR(80) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_general_ci',"
                     + "updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,"
+                    + "popularity DOUBLE NOT NULL,"
+                    + "recency DOUBLE NOT NULL,"
                     + "object MEDIUMBLOB NOT NULL,"
                     + "trend_id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY) CHARACTER SET 'utf8mb4'");
 
             // tweets
             stmt.execute("CREATE TABLE IF NOT EXISTS tweets ("
                     + "content VARCHAR(200) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_general_ci' NOT NULL,"
-                    + "location VARCHAR(80) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_general_ci',"
+                    + "location VARCHAR(200) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_general_ci',"
                     + "updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,"
                     + "object MEDIUMBLOB NOT NULL,"
                     + "trend_id INT UNSIGNED NOT NULL,"
@@ -140,26 +142,39 @@ class DatabaseInternal extends Database {
         return INSTANCE;
     }
 
+    /*
+     * Trend put method
+    */
+    private static final String TREND_INSERT = "INSERT INTO trends"
+        + "(name, location, popularity, recency, object, trend_id) "
+        + "  VALUES (?, ?, ?, ?, ?, ?) "
+        + "ON DUPLICATE KEY UPDATE "
+        + "  name = VALUES(name), location = VALUES(location), "
+        + "  popularity = VALUES(popularity), recency = VALUES(recency), "
+        + "  object = VALUES(object), trend_id = VALUES(trend_id)";
+    private static final String TREND_CHECK_DUP = "SELECT trend_id "
+        + "FROM trends WHERE name=? AND location=?";
+    private static final String TREND_MAX_ID = "SELECT MAX(trend_id) "
+        + "FROM trends";
+
     @Override
     public void putTrend(Trend trend) throws DatabaseException {
         PreparedStatement stmt = null;
 
         try {
-            stmt = connection.prepareStatement("INSERT INTO trends"
-                    + "(name, location, object, trend_id) VALUES (?, ?, ?, ?) "
-                    + "ON DUPLICATE KEY UPDATE name = VALUES(name), "
-                    + "location = VALUES(location), object = VALUES(object), "
-                    + "trend_id = VALUES(trend_id)");
+            stmt = connection.prepareStatement(TREND_INSERT);
             stmt.setString(1, trend.getName());
             stmt.setString(2, trend.getLocation());
-            stmt.setObject(3, trend);
-            stmt.setInt(4, trend.getId());
+            stmt.setDouble(3, trend.getPopularity());
+            stmt.setDouble(4, trend.getRecency());
+            stmt.setObject(5, trend);
+            stmt.setInt(6, trend.getId());
 
             synchronized (conMutex) {
                 // If ID hasn't been set before, we need to set it
                 if (trend.getId() == 0) {
                     // Check if this trend has been in before
-                    PreparedStatement s = connection.prepareStatement("SELECT trend_id FROM trends WHERE name=? AND location=?");
+                    PreparedStatement s = connection.prepareStatement(TREND_CHECK_DUP);
                     s.setString(1, trend.getName());
                     s.setString(2, trend.getLocation());
                     ResultSet rs = s.executeQuery();
@@ -172,15 +187,15 @@ class DatabaseInternal extends Database {
                     // If not, assign it next id available
                     if (trend.getId() == 0) {
                         Statement ss = connection.createStatement();
-                        rs = ss.executeQuery("SELECT MAX(trend_id) FROM trends");
+                        rs = ss.executeQuery(TREND_MAX_ID);
                         rs.first();
                         trend.setId(rs.getInt(1) + 1, accessId);
                         rs.close();
                         ss.close();
                     }
 
-                    stmt.setObject(3, trend);
-                    stmt.setInt(4, trend.getId());
+                    stmt.setObject(5, trend);
+                    stmt.setInt(6, trend.getId());
                 }
 
                 stmt.executeUpdate();
@@ -193,14 +208,16 @@ class DatabaseInternal extends Database {
         return;
     }
 
-    @Override
-    public List<Trend> getTrends() throws DatabaseException {
-        // Pass wildcard as location to get all trends
-        return getTrends("%");
-    }
+    /*
+     * Trends get methods
+    */
+    private static String TREND_SELECT ="SELECT object FROM trends ";
+    private static String TREND_LOC = " WHERE location LIKE ";
+    private static String TREND_SORT_POPULARITY = " ORDER BY popularity DESC";
+    private static String TREND_SORT_RECENCY = " ORDER BY recency DESC";
 
-    @Override
-    public List<Trend> getTrends(String location) throws DatabaseException {
+    // Private method
+    public List<Trend> getTrendsByQuery(String query) throws DatabaseException {
         ArrayList<Trend> result = new ArrayList<>();
         Statement stmt = null;
         ResultSet rs = null;
@@ -209,8 +226,7 @@ class DatabaseInternal extends Database {
             // Creates forward & read only ResultSet by default
             stmt = connection.createStatement();
             synchronized (conMutex) {
-                rs = stmt.executeQuery("SELECT object FROM trends "
-                        + "WHERE location LIKE \"" + location + "\"");
+                rs = stmt.executeQuery(query);
             }
 
             while (rs.next()) {
@@ -226,6 +242,32 @@ class DatabaseInternal extends Database {
             try { if (stmt != null) stmt.close(); } catch (Exception e) {};
         }
         return result;
+    }
+
+    // Public-facing methods
+    @Override
+    public List<Trend> getTrends() throws DatabaseException {
+        return getTrendsByQuery(TREND_SELECT);
+    }
+
+    @Override
+    public List<Trend> getTrends(String location) throws DatabaseException {
+        return getTrendsByQuery(TREND_SELECT
+                + TREND_LOC + "\"" + location + "\"");
+    }
+
+    @Override
+    public List<Trend> getTrendsByPopularity(String location) throws DatabaseException {
+        return getTrendsByQuery(TREND_SELECT
+                + TREND_LOC + "\"" + location + "\""
+                + TREND_SORT_POPULARITY);
+    }
+
+    @Override
+    public List<Trend> getTrendsByRecency(String location) throws DatabaseException {
+        return getTrendsByQuery(TREND_SELECT
+                + TREND_LOC + "\"" + location + "\""
+                + TREND_SORT_RECENCY);
     }
 
     @Override
@@ -406,7 +448,7 @@ class DatabaseInternal extends Database {
     private static final String WIKI_ARTICLE_SORT_RECENCY =
         " ORDER BY wikiarticles.recency DESC";
 
-    //Private method
+    // Private method
     private List<WikiArticle> getWikiArticlesByQuery(String query) throws DatabaseException {
         ArrayList<WikiArticle> result = new ArrayList<>();
         Statement stmt = null;

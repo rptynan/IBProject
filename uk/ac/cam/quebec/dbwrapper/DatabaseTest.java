@@ -25,7 +25,7 @@ public class DatabaseTest {
      *
      */
     public static void main(String[] args) {
-        Database.setCredentials("ibproject", null,
+        Database.setCredentials("ibproject", "ibprojectpassword",
                 "jdbc:mysql://localhost:3306/ibprojectdb", true);
         // By seperating the set credentials call from the tests we can invoke the
         // tests from elsewhere
@@ -91,6 +91,31 @@ public class DatabaseTest {
                     + " " + t.getPriority() + " " + t.getProcessCount()
                     + " " + t.getId());
         }
+        // Sorting test
+        try{
+            t1 = new Trend("SortTest1", "Ireland", 13);
+            t1.setPopularity(3);
+            System.out.println("*Wait a few seconds, then press enter*");
+            System.in.read();
+            t2 = new Trend("SortTest2", "Ireland", 12);
+            t2.setPopularity(4);
+            db1.putTrend(t1);
+            db1.putTrend(t2);
+            trendList1 = db2.getTrendsByPopularity("Ireland");
+            trendList2 = db2.getTrendsByRecency("Ireland");
+        }
+        catch (Exception exp) {
+            exp.printStackTrace();
+        }
+        System.out.println("Trends should be in descending order of popularity (number):");
+        for (Trend t : trendList1) {
+            System.out.println(t.getName() + " " + t.getPopularity());
+        }
+        System.out.println("Trends should be in descending order of recency (number):");
+        for (Trend t : trendList2) {
+            System.out.println(t.getName() + " " + t.getRecency());
+        }
+
 
         // putTweets(), getTweets()
         System.out.println("\n==> Testing Tweets");
@@ -178,15 +203,15 @@ public class DatabaseTest {
         } catch (DatabaseException exp) {
             exp.printStackTrace();
         }
-        System.out.println("Trends should be in descending order of popularity (number):");
+        System.out.println("Articles should be in descending order of popularity (number):");
         for (WikiArticle wk : wikiList1) {
             System.out.println(wk.getTitle() + " " + wk.getPopularity());
         }
-        System.out.println("Trends should be in descending order of controversy (number):");
+        System.out.println("Articles should be in descending order of controversy (number):");
         for (WikiArticle wk : wikiList2) {
             System.out.println(wk.getTitle() + " " + wk.getControversy());
         }
-        System.out.println("Trends should be in descending order of recency (number):");
+        System.out.println("Articles should be in descending order of recency (number):");
         for (WikiArticle wk : wikiList3) {
             System.out.println(wk.getTitle() + " " + wk.getRecency());
         }

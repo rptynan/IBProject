@@ -89,6 +89,26 @@ public abstract class Database {
     public abstract List<Trend> getTrends(String location) throws DatabaseException;
 
     /**
+     * Gets a list of all the trends in the Database for a specific location,
+     * ordered by descending popularity.
+     *
+     * @param location  a location string
+     *
+     * @return a list of Trend objects from the database
+     */
+    public abstract List<Trend> getTrendsByPopularity(String location) throws DatabaseException;
+
+    /**
+     * Gets a list of all the trends in the Database for a specific location,
+     * ordered by descending recency.
+     *
+     * @param location  a location string
+     *
+     * @return a list of Trend objects from the database
+     */
+    public abstract List<Trend> getTrendsByRecency(String location) throws DatabaseException;
+
+    /**
      * Stores a list of tweets with reference to the given Trend.
      *
      * @param tweets    a list of jtwitter Status objects, representing the
