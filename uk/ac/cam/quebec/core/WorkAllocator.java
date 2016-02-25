@@ -22,7 +22,7 @@ public class WorkAllocator {
 
     private final PriorityBlockingQueue<TaskInterface> TweetQueue;
     private final PriorityBlockingQueue<TaskInterface> WikiQueue;
-    private final PriorityBlockingQueue<TaskInterface> TrendTaskQueue;
+    private final PriorityBlockingQueue<TaskInterface> TrendQueue;
     private final PriorityBlockingQueue<TaskInterface> CoreQueue;
     private final Queue<Worker> ThreadQueue;
     private final List<Thread> ThreadPool;
@@ -30,18 +30,18 @@ public class WorkAllocator {
     private final Semaphore taskCount = new Semaphore(0);
     private final WorkerInterface parent;
 
-    WorkAllocator(PriorityBlockingQueue<Worker> _ThreadQueue, List<Thread> _ThreadPool,WorkerInterface _parent) {
+    WorkAllocator(PriorityBlockingQueue<Worker> _ThreadQueue, List<Thread> _ThreadPool, WorkerInterface _parent) {
         WikiQueue = new MyPriorityBlockingQueue<>(taskCount);
         ThreadQueue = _ThreadQueue;
         ThreadPool = _ThreadPool;
         TweetQueue = new MyPriorityBlockingQueue<>(taskCount);
         CoreQueue = new MyPriorityBlockingQueue<>(taskCount);
-        TrendTaskQueue = new MyPriorityBlockingQueue<>(taskCount);
+        TrendQueue = new MyPriorityBlockingQueue<>(taskCount);
         parent = _parent;
     }
 
     public String getStatus() {
-        String s = "There are: " + TrendTaskQueue.size() + " trends, " + TweetQueue.size() + " tweets and " + WikiQueue.size() + " pages in the queue (" + waitingTasks() + " waiting tasks and " + taskCount.availablePermits() + " permits avaliable). There are currently " + ThreadQueue.size() + "/" + ThreadPool.size() + " idle threads. We have started " + startedTasks + " tasks.";
+        String s = "There are: " + TrendQueue.size() + " trends, " + TweetQueue.size() + " tweets and " + WikiQueue.size() + " pages in the queue (" + waitingTasks() + " waiting tasks and " + taskCount.availablePermits() + " permits avaliable). There are currently " + ThreadQueue.size() + "/" + ThreadPool.size() + " idle threads. We have started " + startedTasks + " tasks.";
         return s;
     }
 
@@ -51,7 +51,7 @@ public class WorkAllocator {
             return false;
         }
         TrendTask task = new TrendTask(t);
-        return TrendTaskQueue.add(task);
+        return TrendQueue.add(task);
     }
 
     public boolean putTask(Task t) {
@@ -64,7 +64,7 @@ public class WorkAllocator {
             case Wiki:
                 return WikiQueue.add(t.getTaskInterface());
             case Trend:
-                return TrendTaskQueue.add(t.getTaskInterface());
+                return TrendQueue.add(t.getTaskInterface());
             case Tweet:
                 return TweetQueue.add(t.getTaskInterface());
             case Core:
@@ -73,6 +73,7 @@ public class WorkAllocator {
                 return false;
         }
     }
+
     public boolean putTask(TaskInterface t) {
         if (t == null) {
             System.err.println("Attempted to add null task to queue");
@@ -83,7 +84,7 @@ public class WorkAllocator {
             case Wiki:
                 return WikiQueue.add(t);
             case Trend:
-                return TrendTaskQueue.add(t);
+                return TrendQueue.add(t);
             case Tweet:
                 return TweetQueue.add(t);
             case Core:
@@ -92,6 +93,7 @@ public class WorkAllocator {
                 return false;
         }
     }
+
     public Task getTask(TaskType preferredType) throws InterruptedException {
         int perm = taskCount.availablePermits();
         int tasks = waitingTasks();
@@ -110,7 +112,7 @@ public class WorkAllocator {
                 t = WikiQueue.poll();
                 break;
             case Trend:
-                t = TrendTaskQueue.poll();
+                t = TrendQueue.poll();
                 break;
             case Core:
                 t = CoreQueue.poll();
@@ -125,8 +127,8 @@ public class WorkAllocator {
             ret = new Task(t);
             return ret;
         }
-        if (!TrendTaskQueue.isEmpty()) {
-            t = TrendTaskQueue.poll();
+        if (!TrendQueue.isEmpty()) {
+            t = TrendQueue.poll();
             ret = new Task(t);
             return ret;
         }
@@ -150,7 +152,7 @@ public class WorkAllocator {
         int i = CoreQueue.size();
         i += TweetQueue.size();
         i += WikiQueue.size();
-        i += TrendTaskQueue.size();
+        i += TrendQueue.size();
         return i;
     }
 
@@ -162,29 +164,44 @@ public class WorkAllocator {
         if (i != 0) {
             int j = taskCount.drainPermits();
             int k = CoreQueue.size();
-            TrendTaskQueue.clear();
+            TrendQueue.clear();
             TweetQueue.clear();
             WikiQueue.clear();
             taskCount.release(k);//Don't want to clear the Core Queue tasks
         }
     }
-    private Collection<Thread> getRunningTasks()
-    {Collection<Thread> disjunction = CollectionUtils.disjunction(ThreadPool, ThreadQueue);
+
+    private Collection<Thread> getRunningTasks() {
+        Collection<Thread> disjunction = CollectionUtils.disjunction(ThreadPool, ThreadQueue);
         return disjunction;
     }
-    public void cleanRunningTasks()
-    {
+
+    public void cleanRunningTasks() {
         Collection<Thread> disjunction = getRunningTasks();
         Worker w;
-        for(Thread t: disjunction)
-        {
-            w = (Worker)t;
-            if(!w.hasTask())
-            {   System.err.println("Force reallocating worker: "+w);
+        for (Thread t : disjunction) {
+            w = (Worker) t;
+            if (!w.hasTask()) {
+                System.err.println("Force reallocating worker: " + w);
                 parent.reallocateWorker(w);
             }
         }
     }
+    /**
+     * Note not thread safe either
+     * @return true if null entries were removed from a collection
+     */
+    public boolean cleanQueues() {
+        boolean b = false;
+        b = b || CoreQueue.remove(null);
+        b = b || TweetQueue.remove(null);
+        b = b || TrendQueue.remove(null);
+        b = b || WikiQueue.remove(null);
+        b = b || ThreadQueue.remove(null);
+        b = b || ThreadPool.remove(null);
+        return b;
+    }
+
     public String getRunningTasksStatus() {
         String s = "";
         Collection<Thread> disjunction = getRunningTasks();

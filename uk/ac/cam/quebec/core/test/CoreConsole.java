@@ -95,7 +95,7 @@ public class CoreConsole extends Thread {
                 System.out.println("Core refresh complete");
                 break;
             case ClearWorkCommand:
-                System.out.println("Clearing all tasks");
+                System.out.println("Clearing all tasks - Note this command is unsafe");
                 coreInter.clearAllTasks();
                 break;
             case ListRunningWorkCommand:
@@ -124,6 +124,14 @@ public class CoreConsole extends Thread {
             case CleanRunningWorkCommand:
                 System.out.println("Cleaning running tasks");
                 coreInter.cleanRunningTasks();
+                break;
+            case CleanQueuedWorkCommand:
+                System.out.println("Cleaning queued tasks - Note this command is unsafe");
+                if (coreInter.cleanQueuedTasks()) {
+                    System.out.println("Cleaning successful, null tasks removed");
+                } else {
+                    System.out.println("Cleaning successful, no tasks removed");
+                }
                 break;
             default:
                 oldProcessCommand(command);

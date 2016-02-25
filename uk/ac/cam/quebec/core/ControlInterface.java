@@ -22,4 +22,5 @@ public interface ControlInterface {
     public void clearAllTasks();
     public void cleanRunningTasks();
     public String listRunningTasksStatus();
+    public boolean cleanQueuedTasks();
 }

@@ -37,7 +37,10 @@ public enum CoreConsoleCommand {
     ForceRefreshCommand("force refresh",""),
     ListRunningWorkCommand("list running work",""),
     ShowRunningWorkCommand("show running work",ListRunningWorkCommand),
+    ShowRunningTasksCommand("show running tasks",ListRunningWorkCommand),
+    ListRunningTasksCommand("list running tasks",ListRunningWorkCommand),
     CleanRunningWorkCommand("clean running work",""),
+    CleanQueuedWorkCommand("clean work queues",""),
     InvalidCommand("","(.*)");
     private final Pattern requestPattern;
     private final Pattern fullPattern;

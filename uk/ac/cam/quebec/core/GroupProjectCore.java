@@ -276,4 +276,9 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
     public void cleanRunningTasks() {
         workAllocator.cleanRunningTasks();
     }
+    @Override
+    public boolean cleanQueuedTasks()
+    {
+        return workAllocator.cleanQueues();
+    }
 }
