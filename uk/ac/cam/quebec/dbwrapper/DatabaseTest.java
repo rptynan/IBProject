@@ -169,10 +169,12 @@ public class DatabaseTest {
             System.out.println(wk.getTitle() + " " + wk.getRelevance());
         }
         // Sorting tests
+        WikiArticle a1 = null;
         try {
             wikiList1 = db2.getWikiArticlesByPopularity(t2);
             wikiList2 = db2.getWikiArticlesByControversy(t2);
             wikiList3 = db2.getWikiArticlesByRecency(t2);
+            a1 = db2.getWikiArticle(3174690);
         } catch (DatabaseException exp) {
             exp.printStackTrace();
         }
@@ -188,5 +190,7 @@ public class DatabaseTest {
         for (WikiArticle wk : wikiList3) {
             System.out.println(wk.getTitle() + " " + wk.getRecency());
         }
+        System.out.println("Should be the title for Larry");
+        System.out.println(a1.getTitle());
     }
 }

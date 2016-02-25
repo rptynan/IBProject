@@ -125,6 +125,14 @@ public abstract class Database {
      */
     public abstract void putWikiArticles(List<WikiArticle> articles, Trend trend)
         throws DatabaseException;
+    
+    /**
+     * Get a wikiArticle by its id
+     * @param articleID Wiki article id
+     * @return The article.
+     * @throws DatabaseException if something goes wrong
+     */
+    public abstract WikiArticle getWikiArticle(int articleID) throws DatabaseException;
 
     /**
      * Gets a list of wikipedia articles associated with the Trend specified by
