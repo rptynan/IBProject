@@ -26,6 +26,7 @@ public enum RequestType {
     // Sorting 1 = relevance, 2 = popularity, 3 = recency, 4 = controversy
     ArticlesRequest("Articles","id=(\\d+)&sorting=(\\d+)(.)*"),
     TweetsRequest("Tweets","id=(\\d+)(.)*"),
+    EditsRequest("Edits","id=(\\d+)(.)*"),
     CustomTrendRequest("Custom","trend=(.*)");
     private final Pattern requestPattern;
     private final Pattern fullPattern;

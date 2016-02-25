@@ -150,9 +150,39 @@ public class TwitterProcessor {
             return;
         }
 
-        List<List<String>> tweetsSplitted = filter(removeDuplicates(tweetsBatch));
+        List<String> unique = removeDuplicates(tweetsBatch);
+        List<List<String>> tweetsSplitted = filter(unique);
         tweetsSplitted = hashTagConcepts(trend, tweetsSplitted);
-        wordConcepts(trend, tweetsSplitted);
+        List<Pair<String, Integer>> wordConcepts = wordConcepts(trend, tweetsSplitted);
+
+        for (int i = 0; i < wordConcepts.size(); i++) {
+            String conceptText = wordConcepts.get(i).getKey();
+            int conceptCount = wordConcepts.get(i).getValue();
+            int count = 0;
+            for (String tweet : unique) {
+        	if (tweet.toLowerCase().contains(conceptText.toLowerCase())) {
+        	    count++;
+        	}
+            }
+            wordConcepts.set(i, new Pair<String, Integer>(conceptText,
+        	    Integer.max(conceptCount, count)));
+        }
+
+        Collections.sort(wordConcepts, new Comparator<Pair<String, Integer>>() {
+            @Override
+            public int compare(Pair<String, Integer> o1, Pair<String, Integer> o2) {
+                // sort them such that o2 comes before o1 if o2 > o1, otherwise sort
+                return o2.getValue().compareTo(o1.getValue());
+            }
+        });
+
+        for (int i = 0; i < wordConcepts.size(); i++) {
+	    Pair<String, Integer> concept = wordConcepts.get(i);
+	    if (i < 5 || 100 * concept.getValue() >=
+		    CONCEPT_THRESHOLD_PERCENTAGE * unique.size()) {
+		trend.addConcept(concept);
+	    }
+	}
     }
 
     /**
@@ -204,7 +234,8 @@ public class TwitterProcessor {
      * @param trend
      * @param tweets
      */
-    private static void wordConcepts(Trend trend, List<List<String>> tweets) {
+    private static List<Pair<String, Integer>> wordConcepts(Trend trend,
+	    List<List<String>> tweets) {
 	if (DEBUG) {
 	    System.out.println(" ~~~~ Tweets on which we run the concepts extractor ~~~~ ");
 	    for (List<String> tweet : tweets) {
@@ -227,7 +258,7 @@ public class TwitterProcessor {
 	HashSet<String> removeFromSingleWordConcepts = new HashSet<String>();
 
 	if (orderedBiGrams == null && orderedWords == null) {
-	    return;
+	    return concepts;
 	}
 
 	if (orderedBiGrams != null) {
@@ -257,21 +288,7 @@ public class TwitterProcessor {
 	    }
 	}
 
-	Collections.sort(concepts, new Comparator<Pair<String, Integer>>() {
-            @Override
-            public int compare(Pair<String, Integer> o1, Pair<String, Integer> o2) {
-                // sort them such that o2 comes before o1 if o2 > o1, otherwise sort
-                return o2.getValue().compareTo(o1.getValue());
-            }
-        });
-
-	for (int i = 0; i < concepts.size(); i++) {
-	    Pair<String, Integer> concept = concepts.get(i);
-	    if (i < 5 || 100 * concept.getValue() >=
-		    CONCEPT_THRESHOLD_PERCENTAGE * tweets.size()) {
-		trend.addConcept(concept);
-	    }
-	}
+	return concepts;
     }
 
     /**
