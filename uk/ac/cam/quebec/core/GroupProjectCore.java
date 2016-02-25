@@ -221,13 +221,13 @@ public class GroupProjectCore extends Thread implements TrendsQueue, ControlInte
     }
 
     @Override
-    public boolean addTasks(Collection<Task> t) {
+    public boolean addTasks(Collection<TaskInterface> t) {
         boolean b0 = true;
         if (t == null) {
             return b0;
         }
 
-        for (Task task : t) {
+        for (TaskInterface task : t) {
             b0 = b0 && workAllocator.putTask(task);
         }
         return b0;

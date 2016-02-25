@@ -18,7 +18,7 @@ public abstract class GenericTask implements TaskInterface{
         type = _type;
     }
     @Override
-    public abstract Collection<Task> process();
+    public abstract Collection<TaskInterface> process();
     
     @Override
     public abstract int getPriority();

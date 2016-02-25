@@ -15,7 +15,7 @@ public interface TaskInterface extends Comparable<TaskInterface>{
     /*
     This method should execute the tasks that you want to complete
     */
-    public Collection<Task> process();
+    public Collection<TaskInterface> process();
     /*
     This method should return the task's getPriority
     */

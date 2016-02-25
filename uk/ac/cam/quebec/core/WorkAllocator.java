@@ -73,7 +73,25 @@ public class WorkAllocator {
                 return false;
         }
     }
-
+    public boolean putTask(TaskInterface t) {
+        if (t == null) {
+            System.err.println("Attempted to add null task to queue");
+            return false;
+        }
+        TaskType type = t.getType();
+        switch (type) {
+            case Wiki:
+                return WikiQueue.add(t);
+            case Trend:
+                return TrendTaskQueue.add(t);
+            case Tweet:
+                return TweetQueue.add(t);
+            case Core:
+                return CoreQueue.add(t);
+            default:
+                return false;
+        }
+    }
     public Task getTask(TaskType preferredType) throws InterruptedException {
         int perm = taskCount.availablePermits();
         int tasks = waitingTasks();

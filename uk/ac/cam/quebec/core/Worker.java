@@ -82,7 +82,7 @@ public class Worker extends Thread implements Comparable{
         {
         try {
             currentTask = o.take();
-            Collection<Task> process = currentTask.getTaskInterface().process();
+            Collection<TaskInterface> process = currentTask.getTaskInterface().process();
             boolean addTask = parent.addTasks(process);
             if(!addTask)
             {

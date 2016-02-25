@@ -31,7 +31,7 @@ public class Task implements TaskInterface{
     {
         return taskInterface.getType().name() +" : "+taskInterface.toString();
     }
-    public Collection<Task> process()
+    public Collection<TaskInterface> process()
     {
         return taskInterface.process();
     }

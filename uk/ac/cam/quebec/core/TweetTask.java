@@ -29,7 +29,7 @@ public class TweetTask extends GenericTask{
     }
 
     @Override
-    public Collection<Task> process() {
+    public Collection<TaskInterface> process() {
         System.out.println("Tweet task called for trend: "+trend.getParsedName());
        
        return null;

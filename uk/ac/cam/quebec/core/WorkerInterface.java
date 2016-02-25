@@ -14,7 +14,7 @@ import java.util.Collection;
 public interface WorkerInterface {
 
     public boolean addTask(Task t);
-    public boolean addTasks(Collection<Task> t);
+    public boolean addTasks(Collection<TaskInterface> t);
     public void reallocateWorker(Worker aThis);
     
 }

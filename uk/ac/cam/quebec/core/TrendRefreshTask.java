@@ -31,9 +31,9 @@ public class TrendRefreshTask extends GenericTask {
     }
 
     @Override
-    public Collection<Task> process() {
+    public Collection<TaskInterface> process() {
 
-        ArrayList<Task> ret = new ArrayList<>();
+        ArrayList<TaskInterface> ret = new ArrayList<>();
         Task t = new Task(this);
         thisThread = Thread.currentThread();
         try {

@@ -25,7 +25,7 @@ public class WikiTask extends GenericTask{
       return trend.getPriority();
     }
     @Override
-    public Collection<Task> process() {
+    public Collection<TaskInterface> process() {
        WikiProcessor wp = new WikiProcessor();
        wp.process(trend);
        return null;
