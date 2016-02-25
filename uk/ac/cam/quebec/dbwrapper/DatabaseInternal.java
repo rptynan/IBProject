@@ -101,7 +101,7 @@ class DatabaseInternal extends Database {
             // trends
             stmt.execute("CREATE TABLE IF NOT EXISTS trends ("
                     + "name VARCHAR(60) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_general_ci' NOT NULL,"
-                    + "location VARCHAR(60) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_general_ci',"
+                    + "location VARCHAR(80) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_general_ci',"
                     + "updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,"
                     + "object MEDIUMBLOB NOT NULL,"
                     + "trend_id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY) CHARACTER SET 'utf8mb4'");
@@ -109,7 +109,7 @@ class DatabaseInternal extends Database {
             // tweets
             stmt.execute("CREATE TABLE IF NOT EXISTS tweets ("
                     + "content VARCHAR(200) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_general_ci' NOT NULL,"
-                    + "location VARCHAR(60) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_general_ci',"
+                    + "location VARCHAR(80) CHARACTER SET 'utf8mb4' COLLATE 'utf8mb4_general_ci',"
                     + "updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,"
                     + "object MEDIUMBLOB NOT NULL,"
                     + "trend_id INT UNSIGNED NOT NULL,"
