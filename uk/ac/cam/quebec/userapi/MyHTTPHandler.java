@@ -59,6 +59,9 @@ public class MyHTTPHandler  implements HttpHandler{
         case TweetsRequest:
             s = parent.getTweetsAsString(Integer.parseInt(m.group(1)),"Popularity",15);
             break;
+        case EditsRequest:
+            s = parent.getEditsAsString(Integer.parseInt(m.group(1)),15);
+            break;    
         case CustomTrendRequest:
             if(parent.addTrend(m.group(1))){
                 s = "1";
