@@ -118,9 +118,11 @@ public class NewAPIServer extends APIServerAbstract {
         }
     }
 
-    public String getTrendsAsString(String location, String sorting, int max) {
+    public String getTrendsAsString(String location, int sorting, int max) {
         try {
-            List<Trend> trendList = DB.getTrends(location);
+            List<Trend> trendList;
+            if (sorting == 1) trendList = DB.getTrendsByPopularity(location);
+            else trendList = DB.getTrendsByRecency(location);
             // flag
             boolean itemAdded = false;
             String result = "[";

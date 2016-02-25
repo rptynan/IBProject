@@ -22,7 +22,8 @@ public enum RequestType {
     TestRequest2("stuff","(.)*"),
     DefaultRequest("", "(.)*"),
     InvalidRequest("inv", "(.)*"),
-    TrendsRequest("Trends","location=([a-zA-Z]*)(.)*"),
+    //Sorting 1 = popularity 2 = recency
+    TrendsRequest("Trends","location=([a-zA-Z]*)&sorting=(\\d+)(.)*"),
     // Sorting 1 = relevance, 2 = popularity, 3 = recency, 4 = controversy
     ArticlesRequest("Articles","id=(\\d+)&sorting=(\\d+)(.)*"),
     TweetsRequest("Tweets","id=(\\d+)(.)*"),
