@@ -159,7 +159,7 @@ public class WorkAllocator {
     /**
      * Note not thread safe, for testing only
      */
-    public void clearAllTasks() {
+    public synchronized void clearAllTasks() {
         int i = taskCount.availablePermits();
         if (i != 0) {
             int j = taskCount.drainPermits();
@@ -187,11 +187,14 @@ public class WorkAllocator {
             }
         }
     }
+
     /**
      * Note not thread safe either
+     *
      * @return true if null entries were removed from a collection
      */
-    public boolean cleanQueues() {
+    public synchronized boolean cleanQueues() {
+
         boolean b = false;
         b = b || CoreQueue.remove(null);
         b = b || TweetQueue.remove(null);
@@ -200,6 +203,22 @@ public class WorkAllocator {
         b = b || ThreadQueue.remove(null);
         b = b || ThreadPool.remove(null);
         return b;
+
+    }
+
+    /**
+     * Not thread safe
+     * @return true if the number of permits needed changing
+     */
+    public synchronized boolean reconcilePermits() {
+        int tasks =waitingTasks(); 
+        if (tasks == taskCount.availablePermits()) {
+            return false;
+        } else {
+            taskCount.drainPermits();
+            taskCount.release(waitingTasks());
+            return true;
+        }
     }
 
     public String getRunningTasksStatus() {
