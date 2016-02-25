@@ -296,5 +296,4 @@ public class CoreConsole extends Thread {
             System.err.println(ex);
         }
     }
-
 }

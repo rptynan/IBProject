@@ -20,6 +20,7 @@ public enum CoreConsoleCommand {
     StartCommand("start", ""),
     ExitCommand("exit",""),
     CloseCommand("close",ExitCommand),
+    StopCommand("stop",ExitCommand),
     StatusCommand("status", ""),
     TwitterTestCommand("test twitter", ""),
     WikiProcTestCommand("test wikiproc",""),
@@ -34,13 +35,18 @@ public enum CoreConsoleCommand {
     HelpCommand("help","(?<Command>\\w+)?"),
     CheckStyleCommand("check style",""),
     ClearWorkCommand("clear work",""),
+    ClearTasksCommand("clear tasks",ClearWorkCommand),
     ForceRefreshCommand("force refresh",""),
     ListRunningWorkCommand("list running work",""),
     ShowRunningWorkCommand("show running work",ListRunningWorkCommand),
     ShowRunningTasksCommand("show running tasks",ListRunningWorkCommand),
     ListRunningTasksCommand("list running tasks",ListRunningWorkCommand),
     CleanRunningWorkCommand("clean running work",""),
-    CleanQueuedWorkCommand("clean work queues",""),
+    CleanRunningTasksCommand("clean running tasks",CleanRunningWorkCommand),
+    CleanQueuedWorkCommand("clean queued work",""),
+    CleanQueuedTasksCommand("clean queued tasks",CleanQueuedWorkCommand),
+    CleanTaskQueuesCommand("clean task queues",CleanQueuedWorkCommand),
+    CleanWorkQueuesCommand("clean work queues",CleanQueuedWorkCommand),
     InvalidCommand("","(.*)");
     private final Pattern requestPattern;
     private final Pattern fullPattern;
