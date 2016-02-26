@@ -36,7 +36,7 @@ $(document).ready(function(){
 	// Handle the input of custom trends
 	$("#form").on('submit', function (e) {
 		e.preventDefault();
-		// Can't send spaces through the request
+		// Can't send spaces or # through the request
 		var content = $("#input").val().replace(/\s+/g, '');
 		content = content.replace("#","");
 	
@@ -53,10 +53,7 @@ $(document).ready(function(){
 	// Handle startup or a selection of a new location
 	var updateTrends = function(){
 		$.get("TwikfeedServlet?Type=Trends&location=" + location + "&sorting=" + trendSorting).done(function(data, textStatus) {
-		
-	
 			trendList = $.parseJSON(data);
-		
 			tL.empty();
 			var i;
 			for(i=0; i < trendList.length; i++){
@@ -66,28 +63,9 @@ $(document).ready(function(){
 		
 	}
 	
-	var updatePagesInner = function(){
-		// Call to load articles
-		$.get("TwikfeedServlet?Type=Articles&id="+trendObject.id + "&sorting=" + pageSorting).done(function(data, textStatus) {
-
-
-			pageList = $.parseJSON(data);
-			pL.empty();
-			tH.html(cTrend.find("a").html());
-	
-		
-			var i;
-			for(i=0; i < pageList.length; i++){
-				pL.append("<li><a href=\"#\">" + pageList[i].title + "</a></li>");
-			}
-		}, "text");
-	}
-	
-	var updateTweets = function(){
+		var updateTweets = function(){
 		// Call to load tweets
 		$.get("TwikfeedServlet?Type=Tweets&id="+trendObject.id).done(function(data, textStatus) {
-
-
 			tweetList = $.parseJSON(data);
 			twH.html(trendObject.name + " Tweets");
 			twL.empty();
@@ -100,11 +78,26 @@ $(document).ready(function(){
 		}, "text");
 	}
 	
+	// Inner just makes the request to update pages
+	var updatePagesInner = function(){
+		// Call to load articles
+		$.get("TwikfeedServlet?Type=Articles&id="+trendObject.id + "&sorting=" + pageSorting).done(function(data, textStatus) {
+			pageList = $.parseJSON(data);
+			pL.empty();
+			// Set the trend header from the selected trend in the list
+			tH.html(cTrend.find("a").html());
+			var i;
+			for(i=0; i < pageList.length; i++){
+				pL.append("<li><a href=\"#\">" + pageList[i].title + "</a></li>");
+			}
+		}, "text");
+	}
 	
-	// Handle the selection of a trend
+
+	
+	
+	// Handle the selection of a trend and calls UpdatePagesInner
 	var updatePages = function(event){
-		
-		
 		cTrend = $(event.target).parent();
 		if (cTrend[0].nodeName == "LI"){
 			pageIndex = -1;
@@ -144,8 +137,6 @@ $(document).ready(function(){
 			lPage = cPage;
 			// Now make call to update the edits
 			$.get("TwikfeedServlet?Type=Edits&id="+pageList[pageIndex].id).done(function(data, textStatus) {
-
-
 				editList = $.parseJSON(data);
 				eH.html(pageList[pageIndex].title + " Edit Comments");
 				eL.empty();
@@ -193,6 +184,8 @@ $(document).ready(function(){
 		updateTrends();
 		
 	});
+	
+	//Handlers for the refresh buttons
 	$("#trendRefresh").click(function(){
 		updateTrends();
 	});
@@ -220,6 +213,8 @@ $(document).ready(function(){
 		pageSorting = 4;
 		if (trendObject !== null) updatePagesInner();
 	});
+	
+	// Select the sorting method for the trends
 	$("#trendPopularity").click(function(){
 		trendSorting = 1;
 		updateTrends();
