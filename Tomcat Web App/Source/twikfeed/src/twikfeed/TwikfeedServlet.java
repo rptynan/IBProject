@@ -62,7 +62,7 @@ public class TwikfeedServlet extends HttpServlet {
             BufferedReader r = null;
             try {
                 r = new BufferedReader(new InputStreamReader(new URL(
-                        "http://localhost:90/" + serverAddress).openStream()));
+                        "http://localhost:90/" + serverAddress).openStream(),"UTF-8"));
             } catch (IOException e) {
 
                 e.printStackTrace();
@@ -77,7 +77,6 @@ public class TwikfeedServlet extends HttpServlet {
             } finally {
                 r.close();
             }
-            System.out.println(sb.toString());
 
             response.getWriter().println(sb.toString());
         } else
