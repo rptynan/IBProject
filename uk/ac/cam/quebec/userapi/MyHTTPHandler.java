@@ -80,7 +80,8 @@ public class MyHTTPHandler  implements HttpHandler{
     }
     private static void sendMessage(String message,HttpExchange he) throws IOException
     {
-        
+
+        he.getResponseHeaders().set("Content-Type", "text/html; charset=UTF-8");
         he.sendResponseHeaders(200, message.getBytes().length);
             OutputStream os = he.getResponseBody();
             os.write(message.getBytes());
