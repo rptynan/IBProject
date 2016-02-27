@@ -78,9 +78,14 @@ body {
   background-color: #428bca;
 }
 
-/* Trying to make buttons all fit inline TODO */
+/* Trying to make buttons all fit inline */
 .nav-sidebar > .btn-group-sm > .btn {
   padding: 5px 3px;
+}
+
+/* Wrap long trend titles on right sidebar */
+#trendHeading {
+  word-wrap: break-word;
 }
 
 /*
@@ -104,12 +109,14 @@ html, body, div.container-fluid, div.row, .main {
   min-height: 100%;
 }
 
+/* Tweets and Edits lists styled nicely */
 .niceList {
   list-style-type: none;
   list-style-position:inside;
 }
 
 .niceList li {
+  word-wrap: break-word;
   border-style: solid;
   border-width: 2px;
   border-color: #f5f5f5;
