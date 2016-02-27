@@ -67,11 +67,11 @@ $(document).ready(function(){
 		// Call to load tweets
 		$.get("TwikfeedServlet?Type=Tweets&id="+trendObject.id).done(function(data, textStatus) {
 			tweetList = $.parseJSON(data);
-			twH.html(trendObject.name + " Tweets");
+			twH.html("<strong>" + trendObject.name + " </strong><small>Tweets</small>");
 			twL.empty();
 			var i;
 			for(i=0; i < tweetList.length; i++){
-				twL.append("<li>" + tweetList[i].content + "<br>" + tweetList[i].time + "</li>");
+				twL.append("<li>" + tweetList[i].content + "<br> <small>" + tweetList[i].time + "</small> </li> <br>");
 			}
 			
 			
@@ -138,11 +138,11 @@ $(document).ready(function(){
 			// Now make call to update the edits
 			$.get("TwikfeedServlet?Type=Edits&id="+pageList[pageIndex].id).done(function(data, textStatus) {
 				editList = $.parseJSON(data);
-				eH.html(pageList[pageIndex].title + " Edit Comments");
+				eH.html("<strong>" + pageList[pageIndex].title + " </strong><small>Edit Comments</small>");
 				eL.empty();
 				var i;
 				for(i=0; i < editList.length; i++){
-					eL.append("<li>" + editList[i].comment + "<br>" + editList[i].time + "</li>");
+					eL.append("<li>" + editList[i].comment + "<br> <small>" + editList[i].time + "</small> </li> <br>");
 				}
 				
 				

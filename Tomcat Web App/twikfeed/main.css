@@ -39,17 +39,17 @@ body {
  */
 
 .sidebar {
-    position: fixed;
-    top: 51px;
-    bottom: 0;
-    left: 0;
-    z-index: 1000;
-    display: block;
-    padding: 20px;
-    overflow-x: hidden;
-    overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
-    background-color: #f5f5f5;
-    border-right: 1px solid #eee;
+  position: fixed;
+  top: 51px;
+  bottom: 0;
+  left: 0;
+  z-index: 1000;
+  display: block;
+  padding: 20px;
+  overflow-x: hidden;
+  overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
+  background-color: #f5f5f5;
+  border-right: 1px solid #eee;
 }
 
 /* Sidebar navigation */
@@ -80,7 +80,7 @@ body {
 
 /* Trying to make buttons all fit inline TODO */
 .nav-sidebar > .btn-group-sm > .btn {
-    padding: 5px 3px;
+  padding: 5px 3px;
 }
 
 /*
@@ -104,7 +104,15 @@ html, body, div.container-fluid, div.row, .main {
   min-height: 100%;
 }
 
-.niceList{
-	list-style-type: none;
-    list-style-position:inside;
+.niceList {
+  list-style-type: none;
+  list-style-position:inside;
+}
+
+.niceList li {
+  border-style: solid;
+  border-width: 2px;
+  border-color: #f5f5f5;
+  border-radius: 10px;
+  padding: 0.5em;
 }
