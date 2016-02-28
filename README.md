@@ -2,7 +2,9 @@
 
 ## Running the project
 
-To run the core ensure you have your config file set up correctly (such as the port being 90 and locations being World, UK, Ireland, USA and Australia) and call java -Dfile.encoding=UTF-8 -jar build270216.jar config.xml. Then run the Tomcat server and you're done.
+To run the core ensure you have your config file set up correctly (such as the port being 90 and locations being
+ World, UK, Ireland, USA and Australia) and call java -Dfile.encoding=UTF-8 -jar build270216.jar config.xml. 
+ Then run the Tomcat server and you're done.
 
 ## Setting up Tomcat
 
