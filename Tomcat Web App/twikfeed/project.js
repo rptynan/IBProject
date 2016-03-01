@@ -26,7 +26,7 @@ $(document).ready(function(){
 	var pageIndex = -1;
 	var lTrend;
 	var lPage;
-	var location = "World";
+	var location = "UK";
 	var pageSorting = 1;
 	var trendSorting = 1;
 	var trendObject = null;
@@ -148,6 +148,14 @@ $(document).ready(function(){
 				
 			}, "text");
 			
+		}
+
+        // Switch to article view if not on it
+		if(cState != "Wikipedia"){
+			wF.show();
+			eD.hide();
+			tD.hide();
+			cState = "Wikipedia";
 		}
 	}
 	// Handle changes between the views
